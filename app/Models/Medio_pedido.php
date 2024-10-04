@@ -16,4 +16,7 @@ class Medio_pedido extends Model
         'estatus_medio_pedido'
     ];
     public $timestamps=false;
+    public function pedido(){
+        return $this->hasMany(Pedido::class, 'medio_pedido_fk');
+    }
 }

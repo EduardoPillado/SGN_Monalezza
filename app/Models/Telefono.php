@@ -16,4 +16,7 @@ class Telefono extends Model
         'estatus_telefono'
     ];
     public $timestamps=false;
+    public function cliente(){
+        return $this->hasMany(Cliente::class, 'telefono_fk');
+    }
 }

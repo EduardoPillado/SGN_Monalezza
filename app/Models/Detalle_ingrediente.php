@@ -17,4 +17,10 @@ class Detalle_ingrediente extends Model
         'cantidad_usada'
     ];
     public $timestamps=false;
+    public function producto(){
+        return $this->belongsTo(Producto::class, 'producto_fk');
+    }
+    public function ingrediente(){
+        return $this->belongsTo(Ingrediente::class, 'ingrediente_fk');
+    }
 }

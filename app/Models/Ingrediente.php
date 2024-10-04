@@ -19,4 +19,13 @@ class Ingrediente extends Model
         'estatus_ingrediente'
     ];
     public $timestamps=false;
+    public function detalle_ingrediente(){
+        return $this->hasMany(Detalle_ingrediente::class, 'ingrediente_fk');
+    }
+    public function inventario(){
+        return $this->hasMany(Inventario::class, 'ingrediente_fk');
+    }
+    public function productos() {
+        return $this->belongsToMany(Producto::class, 'producto_ingrediente', 'ingrediente_fk', 'producto_fk');
+    }
 }

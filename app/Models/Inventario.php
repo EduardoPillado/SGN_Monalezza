@@ -14,7 +14,14 @@ class Inventario extends Model
     protected $fillable = [
         'ingrediente_fk',
         'fecha_inventario',
-        'cantidad_inventario'
+        'cantidad_inventario',
+        'gasto_fk'
     ];
     public $timestamps=false;
+    public function ingrediente(){
+        return $this->belongsTo(Ingrediente::class, 'ingrediente_fk');
+    }
+    public function gasto(){
+        return $this->belongsTo(Gasto::class, 'gasto_fk');
+    }
 }

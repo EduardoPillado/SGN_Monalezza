@@ -16,4 +16,7 @@ class Rol extends Model
         'permisos'
     ];
     public $timestamps=false;
+    public function usuario(){
+        return $this->hasMany(Usuario::class, 'rol_fk');
+    }
 }

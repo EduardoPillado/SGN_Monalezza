@@ -16,4 +16,7 @@ class Tipo_producto extends Model
         'estatus_tipo_producto'
     ];
     public $timestamps=false;
+    public function producto(){
+        return $this->hasMany(Producto::class, 'tipo_producto_fk');
+    }
 }

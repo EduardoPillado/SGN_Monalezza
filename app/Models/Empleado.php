@@ -17,4 +17,16 @@ class Empleado extends Model
         'estatus_empleado'
     ];
     public $timestamps=false;
+    public function asistencia(){
+        return $this->hasMany(Asistencia::class, 'empleado_fk');
+    }
+    public function pedido(){
+        return $this->hasMany(Pedido::class, 'empleado_fk');
+    }
+    public function nomina(){
+        return $this->hasMany(Nomina::class, 'empleado_fk');
+    }
+    public function usuario(){
+        return $this->belongsTo(Usuario::class, 'usuario_fk');
+    }
 }

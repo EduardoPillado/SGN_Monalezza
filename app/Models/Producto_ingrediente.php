@@ -16,4 +16,10 @@ class Producto_ingrediente extends Model
         'ingrediente_fk'
     ];
     public $timestamps=false;
+    public function producto(){
+        return $this->belongsTo(Producto::class, 'producto_fk');
+    }
+    public function ingrediente(){
+        return $this->belongsTo(Ingrediente::class, 'ingrediente_fk');
+    }
 }

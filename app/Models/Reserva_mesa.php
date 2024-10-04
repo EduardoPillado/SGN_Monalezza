@@ -16,4 +16,10 @@ class Reserva_mesa extends Model
         'reserva_fk'
     ];
     public $timestamps=false;
+    public function mesa(){
+        return $this->belongsTo(Mesa::class, 'mesa_fk');
+    }
+    public function reserva(){
+        return $this->belongsTo(Reserva::class, 'reserva_fk');
+    }
 }

@@ -18,4 +18,10 @@ class Reserva extends Model
         'estatus_reserva'
     ];
     public $timestamps=false;
+    public function mesas() {
+        return $this->belongsToMany(Mesa::class, 'reserva_mesa', 'reserva_fk', 'mesa_fk');
+    }
+    public function cliente(){
+        return $this->belongsTo(Cliente::class, 'cliente_fk');
+    }
 }

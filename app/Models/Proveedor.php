@@ -16,4 +16,10 @@ class Proveedor extends Model
         'estatus_proveedor'
     ];
     public $timestamps=false;
+    public function producto(){
+        return $this->hasMany(Producto::class, 'proveedor_fk');
+    }
+    public function gasto(){
+        return $this->hasMany(Gasto::class, 'proveedor_fk');
+    }
 }

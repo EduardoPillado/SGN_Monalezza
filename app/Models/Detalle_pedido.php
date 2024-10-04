@@ -19,4 +19,13 @@ class Detalle_pedido extends Model
         'precio_unitario'
     ];
     public $timestamps=false;
+    public function pedido(){
+        return $this->belongsTo(Pedido::class, 'pedido_fk');
+    }
+    public function producto(){
+        return $this->belongsTo(Producto::class, 'producto_fk');
+    }
+    public function venta(){
+        return $this->belongsTo(Venta::class, 'venta_fk');
+    }
 }

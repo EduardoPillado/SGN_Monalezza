@@ -16,4 +16,7 @@ class Venta extends Model
         'monto_venta'
     ];
     public $timestamps=false;
+    public function detalle_pedido(){
+        return $this->hasMany(Detalle_pedido::class, 'venta_fk');
+    }
 }
