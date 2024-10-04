@@ -24,12 +24,12 @@
                     </button>
                 </div>
                 <ul>
-                    <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Inicio</a></li>
+                    <li class="mb-2"><a href="inicio.php" class="block p-2 hover:bg-gray-100 rounded">Inicio</a></li>
                     <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Ventas</a></li>
                     <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Inventario</a></li>
                     <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Reportes</a></li>
-                    <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Clientes</a></li>
-                    <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Empleados</a></li>
+                    <li class="mb-2"><a href="clientes.php" class="block p-2 hover:bg-gray-100 rounded">Clientes</a></li>
+                    <li class="mb-2"><a href="empleados.php" class="block p-2 hover:bg-gray-100 rounded">Empleados</a></li>
                     <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Realizar corte de caja</a></li>
                     <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Configuración del sistema</a></li>
 
