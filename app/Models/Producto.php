@@ -19,4 +19,19 @@ class Producto extends Model
         'estatus_producto'
     ];
     public $timestamps=false;
+    public function detalle_ingrediente(){
+        return $this->hasMany(Detalle_ingrediente::class, 'producto_fk');
+    }
+    public function detalle_pedido(){
+        return $this->hasMany(Detalle_pedido::class, 'producto_fk');
+    }
+    public function ingredientes() {
+        return $this->belongsToMany(Ingrediente::class, 'producto_ingrediente', 'producto_fk', 'ingrediente_fk');
+    }
+    public function tipo_producto(){
+        return $this->belongsTo(Tipo_producto::class, 'tipo_producto_fk');
+    }
+    public function proveedor(){
+        return $this->belongsTo(Proveedor::class, 'proveedor_fk');
+    }
 }

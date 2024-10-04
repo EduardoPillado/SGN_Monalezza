@@ -31,9 +31,9 @@ return new class extends Migration
                 ->references('empleado_pk')
                 ->on('empleado');
 
-            $table->foreign('medio_padido_fk')
-                ->references('medio_padido_pk')
-                ->on(table: 'medio_padido');
+            $table->foreign('medio_pedido_fk')
+                ->references('medio_pedido_pk')
+                ->on(table: 'medio_pedido');
 
             $table->foreign('tipo_pago_fk')
                 ->references('tipo_pago_pk')

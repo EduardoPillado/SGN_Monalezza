@@ -16,4 +16,7 @@ class Mesa extends Model
         'ubicacion'
     ];
     public $timestamps=false;
+    public function reservas() {
+        return $this->belongsToMany(Reserva::class, 'reserva_mesa', 'mesa_fk', 'reserva_fk');
+    }
 }

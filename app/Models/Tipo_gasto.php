@@ -16,4 +16,7 @@ class Tipo_gasto extends Model
         'estatus_tipo_gasto'
     ];
     public $timestamps=false;
+    public function gasto(){
+        return $this->hasMany(Gasto::class, 'tipo_gasto_fk');
+    }
 }

@@ -13,13 +13,18 @@ return new class extends Migration
     {
         Schema::create('inventario', function (Blueprint $table) {
             $table->id('inventario_pk')->autoIncrement();
-            $table->unsignedBigInteger('ingrediente_fk');
+            $table->unsignedBigInteger('ingrediente_fk')->nullable();
             $table->datetime('fecha_inventario');
             $table->decimal('cantidad_inventario');
+            $table->unsignedBigInteger('gasto_fk')->nullable();
 
             $table->foreign('ingrediente_fk')
                 ->references('ingrediente_pk')
                 ->on('ingrediente');
+
+            $table->foreign('gasto_fk')
+                ->references('gasto_pk')
+                ->on('gasto');
         });
     }
 

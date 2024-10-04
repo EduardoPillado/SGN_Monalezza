@@ -17,4 +17,16 @@ class Cliente extends Model
         'telefono_fk'
     ];
     public $timestamps=false;
+    public function pedido(){
+        return $this->hasMany(Pedido::class, 'cliente_fk');
+    }
+    public function reserva(){
+        return $this->hasMany(Reserva::class, 'cliente_fk');
+    }
+    public function domicilio(){
+        return $this->belongsTo(Domicilio::class, 'domicilio_fk');
+    }
+    public function telefono(){
+        return $this->belongsTo(Telefono::class, 'telefono_fk');
+    }
 }

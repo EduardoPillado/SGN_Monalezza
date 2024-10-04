@@ -19,4 +19,7 @@ class Domicilio extends Model
         'estatus_domicilio'
     ];
     public $timestamps=false;
+    public function cliente(){
+        return $this->hasMany(Cliente::class, 'domicilio_fk');
+    }
 }

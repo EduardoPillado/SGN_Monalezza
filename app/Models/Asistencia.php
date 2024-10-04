@@ -18,4 +18,7 @@ class Asistencia extends Model
         'hora_salida'
     ];
     public $timestamps=false;
+    public function empleado(){
+        return $this->belongsTo(Empleado::class, 'empleado_fk');
+    }
 }

@@ -16,4 +16,7 @@ class Tipo_pago extends Model
         'estatus_tipo_pago'
     ];
     public $timestamps=false;
+    public function pedido(){
+        return $this->hasMany(Pedido::class, 'tipo_pago_fk');
+    }
 }

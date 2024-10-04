@@ -20,4 +20,7 @@ class Nomina extends Model
         'salario_neto'
     ];
     public $timestamps=false;
+    public function empleado(){
+        return $this->belongsTo(Empleado::class, 'empleado_fk');
+    }
 }
