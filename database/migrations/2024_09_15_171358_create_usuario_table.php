@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nombre', 100);
             $table->unsignedBigInteger('rol_fk');
             $table->string('usuario', 50);
-            $table->string('contraseña', 20);
+            $table->string('contraseña', 255);
             $table->smallInteger('estatus_usuario');
 
             $table->foreign('rol_fk')
