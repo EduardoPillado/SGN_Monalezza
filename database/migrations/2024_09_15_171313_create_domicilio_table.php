@@ -17,7 +17,6 @@ return new class extends Migration
             $table->integer('numero_externo');
             $table->integer('numero_interno')->nullable();
             $table->text('referencias')->nullable();
-            $table->smallInteger('estatus_domicilio');
         });
     }
 

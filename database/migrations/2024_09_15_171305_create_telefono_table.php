@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('telefono', function (Blueprint $table) {
             $table->id('telefono_pk')->autoIncrement();
-            $table->integer('telefono');
-            $table->smallInteger('estatus_telefono');
+            $table->string('telefono', 15);
         });
     }
 

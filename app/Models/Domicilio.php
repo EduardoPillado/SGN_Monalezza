@@ -16,7 +16,6 @@ class Domicilio extends Model
         'numero_externo',
         'numero_interno',
         'referencias',
-        'estatus_domicilio'
     ];
     public $timestamps=false;
     public function cliente(){
