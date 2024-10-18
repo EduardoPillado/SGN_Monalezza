@@ -36,7 +36,8 @@ Route::get('/empleados', [Empleado_controller::class, 'mostrar'])->name('emplead
 Route::post('/registrandoEmpleado', [Empleado_controller::class, 'insertar'])->name('empleado.insertar');
 Route::get('/editarEmpleado/{empleado_pk}', [Empleado_controller::class, 'datosParaEdicion'])->name('empleado.datosParaEdicion');
 Route::put('/editandoEmpleado/{empleado_pk}', [Empleado_controller::class, 'actualizar'])->name('empleado.actualizar');
-Route::match(['get', 'put'], '/eliminandoEmpleado/{empleado_pk}', [Empleado_controller::class, 'baja'])->name('empleado.baja');
+Route::match(['get', 'put'], '/dandoDeBajaEmpleado/{empleado_pk}', [Empleado_controller::class, 'baja'])->name('empleado.baja');
+Route::match(['get', 'put'], '/dandoDeAltaEmpleado/{empleado_pk}', [Empleado_controller::class, 'alta'])->name('empleado.alta');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -46,7 +47,8 @@ Route::get('/clientes', [Cliente_controller::class, 'mostrar'])->name('cliente.m
 Route::post('/registrandoCliente', [Cliente_controller::class, 'insertar'])->name('cliente.insertar');
 Route::get('/editarCliente/{cliente_pk}', [Cliente_controller::class, 'datosParaEdicion'])->name('cliente.datosParaEdicion');
 Route::put('/editandoCliente/{cliente_pk}', [Cliente_controller::class, 'actualizar'])->name('cliente.actualizar');
-Route::match(['get', 'put'], '/eliminandoCliente/{cliente_pk}', [Cliente_controller::class, 'baja'])->name('cliente.baja');
+Route::match(['get', 'put'], '/dandoDeBajaCliente/{cliente_pk}', [Cliente_controller::class, 'baja'])->name('cliente.baja');
+Route::match(['get', 'put'], '/dandoDeAltaCliente/{cliente_pk}', [Cliente_controller::class, 'alta'])->name('cliente.alta');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

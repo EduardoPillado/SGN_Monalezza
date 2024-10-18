@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
 use App\Models\Empleado;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 
 class Empleado_controller extends Controller
 {
@@ -36,12 +34,11 @@ class Empleado_controller extends Controller
         $usuario->nombre=$req->nombre;
         $usuario->rol_fk=$req->rol_fk;
         $usuario->usuario=$req->usuario;
-        $hash = Hash::make($req->input('contraseña'));
+        $pass = $req->input('contraseña');
+        $hash = password_hash($pass, PASSWORD_DEFAULT, ['cost' => 10]);
         $usuario->contraseña=$hash;
         $usuario->estatus_usuario=1;
         $usuario->save();
-
-        $usuario->refresh();
 
         $empleado=new Empleado();
         
@@ -59,7 +56,7 @@ class Empleado_controller extends Controller
     }
 
     public function mostrar(){
-        $datosEmpleado = Empleado::where('estatus_empleado', '=', 1)->get();
+        $datosEmpleado = Empleado::all();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
             $rol = session('nombre_rol');
@@ -100,13 +97,40 @@ class Empleado_controller extends Controller
         }
     }
 
+    public function alta($empleado_pk){
+        $datosEmpleado = Empleado::findOrFail($empleado_pk);
+        $USUARIO_PK = session('usuario_pk');
+        if ($USUARIO_PK) {
+            $rol = session('nombre_rol');
+            if ($rol == 'Administrador') {
+                if ($datosEmpleado) {
+                    $datosEmpleado->estatus_empleado = 1;
+                    $datosEmpleado->save();
+
+                    if ($datosEmpleado->usuario_fk) {
+                        $usuario = Usuario::findOrFail($datosEmpleado->usuario_fk);
+                        $usuario->estatus_usuario = 1;
+                        $usuario->save();
+                    }
+                    return back()->with('success', 'Empleado dado de alta');
+                } else {
+                    return back()->with('error', 'Hay algún problema con la información');
+                }
+            } else {
+                return back()->with('message', 'No puedes acceder');
+            }
+        } else {
+            return redirect('/login');
+        }
+    }
+
     public function datosParaEdicion($empleado_pk){
         $datosEmpleado = Empleado::findOrFail($empleado_pk);
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
             $rol = session('nombre_rol');
             if ($rol == 'Administrador') {
-                return view('empleados', compact('datosEmpleado'));
+                return view('editarEmpleado', compact('datosEmpleado'));
             } else {
                 return back()->with('warning', 'No puedes acceder');
             }
@@ -116,55 +140,46 @@ class Empleado_controller extends Controller
     }
 
     public function actualizar(Request $req, $empleado_pk){
+        $datosEmpleado = Empleado::findOrFail($empleado_pk);
+        $usuario_pk = $datosEmpleado->usuario->usuario_pk;
+
         $req->validate([
-            'nombre' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:255', 'unique:usuario,nombre,' . $empleado_pk . ',empleado_pk'],
-            'usuario' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:255', 'unique:usuario,usuario,' . $empleado_pk . ',empleado_pk'],
-            'contraseña' => ['required', 'min:8', 'max:255', 'confirmed'],
+            'nombre' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:100', 'unique:usuario,nombre,' . $usuario_pk . ',usuario_pk'],
+            'usuario' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:usuario,usuario,' . $usuario_pk . ',usuario_pk'],
+            'contraseña' => ['nullable', 'min:8', 'max:255', 'confirmed'],
         ], [
-            'nombre.required' => 'El nombre del empleado es obligatorio.',
             'nombre.regex' => 'El nombre del empleado solo puede contener letras, números y espacios.',
             'nombre.max' => 'El nombre del empleado no puede tener más de :max caracteres.',
             'nombre.unique' => 'El nombre del empleado ya existe.',
 
-            'usuario.required' => 'El usuario es obligatorio.',
             'usuario.regex' => 'El usuario solo puede contener letras, números y espacios.',
             'usuario.max' => 'El usuario no puede tener más de :max caracteres.',
             'usuario.unique' => 'El usuario ya existe.',
 
-            'contraseña.required' => 'La contraseña es obligatoria.',
             'contraseña.max' => 'La contraseña no puede tener más de :max caracteres.',
             'contraseña.min' => 'La contraseña no puede tener menos de :min caracteres.',
             'contraseña.confirmed' => 'Las contraseñas ingresadas deben coincidir.',
         ]);
 
-        $datosEmpleado = Empleado::findOrFail($empleado_pk);
-
         $datosEmpleado->usuario->nombre=$req->nombre;
         $datosEmpleado->usuario->rol_fk=$req->rol_fk;
         $datosEmpleado->usuario->usuario=$req->usuario;
-        
-        $rules = [
-            'contraseña' => 'required',
-            'confirmar_contraseña' => 'required|same:contraseña',
-        ];
-        $validacion = Validator::make($req->all(), $rules);
-        if ($validacion->fails()) {
-            return back()->with('error', 'Las contraseñas no coinciden');
+
+        if (password_verify($req->contraseña, $datosEmpleado->usuario->contraseña)) {
+            return back()->withErrors(['contraseña' => 'La nueva contraseña no puede ser igual a la actual.'])->withInput();
         }
-
         $pass = $req->input('contraseña');
-        $hash = Hash::make($pass);
+        $hash = password_hash($pass, PASSWORD_DEFAULT, ['cost' => 10]);
         $datosEmpleado->usuario->contraseña=$hash;
-
-        $datosEmpleado->save();
         
         $datosEmpleado->usuario_fk=$datosEmpleado->usuario->usuario_pk;
         $datosEmpleado->fecha_contratacion=$req->fecha_contratacion;
 
+        $datosEmpleado->usuario->save();
         $datosEmpleado->save();
         
         if ($datosEmpleado->empleado_pk) {
-            return back()->with('success', 'Datos de empleado actualizados');
+            return redirect('/empleados')->with('success', 'Datos de empleado actualizados');
         } else {
             return back()->with('error', 'Hay algún problema con la información');
         }

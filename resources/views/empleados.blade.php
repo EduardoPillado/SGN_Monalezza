@@ -12,7 +12,6 @@
     sidebarOpen: false, 
     modalOpen: false,
     editModalOpen: false,
-    editingEmployee: null
 }">
 
     @php
@@ -28,7 +27,7 @@
         <div class="flex-grow overflow-y-auto p-4">
             <h1 class="text-2xl font-bold mb-4">Empleados</h1>
             <div class="bg-white shadow-md rounded-lg p-4">
-                <table class="w-full">
+                <table id="tabla-empleados" class="w-full">
                     <thead>
                         <tr class="border-b">
                             <th class="text-left py-2">Nombre</th>
@@ -53,7 +52,12 @@
                                 @endif
                                 <td class="text-right py-2">
                                     <a href="{{ route('empleado.datosParaEdicion', $dato->empleado_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
-                                    <a href="{{ route('empleado.baja', $dato->empleado_pk) }}" onclick="confirmarBaja(event)" class="bg-red-500 text-white px-2 py-1 rounded">Eliminar</a>
+
+                                    @if ($dato->estatus_empleado == 1 & $dato->usuario->estatus_usuario == 1)
+                                        <a href="{{ route('empleado.baja', $dato->empleado_pk) }}" onclick="confirmarBaja(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
+                                    @else
+                                        <a href="{{ route('empleado.alta', $dato->empleado_pk) }}" onclick="confirmarAlta(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -66,6 +70,25 @@
         </div>
 
         <script>
+            // Tabla con DataTable
+            $(document).ready(function () {
+                $('#tabla-empleados').DataTable({
+                    "language": {
+                    "search": "Buscar:",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    "zeroRecords": "Sin resultados",
+                    "lengthMenu": "Mostrar _MENU_ registros por página",
+                        "paginate": {
+                            "first": "Primero",
+                            "last": "Último",
+                            "next": "Siguiente",
+                            "previous": "Anterior"
+                        }
+                    }
+                });
+            });
+
+            // Alerta de confirmación de baja
             function confirmarBaja(event) {
                 event.preventDefault();
     
@@ -78,6 +101,28 @@
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, dar de baja',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = link.href;
+                        }
+                    });
+                }
+            }
+
+            // Alerta de confirmación de alta
+            function confirmarAlta(event) {
+                event.preventDefault();
+    
+                const link = event.target.closest('a');
+    
+                if (link) {
+                    Swal.fire({
+                        title: '¿Seguro?',
+                        text: '¿Deseas dar de alta a este empleado?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, dar de alta',
                         cancelButtonText: 'Cancelar',
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -155,7 +200,7 @@
         @endif
 
         <!-- Modal de edición de empleado -->
-        <div x-show="editModalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
+        {{-- <div x-show="editModalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Editar Empleado</h3>
@@ -204,7 +249,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 </body>
 </html>

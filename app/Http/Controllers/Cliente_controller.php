@@ -3,68 +3,78 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Usuario;
-use App\Models\Empleado;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Domicilio;
+use App\Models\Telefono;
+use App\Models\Cliente;
+use Illuminate\Validation\Rule;
 
 class Cliente_controller extends Controller
 {
     public function insertar(Request $req){
         $req->validate([
-            'nombre' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:255', 'unique:usuario,nombre'],
-            'usuario' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:255', 'unique:usuario,usuario'],
-            'contraseña' => ['required', 'min:8', 'max:255'],
+            'nombre_cliente' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:cliente,nombre_cliente'],
+            'calle' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50'],
+            'numero_externo' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/'],
+            'numero_interno' => ['nullable', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'unique:domicilio,numero_interno'],
+            'referencias' => ['nullable', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/'],
+            'telefono' => ['required', 'regex:/^[0-9]{10,15}$/', 'unique:telefono,telefono'],
         ], [
-            'nombre.required' => 'El nombre del empleado es obligatorio.',
-            'nombre.regex' => 'El nombre del empleado solo puede contener letras, números y espacios.',
-            'nombre.max' => 'El nombre del empleado no puede tener más de :max caracteres.',
-            'nombre.unique' => 'El nombre del empleado ya existe.',
-
-            'usuario.required' => 'El usuario es obligatorio.',
-            'usuario.regex' => 'El usuario solo puede contener letras, números y espacios.',
-            'usuario.max' => 'El usuario no puede tener más de :max caracteres.',
-            'usuario.unique' => 'El usuario ya existe.',
-
-            'contraseña.required' => 'La contraseña es obligatoria.',
-            'contraseña.max' => 'La contraseña no puede tener más de :max caracteres.',
-            'contraseña.min' => 'La contraseña no puede tener menos de :min caracteres.',
+            'nombre_cliente.required' => 'El nombre del cliente es obligatorio.',
+            'nombre_cliente.regex' => 'El nombre del cliente solo puede contener letras, números y espacios.',
+            'nombre_cliente.max' => 'El nombre del cliente no debe exceder los 50 caracteres.',
+            'nombre_cliente.unique' => 'Este nombre de cliente ya está registrado.',
+            
+            'calle.required' => 'La calle es obligatoria.',
+            'calle.regex' => 'La calle solo puede contener letras, números y espacios.',
+            'calle.max' => 'La calle no debe exceder los 50 caracteres.',
+            
+            'numero_externo.required' => 'El número externo es obligatorio.',
+            'numero_externo.regex' => 'El número externo solo puede contener letras, números y espacios.',
+            
+            'numero_interno.regex' => 'El número interno solo puede contener letras, números y espacios.',
+            'numero_interno.unique' => 'El número interno ya está registrado.',
+            
+            'referencias.regex' => 'Las referencias solo pueden contener letras, números y espacios.',
+            
+            'telefono.required' => 'El teléfono es obligatorio.',
+            'telefono.regex' => 'El teléfono debe contener entre 10 y 15 dígitos.',
+            'telefono.unique' => 'Este teléfono ya está registrado.',
         ]);
 
-        $usuario=new Usuario();
+        $domicilio=new Domicilio();
 
-        $usuario->nombre=$req->nombre;
-        $usuario->rol_fk=$req->rol_fk;
-        $usuario->usuario=$req->usuario;
-        $hash = Hash::make($req->input('contraseña'));
-        $usuario->contraseña=$hash;
-        $usuario->estatus_usuario=1;
-        $usuario->save();
+        $domicilio->calle=$req->calle;
+        $domicilio->numero_externo=$req->numero_externo;
+        $domicilio->numero_interno=$req->numero_interno;
+        $domicilio->referencias=$req->referencias;
+        $domicilio->save();
 
-        $usuario->refresh();
+        $telefono=new Telefono();
 
-        $empleado=new Empleado();
+        $telefono->telefono=$req->telefono;
+        $telefono->save();
+
+        $cliente=new Cliente();
+
+        $cliente->nombre_cliente=$req->nombre_cliente;
+        $cliente->domicilio_fk=$domicilio->domicilio_pk;
+        $cliente->telefono_fk=$telefono->telefono_pk;
+        $cliente->save();
         
-        $empleado->usuario_fk=$usuario->usuario_pk;
-        $empleado->fecha_contratacion=$req->fecha_contratacion;
-        $empleado->estatus_empleado=1;
-
-        $empleado->save();
-        
-        if ($empleado->empleado_pk) {
-            return back()->with('success', 'Empleado registrado');
+        if ($cliente->cliente_pk) {
+            return back()->with('success', 'Cliente registrado');
         } else {
             return back()->with('error', 'Hay algún problema con la información');
         }
     }
 
     public function mostrar(){
-        $datosEmpleado = Empleado::where('estatus_empleado', '=', 1)->get();
+        $datosCliente = Cliente::all();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
             $rol = session('nombre_rol');
             if ($rol == 'Administrador') {
-                return view('empleados', compact('datosEmpleado'));
+                return view('clientes', compact('datosCliente'));
             } else {
                 return back()->with('message', 'No puedes acceder');
             }
@@ -73,40 +83,13 @@ class Cliente_controller extends Controller
         }
     }
 
-    public function baja($empleado_pk){
-        $datosEmpleado = Empleado::findOrFail($empleado_pk);
+    public function datosParaEdicion($cliente_pk){
+        $datosCliente = Cliente::findOrFail($cliente_pk);
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
             $rol = session('nombre_rol');
             if ($rol == 'Administrador') {
-                if ($datosEmpleado) {
-                    $datosEmpleado->estatus_empleado = 0;
-                    $datosEmpleado->save();
-
-                    if ($datosEmpleado->usuario_fk) {
-                        $usuario = Usuario::findOrFail($datosEmpleado->usuario_fk);
-                        $usuario->estatus_usuario = 0;
-                        $usuario->save();
-                    }
-                    return back()->with('success', 'Empleado dado de baja');
-                } else {
-                    return back()->with('error', 'Hay algún problema con la información');
-                }
-            } else {
-                return back()->with('message', 'No puedes acceder');
-            }
-        } else {
-            return redirect('/login');
-        }
-    }
-
-    public function datosParaEdicion($empleado_pk){
-        $datosEmpleado = Empleado::findOrFail($empleado_pk);
-        $USUARIO_PK = session('usuario_pk');
-        if ($USUARIO_PK) {
-            $rol = session('nombre_rol');
-            if ($rol == 'Administrador') {
-                return view('empleados', compact('datosEmpleado'));
+                return view('editarCliente', compact('datosCliente'));
             } else {
                 return back()->with('warning', 'No puedes acceder');
             }
@@ -115,56 +98,53 @@ class Cliente_controller extends Controller
         }
     }
 
-    public function actualizar(Request $req, $empleado_pk){
+    public function actualizar(Request $req, $cliente_pk){
+        $datosCliente = Cliente::findOrFail($cliente_pk);
+        $domicilio_pk = $datosCliente->domicilio->domicilio_pk;
+        $telefono_pk = $datosCliente->telefono->telefono_pk;
+
         $req->validate([
-            'nombre' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:255', 'unique:usuario,nombre,' . $empleado_pk . ',empleado_pk'],
-            'usuario' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:255', 'unique:usuario,usuario,' . $empleado_pk . ',empleado_pk'],
-            'contraseña' => ['required', 'min:8', 'max:255', 'confirmed'],
+            'nombre_cliente' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', Rule::unique('cliente', 'nombre_cliente')->ignore($cliente_pk, 'cliente_pk')], 
+            'calle' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50'],
+            'numero_externo' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/'],
+            'numero_interno' => ['nullable', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', Rule::unique('domicilio', 'numero_interno')->ignore($domicilio_pk, 'domicilio_pk')],
+            'referencias' => ['nullable', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/'],
+            'telefono' => ['regex:/^[0-9]{10,15}$/', Rule::unique('telefono', 'telefono')->ignore($telefono_pk, 'telefono_pk')],
         ], [
-            'nombre.required' => 'El nombre del empleado es obligatorio.',
-            'nombre.regex' => 'El nombre del empleado solo puede contener letras, números y espacios.',
-            'nombre.max' => 'El nombre del empleado no puede tener más de :max caracteres.',
-            'nombre.unique' => 'El nombre del empleado ya existe.',
-
-            'usuario.required' => 'El usuario es obligatorio.',
-            'usuario.regex' => 'El usuario solo puede contener letras, números y espacios.',
-            'usuario.max' => 'El usuario no puede tener más de :max caracteres.',
-            'usuario.unique' => 'El usuario ya existe.',
-
-            'contraseña.required' => 'La contraseña es obligatoria.',
-            'contraseña.max' => 'La contraseña no puede tener más de :max caracteres.',
-            'contraseña.min' => 'La contraseña no puede tener menos de :min caracteres.',
-            'contraseña.confirmed' => 'Las contraseñas ingresadas deben coincidir.',
+            'nombre_cliente.regex' => 'El nombre del cliente solo puede contener letras, números y espacios.',
+            'nombre_cliente.max' => 'El nombre del cliente no debe exceder los 50 caracteres.',
+            'nombre_cliente.unique' => 'Este nombre de cliente ya está registrado.',
+            
+            'calle.regex' => 'La calle solo puede contener letras, números y espacios.',
+            'calle.max' => 'La calle no debe exceder los 50 caracteres.',
+            
+            'numero_externo.regex' => 'El número externo solo puede contener letras, números y espacios.',
+            
+            'numero_interno.regex' => 'El número interno solo puede contener letras, números y espacios.',
+            
+            'referencias.regex' => 'Las referencias solo pueden contener letras, números y espacios.',
+            
+            'telefono.regex' => 'El teléfono debe contener entre 10 y 15 dígitos.',
+            'telefono.unique' => 'Este teléfono ya está registrado.',
         ]);
 
-        $datosEmpleado = Empleado::findOrFail($empleado_pk);
+        $datosCliente->domicilio->calle=$req->calle;
+        $datosCliente->domicilio->numero_externo=$req->numero_externo;
+        $datosCliente->domicilio->numero_interno=$req->numero_interno;
+        $datosCliente->domicilio->referencias=$req->referencias;
 
-        $datosEmpleado->usuario->nombre=$req->nombre;
-        $datosEmpleado->usuario->rol_fk=$req->rol_fk;
-        $datosEmpleado->usuario->usuario=$req->usuario;
+        $datosCliente->telefono->telefono=$req->telefono;
+
+        $datosCliente->nombre_cliente=$req->nombre_cliente;
+        $datosCliente->domicilio_fk=$datosCliente->domicilio->domicilio_pk;
+        $datosCliente->telefono_fk=$datosCliente->telefono->telefono_pk;
+
+        $datosCliente->domicilio->save();
+        $datosCliente->telefono->save();
+        $datosCliente->save();
         
-        $rules = [
-            'contraseña' => 'required',
-            'confirmar_contraseña' => 'required|same:contraseña',
-        ];
-        $validacion = Validator::make($req->all(), $rules);
-        if ($validacion->fails()) {
-            return back()->with('error', 'Las contraseñas no coinciden');
-        }
-
-        $pass = $req->input('contraseña');
-        $hash = Hash::make($pass);
-        $datosEmpleado->usuario->contraseña=$hash;
-
-        $datosEmpleado->save();
-        
-        $datosEmpleado->usuario_fk=$datosEmpleado->usuario->usuario_pk;
-        $datosEmpleado->fecha_contratacion=$req->fecha_contratacion;
-
-        $datosEmpleado->save();
-        
-        if ($datosEmpleado->empleado_pk) {
-            return back()->with('success', 'Datos de empleado actualizados');
+        if ($datosCliente->cliente_pk) {
+            return redirect('/clientes')->with('success', 'Datos de cliente actualizados');
         } else {
             return back()->with('error', 'Hay algún problema con la información');
         }

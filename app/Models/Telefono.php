@@ -12,8 +12,7 @@ class Telefono extends Model
     protected $table="telefono";
     protected $primaryKey='telefono_pk';
     protected $fillable = [
-        'telefono',
-        'estatus_telefono'
+        'telefono'
     ];
     public $timestamps=false;
     public function cliente(){
