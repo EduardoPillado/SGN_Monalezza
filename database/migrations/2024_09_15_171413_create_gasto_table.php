@@ -16,8 +16,8 @@ return new class extends Migration
             $table->date('fecha_gasto');
             $table->unsignedBigInteger('tipo_gasto_fk');
             $table->decimal('monto_gasto');
-            $table->unsignedBigInteger('proveedor_fk');
-            $table->text('descripcion');
+            $table->unsignedBigInteger('proveedor_fk')->nullable();
+            $table->text('descripcion')->nullable();
 
             $table->foreign('tipo_gasto_fk')
                 ->references('tipo_gasto_pk')

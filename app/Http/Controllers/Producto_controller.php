@@ -3,8 +3,159 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Producto;
 
 class Producto_controller extends Controller
 {
-    //
+    public function insertar(Request $req){
+        $req->validate([
+            'nombre_producto' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:producto,nombre_producto'],
+            'tipo_producto_fk' => ['required', 'exists:tipo_producto,tipo_producto_pk'],
+            'precio_producto' => ['required', 'numeric', 'min:0.01', 'max:999999.99'],
+            'proveedor_fk' => ['nullable', 'exists:proveedor,proveedor_pk'],
+        ], [
+            'nombre_producto.required' => 'El nombre del producto es obligatorio.',
+            'nombre_producto.regex' => 'El nombre del producto solo puede contener letras, números y espacios.',
+            'nombre_producto.max' => 'El nombre del producto no puede tener más de :max caracteres.',
+            'nombre_producto.unique' => 'El nombre del producto ya existe.',
+
+            'tipo_producto_fk.required' => 'El tipo de producto es obligatorio.',
+            'tipo_producto_fk.exists' => 'El tipo de producto seleccionado no es válido.',
+
+            'precio_producto.required' => 'El precio del producto es obligatorio.',
+            'precio_producto.numeric' => 'El precio del producto debe ser un valor numérico.',
+            'precio_producto.min' => 'El precio del producto debe ser mayor o igual a 0.01.',
+            'precio_producto.max' => 'El precio del producto no debe exceder 999999.99.',
+
+            'proveedor_fk.exists' => 'El proveedor seleccionado no es válido.',
+        ]);
+
+        $producto=new Producto();
+
+        $producto->nombre_producto=$req->nombre_producto;
+        $producto->tipo_producto_fk=$req->tipo_producto_fk;
+        $producto->precio_producto=$req->precio_producto;
+        $producto->proveedor_fk=$req->proveedor_fk;
+        $producto->estatus_producto=1;
+
+        $producto->save();
+        
+        if ($producto->producto_pk) {
+            return back()->with('success', 'Producto registrado');
+        } else {
+            return back()->with('error', 'Hay algún problema con la información');
+        }
+    }
+
+    public function mostrar(){
+        $datosProducto = Producto::all();
+        $USUARIO_PK = session('usuario_pk');
+        if ($USUARIO_PK) {
+            $ROL = session('nombre_rol');
+            if ($ROL == 'Administrador') {
+                return view('productos', compact('datosProducto'));
+            } else {
+                return back()->with('message', 'No puedes acceder');
+            }
+        } else {
+            return redirect('/login');
+        }
+    }
+
+    public function baja($producto_pk){
+        $datosProducto = Producto::findOrFail($producto_pk);
+        $USUARIO_PK = session('usuario_pk');
+        if ($USUARIO_PK) {
+            $ROL = session('nombre_rol');
+            if ($ROL == 'Administrador') {
+                if ($datosProducto) {
+
+                    $datosProducto->estatus_producto = 0;
+                    $datosProducto->save();
+
+                    return back()->with('success', 'Producto dado de baja');
+                } else {
+                    return back()->with('error', 'Hay algún problema con la información');
+                }
+            } else {
+                return back()->with('message', 'No puedes acceder');
+            }
+        } else {
+            return redirect('/login');
+        }
+    }
+
+    public function alta($producto_pk){
+        $datosProducto = Producto::findOrFail($producto_pk);
+        $USUARIO_PK = session('usuario_pk');
+        if ($USUARIO_PK) {
+            $ROL = session('nombre_rol');
+            if ($ROL == 'Administrador') {
+                if ($datosProducto) {
+
+                    $datosProducto->estatus_producto = 1;
+                    $datosProducto->save();
+
+                    return back()->with('success', 'Producto dado de alta');
+                } else {
+                    return back()->with('error', 'Hay algún problema con la información');
+                }
+            } else {
+                return back()->with('message', 'No puedes acceder');
+            }
+        } else {
+            return redirect('/login');
+        }
+    }
+
+    public function datosParaEdicion($producto_pk){
+        $datosProducto = Producto::findOrFail($producto_pk);
+        $USUARIO_PK = session('usuario_pk');
+        if ($USUARIO_PK) {
+            $ROL = session('nombre_rol');
+            if ($ROL == 'Administrador') {
+                return view('editarProducto', compact('datosProducto'));
+            } else {
+                return back()->with('warning', 'No puedes acceder');
+            }
+        } else {
+            return redirect('/login');
+        }
+    }
+
+    public function actualizar(Request $req, $producto_pk){
+        $datosProducto = Producto::findOrFail($producto_pk);
+
+        $req->validate([
+            'nombre_producto' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:producto,nombre_producto,' . $producto_pk . ',producto_pk'],
+            'tipo_producto_fk' => ['exists:tipo_producto,tipo_producto_pk'],
+            'precio_producto' => ['numeric', 'min:0.01', 'max:999999.99'],
+            'proveedor_fk' => ['nullable', 'exists:proveedor,proveedor_pk'],
+        ], [
+            'nombre_producto.regex' => 'El nombre del producto solo puede contener letras, números y espacios.',
+            'nombre_producto.max' => 'El nombre del producto no puede tener más de :max caracteres.',
+            'nombre_producto.unique' => 'El nombre del producto ya existe.',
+
+            'tipo_producto_fk.exists' => 'El tipo de producto seleccionado no es válido.',
+
+            'precio_producto.numeric' => 'El precio del producto debe ser un valor numérico.',
+            'precio_producto.min' => 'El precio del producto debe ser mayor o igual a 0.01.',
+            'precio_producto.max' => 'El precio del producto no debe exceder 999999.99.',
+
+            'proveedor_fk.exists' => 'El proveedor seleccionado no es válido.',
+        ]);
+
+        $datosProducto->nombre_producto=$req->nombre_producto;
+        $datosProducto->tipo_producto_fk=$req->tipo_producto_fk;
+        $datosProducto->precio_producto=$req->precio_producto;
+        $datosProducto->proveedor_fk=$req->proveedor_fk;
+
+        $datosProducto->save();
+        
+        if ($datosProducto->producto_pk) {
+            return redirect('/productos')->with('success', 'Datos de producto actualizados');
+        } else {
+            return back()->with('error', 'Hay algún problema con la información');
+        }
+    }
 }

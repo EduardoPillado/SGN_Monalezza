@@ -6,17 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('img/monalezza.ico') }}" rel="icon">
     <title>Gestión de Empleados - La Monalezza</title>
+    {{-- Tailwind --}}
+    <style>
+        .modal-hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 
-<body class="h-full bg-gray-100 overflow-hidden" x-data="{ 
-    sidebarOpen: false, 
-    modalOpen: false,
-    editModalOpen: false,
-}">
-
+<body class="h-full bg-gray-100 overflow-hidden">
     @php
         use Carbon\Carbon;
-
+        
         use App\Models\Rol;
         $datosRol=Rol::all();
     @endphp
@@ -65,7 +66,7 @@
                 </table>
             </div>
             <div class="mt-4 text-right">
-                <button @click="modalOpen = true" class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo empleado</button>
+                <button onclick="toggleModal()" class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo empleado</button>
             </div>
         </div>
 
@@ -75,8 +76,10 @@
                 $('#tabla-empleados').DataTable({
                     "language": {
                     "search": "Buscar:",
-                    "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                    "zeroRecords": "Sin resultados",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay registros disponibles",
+                    "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                    "zeroRecords": "Sin empleados registrados",
                     "lengthMenu": "Mostrar _MENU_ registros por página",
                         "paginate": {
                             "first": "Primero",
@@ -87,6 +90,12 @@
                     }
                 });
             });
+
+            // Función para mostrar/ocultar el modal
+            function toggleModal() {
+                const modal = document.getElementById('modal-empleado');
+                modal.classList.toggle('modal-hidden');
+            }
 
             // Alerta de confirmación de baja
             function confirmarBaja(event) {
@@ -134,7 +143,7 @@
         </script>
 
         <!-- Modal de registro de empleado -->
-        <div x-show="modalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
+        <div id="modal-empleado" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full modal-hidden">
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nuevo Empleado</h3>
@@ -167,7 +176,7 @@
                                 <input type="date" id="fecha_contratacion" name="fecha_contratacion" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="items-center px-4 py-3">
-                                <button type="button" @click="modalOpen = false" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                <button type="button" onclick="toggleModal()" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
                                     Cancelar
                                 </button>
                                 <button type="submit" class="mt-3 px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
@@ -198,58 +207,6 @@
                 });
             </script>
         @endif
-
-        <!-- Modal de edición de empleado -->
-        {{-- <div x-show="editModalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                <div class="mt-3 text-center">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Editar Empleado</h3>
-                    <div class="mt-2 px-7 py-3">
-                        <form action="{{ route('empleado.actualizar', $datosEmpleado->empleado_pk) }}" method="post">
-                            @csrf
-                            @method('put')
-                            <div class="mb-4">
-                                <label for="edit_nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
-                                <input type="text" id="edit_nombre" name="nombre" value="{{ $datosEmpleado->usuario->nombre }}" x-model="editingEmployee.nombre" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit_usuario" class="block text-sm font-medium text-gray-700">Nombre de Usuario</label>
-                                <input type="text" id="edit_usuario" name="usuario" value="{{ $datosEmpleado->usuario->usuario }}" x-model="editingEmployee.usuario" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit_contraseña" class="block text-sm font-medium text-gray-700">Nueva Contraseña</label>
-                                <input type="password" id="edit_contraseña" name="contraseña" x-model="editingEmployee.contraseña" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit_confirmar_contraseña" class="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
-                                <input type="password" id="edit_confirmar_contraseña" name="confirmar_contraseña" x-model="editingEmployee.confirmar_contraseña" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit_jrol_fk" class="block text-sm font-medium text-gray-700">Rol del empleado</label>
-                                <select name="rol_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-                                    <option value="">Selecciona el rol del empleado</option>
-                                    @foreach ($datosRol as $dato)
-                                        <option @if ($dato->rol_fk == $datosEmpleado->rol_pk) selected @endif value="{{ $dato->rol_pk }}">{{ $dato->nombre_rol }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit_fecha_contratacion" class="block text-sm font-medium text-gray-700">Fecha de Contratación</label>
-                                <input type="date" id="edit_fecha_contratacion" name="fecha_contratacion" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" x-model="editingEmployee.fecha_contratacion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                            </div>
-                            <div class="items-center px-4 py-3">
-                                <button type="button" @click="editModalOpen = false" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
-                                    Cancelar
-                                </button>
-                                <button type="submit" class="mt-3 px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                                    Actualizar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
     </div>
 </body>
 </html>
