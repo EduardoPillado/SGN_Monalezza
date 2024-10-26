@@ -72,8 +72,8 @@ class Cliente_controller extends Controller
         $datosCliente = Cliente::all();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $rol = session('nombre_rol');
-            if ($rol == 'Administrador') {
+            $ROL = session('nombre_rol');
+            if ($ROL == 'Administrador') {
                 return view('clientes', compact('datosCliente'));
             } else {
                 return back()->with('message', 'No puedes acceder');
@@ -87,8 +87,8 @@ class Cliente_controller extends Controller
         $datosCliente = Cliente::findOrFail($cliente_pk);
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $rol = session('nombre_rol');
-            if ($rol == 'Administrador') {
+            $ROL = session('nombre_rol');
+            if ($ROL == 'Administrador') {
                 return view('editarCliente', compact('datosCliente'));
             } else {
                 return back()->with('warning', 'No puedes acceder');

@@ -10,8 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
     {{-- Tailwind --}}
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @vite('resources/css/app.css')
     {{-- CSS --}}
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     {{-- DataTables --}}
@@ -20,6 +19,15 @@
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     {{-- SweetAlert2 --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        .sidebar-hidden {
+            transform: translateX(-100%);
+        }
+        .sidebar-visible {
+            transform: translateX(0);
+        }
+    </style>
 </head>
 <body>
 
@@ -28,15 +36,16 @@
     @php
         $USUARIO_PK = session('usuario_pk');
         $USUARIO = session('usuario');
+        $ROL_PK = session('rol_pk');
+        $ROL = session('nombre_rol');
     @endphp
 
     <!-- Sidebar -->
-    <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out"
-        :class="{ '-translate-x-full': !sidebarOpen, 'translate-x-0': sidebarOpen }">
+    <div id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out sidebar-hidden">
         <div class="p-4">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold">Menú</h2>
-                <button @click="sidebarOpen = false" class="text-gray-500 hover:text-gray-700">
+                <button onclick="toggleSidebar()" class="text-gray-500 hover:text-gray-700">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -49,6 +58,7 @@
                 <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Reportes</a></li>
                 <li class="mb-2"><a href="{{ route('cliente.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Clientes</a></li>
                 <li class="mb-2"><a href="{{ route('empleado.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Empleados</a></li>
+                <li class="mb-2"><a href="{{ route('proveedor.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Proveedores</a></li>
                 <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Realizar corte de caja</a></li>
                 <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Configuración del sistema</a></li>
                 <li class="mb-2"><a href="{{ route('usuario.logout') }}" class="block p-2 hover:bg-gray-100 rounded">Cerrar sesión</a></li>
@@ -57,7 +67,7 @@
     </div>
 
     <!-- Overlay para cerrar el sidebar en pantallas pequeñas -->
-    <div @click="sidebarOpen = false" class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden" x-show="sidebarOpen"></div>
+    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden hidden"></div>
 
     <!-- Encabezado con logo y fondo de iconos de pizza -->
     <div class="bg-gray-200 p-4 relative overflow-hidden">
@@ -65,10 +75,23 @@
             <!-- Aquí irían los iconos de pizza como background -->
         </div>
         <div class="relative z-10 flex justify-between items-center">
-            <button class="text-2xl" @click="sidebarOpen = !sidebarOpen">☰</button>
-            <img src="{{ asset('img/logo_lamonalezza.webp') }}" class="w-16 h-16 bg-black rounded-full flex items-center justify-center text-white text-xs text-center">
+            <button class="text-2xl" onclick="toggleSidebar()">☰</button>
+            <a href="{{ route('inicio') }}">
+                <img src="{{ asset('img/logo_lamonalezza.webp') }}" class="w-16 h-16 bg-black rounded-full flex items-center justify-center text-white text-xs text-center">
+            </a>
         </div>
     </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.toggle('sidebar-hidden');
+            sidebar.classList.toggle('sidebar-visible');
+            overlay.classList.toggle('hidden');
+        }
+    </script>
     
 </body>
 </html>

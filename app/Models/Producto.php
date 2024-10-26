@@ -25,6 +25,9 @@ class Producto extends Model
     public function detalle_pedido(){
         return $this->hasMany(Detalle_pedido::class, 'producto_fk');
     }
+    public function inventario(){
+        return $this->hasMany(Inventario::class, 'producto_fk');
+    }
     public function ingredientes() {
         return $this->belongsToMany(Ingrediente::class, 'producto_ingrediente', 'producto_fk', 'ingrediente_fk');
     }

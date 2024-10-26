@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('img/monalezza.ico') }}" rel="icon">
     <title>Sistema de Gestión de Pizzería</title>
+    {{-- Tailwind --}}
+    @vite('resources/css/app.css')
 </head>
 <body class="pizza-body" x-data="{ sidebarOpen: false }">
     @include('sidebar')
@@ -14,44 +16,88 @@
             <!-- Columna izquierda -->
             <div class="left-column">
                 <div class="order-summary">
-                    <div class="order-items">
-                        <div class="order-item">
-                            <span>Pizza #1 🍕</span>
-                            <span>$170</span>
+                    <form action="{{ route('pedido.guardar') }}" method="POST">
+                        @csrf
+                        
+                        <!-- Cliente -->
+                        <div class="form-group">
+                            <label for="cliente">Cliente:</label>
+                            <select name="cliente_fk" id="cliente" class="form-control">
+                                <option value="">Selecciona un cliente</option>
+                                @foreach($clientes as $cliente)
+                                    <option value="{{ $cliente->id }}">{{ $cliente->nombre }}</option>
+                                @endforeach
+                            </select>
                         </div>
-                        <div class="order-item">
-                            <span>Pizza #2 🍕</span>
-                            <span>$190</span>
+
+                        <!-- Empleado -->
+                        <div class="form-group">
+                            <label for="empleado">Empleado:</label>
+                            <select name="empleado_fk" id="empleado" class="form-control">
+                                <option value="">Selecciona un empleado</option>
+                                @foreach($empleados as $empleado)
+                                    <option value="{{ $empleado->id }}">{{ $empleado->nombre }}</option>
+                                @endforeach
+                            </select>
                         </div>
-                        <div class="order-item">
-                            <span>Pizza #3 🍕</span>
-                            <span>$200</span>
+
+                        <!-- Fecha y hora del pedido -->
+                        <div class="form-group">
+                            <label for="fecha_hora_pedido">Fecha y Hora del Pedido:</label>
+                            <input type="datetime-local" name="fecha_hora_pedido" id="fecha_hora_pedido" class="form-control">
                         </div>
-                    </div>
-                    <div class="order-total">
-                        <span>Total:</span>
-                        <span>$ 560.00</span>
-                    </div>
-                </div>
-                <div class="numpad-container">
-                    <button class="numpad-button">1</button>
-                    <button class="numpad-button">2</button>
-                    <button class="numpad-button">3</button>
-                    <button class="numpad-button">+/-</button>
-                    <button class="numpad-button">4</button>
-                    <button class="numpad-button">5</button>
-                    <button class="numpad-button">6</button>
-                    <button class="numpad-button">0</button>
-                    <button class="numpad-button">7</button>
-                    <button class="numpad-button">8</button>
-                    <button class="numpad-button">9</button>
-                    <button class="numpad-button">&lt;</button>
-                    <button class="numpad-button numpad-button-cobrar">Cobrar</button>
+
+                        <!-- Medio del pedido -->
+                        <div class="form-group">
+                            <label for="medio_pedido">Medio del Pedido:</label>
+                            <select name="medio_pedido_fk" id="medio_pedido" class="form-control">
+                                <option value="">Selecciona un medio</option>
+                                @foreach($mediosPedido as $medio)
+                                    <option value="{{ $medio->id }}">{{ $medio->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Monto total -->
+                        <div class="form-group">
+                            <label for="monto_total">Monto Total:</label>
+                            <input type="number" step="0.01" name="monto_total" id="monto_total" class="form-control" placeholder="0.00">
+                        </div>
+
+                        <!-- Número de transacción -->
+                        <div class="form-group">
+                            <label for="numero_transaccion">Número de Transacción (opcional):</label>
+                            <input type="text" name="numero_transaccion" id="numero_transaccion" class="form-control" placeholder="Número de transacción">
+                        </div>
+
+                        <!-- Tipo de pago -->
+                        <div class="form-group">
+                            <label for="tipo_pago">Tipo de Pago:</label>
+                            <select name="tipo_pago_fk" id="tipo_pago" class="form-control">
+                                <option value="">Selecciona un tipo de pago</option>
+                                @foreach($tiposPago as $tipo)
+                                    <option value="{{ $tipo->id }}">{{ $tipo->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Notas de la remisión -->
+                        <div class="form-group">
+                            <label for="notas_remision">Notas:</label>
+                            <textarea name="notas_remision" id="notas_remision" class="form-control" rows="3" placeholder="Notas adicionales"></textarea>
+                        </div>
+
+                        <!-- Botón para enviar el formulario -->
+                        <div class="form-group">
+                            <button type="submit" class="numpad-button numpad-button-cobrar">Guardar Pedido</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
             <!-- Columna derecha -->
             <div class="right-column">
+                <!-- Tu contenido para la columna derecha permanece igual -->
                 <div class="menu-grid">
                     <div class="menu-item">
                         <div>Pizza #1</div>
@@ -80,10 +126,20 @@
                     </div>
                 </div>
                 <div class="info-buttons">
-                    <div class="info-button products-registered">Productos registrados 🍕</div>
-                    <div class="info-button total-sales">Total ventas 💰</div>
-                    <div class="info-button profits">Ganancias 💼</div>
-                    <div class="info-button low-stock">Productos poco Stock 📉</div>
+                    <a href="{{ route('producto.mostrar') }}">
+                        <div class="info-button products-registered">
+                            Productos registrados 🍕
+                        </div>
+                    </a>
+                    <div class="info-button total-sales">
+                        Total ventas 💰
+                    </div>
+                    <div class="info-button profits">
+                        Ganancias 💼
+                    </div>
+                    <div class="info-button low-stock">
+                        Productos poco Stock 📉
+                    </div>
                 </div>
             </div>
         </div>

@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Usuario_controller;
 use App\Http\Controllers\Empleado_controller;
 use App\Http\Controllers\Cliente_controller;
+use App\Http\Controllers\Proveedor_controller;
+use App\Http\Controllers\Producto_controller;
 
 Route::get('/', function () {
     $USUARIO_PK = session('usuario_pk');
@@ -51,6 +53,30 @@ Route::match(['get', 'put'], '/dandoDeBajaCliente/{cliente_pk}', [Cliente_contro
 Route::match(['get', 'put'], '/dandoDeAltaCliente/{cliente_pk}', [Cliente_controller::class, 'alta'])->name('cliente.alta');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Proveedor -------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Route::get('/proveedores', [Proveedor_controller::class, 'mostrar'])->name('proveedor.mostrar');
+Route::post('/registrandoProveedor', [Proveedor_controller::class, 'insertar'])->name('proveedor.insertar');
+Route::get('/editarProveedor/{proveedor_pk}', [Proveedor_controller::class, 'datosParaEdicion'])->name('proveedor.datosParaEdicion');
+Route::put('/editandoProveedor/{proveedor_pk}', [Proveedor_controller::class, 'actualizar'])->name('proveedor.actualizar');
+Route::match(['get', 'put'], '/dandoDeBajaProveedor/{proveedor_pk}', [Proveedor_controller::class, 'baja'])->name('proveedor.baja');
+Route::match(['get', 'put'], '/dandoDeAltaProveedor/{proveedor_pk}', [Proveedor_controller::class, 'alta'])->name('proveedor.alta');
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Producto --------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Route::get('/productos', [Producto_controller::class, 'mostrar'])->name('producto.mostrar');
+Route::post('/registrandoProducto', [Producto_controller::class, 'insertar'])->name('producto.insertar');
+Route::get('/editarProducto/{producto_pk}', [Producto_controller::class, 'datosParaEdicion'])->name('producto.datosParaEdicion');
+Route::put('/editandoProducto/{producto_pk}', [Producto_controller::class, 'actualizar'])->name('producto.actualizar');
+Route::match(['get', 'put'], '/dandoDeBajaProducto/{producto_pk}', [Producto_controller::class, 'baja'])->name('producto.baja');
+Route::match(['get', 'put'], '/dandoDeAltaProducto/{producto_pk}', [Producto_controller::class, 'alta'])->name('producto.alta');
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 // require __DIR__.'/auth.php';
 

@@ -11,29 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('gasto', function (Blueprint $table) {
-            $table->id('gasto_pk')->autoIncrement();
-            $table->date('fecha_gasto');
+        Schema::create('servicio', function (Blueprint $table) {
+            $table->id('servicio_pk')->autoIncrement();
             $table->unsignedBigInteger('tipo_gasto_fk');
-            $table->decimal('monto_gasto');
-            $table->unsignedBigInteger('proveedor_fk');
-            $table->text('descripcion');
+            $table->decimal('cantidad_pagada_servicio');
+            $table->date('fecha_pago_servicio');
 
             $table->foreign('tipo_gasto_fk')
                 ->references('tipo_gasto_pk')
                 ->on('tipo_gasto');
-
-            $table->foreign('proveedor_fk')
-                ->references('proveedor_pk')
-                ->on('proveedor');
-        });
+    });
     }
-
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('gasto');
+        Schema::dropIfExists('servicio');
     }
 };

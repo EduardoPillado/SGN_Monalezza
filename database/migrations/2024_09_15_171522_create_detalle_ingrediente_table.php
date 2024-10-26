@@ -12,10 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('detalle_ingrediente', function (Blueprint $table) {
-            $table->id('detalle_ingrediente')->autoIncrement();
+            $table->id('detalle_ingrediente_pk')->autoIncrement();
             $table->unsignedBigInteger('producto_fk');
             $table->unsignedBigInteger('ingrediente_fk');
-            $table->decimal('cantidad_usada');
 
             $table->foreign('producto_fk')
                 ->references('producto_pk')

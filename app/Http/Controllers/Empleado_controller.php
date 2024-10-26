@@ -59,8 +59,8 @@ class Empleado_controller extends Controller
         $datosEmpleado = Empleado::all();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $rol = session('nombre_rol');
-            if ($rol == 'Administrador') {
+            $ROL = session('nombre_rol');
+            if ($ROL == 'Administrador') {
                 return view('empleados', compact('datosEmpleado'));
             } else {
                 return back()->with('message', 'No puedes acceder');
@@ -74,8 +74,8 @@ class Empleado_controller extends Controller
         $datosEmpleado = Empleado::findOrFail($empleado_pk);
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $rol = session('nombre_rol');
-            if ($rol == 'Administrador') {
+            $ROL = session('nombre_rol');
+            if ($ROL == 'Administrador') {
                 if ($datosEmpleado) {
                     $datosEmpleado->estatus_empleado = 0;
                     $datosEmpleado->save();
@@ -101,8 +101,8 @@ class Empleado_controller extends Controller
         $datosEmpleado = Empleado::findOrFail($empleado_pk);
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $rol = session('nombre_rol');
-            if ($rol == 'Administrador') {
+            $ROL = session('nombre_rol');
+            if ($ROL == 'Administrador') {
                 if ($datosEmpleado) {
                     $datosEmpleado->estatus_empleado = 1;
                     $datosEmpleado->save();
@@ -128,8 +128,8 @@ class Empleado_controller extends Controller
         $datosEmpleado = Empleado::findOrFail($empleado_pk);
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $rol = session('nombre_rol');
-            if ($rol == 'Administrador') {
+            $ROL = session('nombre_rol');
+            if ($ROL == 'Administrador') {
                 return view('editarEmpleado', compact('datosEmpleado'));
             } else {
                 return back()->with('warning', 'No puedes acceder');

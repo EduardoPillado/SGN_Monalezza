@@ -14,17 +14,29 @@ return new class extends Migration
         Schema::create('inventario', function (Blueprint $table) {
             $table->id('inventario_pk')->autoIncrement();
             $table->unsignedBigInteger('ingrediente_fk')->nullable();
+            $table->unsignedBigInteger('producto_fk')->nullable();
+            $table->unsignedBigInteger('tipo_gasto_fk')->nullable();
+            $table->unsignedBigInteger('proveedor_fk');
+            $table->decimal('precio_proveedor');
             $table->datetime('fecha_inventario');
             $table->decimal('cantidad_inventario');
-            $table->unsignedBigInteger('gasto_fk')->nullable();
+            $table->decimal('cantidad_inventario_minima');
 
             $table->foreign('ingrediente_fk')
                 ->references('ingrediente_pk')
                 ->on('ingrediente');
 
-            $table->foreign('gasto_fk')
-                ->references('gasto_pk')
-                ->on('gasto');
+            $table->foreign('producto_fk')
+                ->references('producto_pk')
+                ->on('producto');
+
+            $table->foreign('tipo_gasto_fk')
+                ->references('tipo_gasto_pk')
+                ->on('tipo_gasto');
+
+            $table->foreign('proveedor_fk')
+                ->references('proveedor_pk')
+                ->on('proveedor');
         });
     }
 
