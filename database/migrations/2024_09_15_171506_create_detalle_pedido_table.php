@@ -15,9 +15,7 @@ return new class extends Migration
             $table->id('detalle_pedido_pk')->autoIncrement();
             $table->unsignedBigInteger('pedido_fk');
             $table->unsignedBigInteger('producto_fk');
-            $table->unsignedBigInteger('venta_fk');
             $table->integer('cantidad_producto');
-            $table->decimal('precio_unitario');
 
             $table->foreign('pedido_fk')
                 ->references('pedido_pk')
@@ -26,10 +24,6 @@ return new class extends Migration
             $table->foreign('producto_fk')
                 ->references('producto_pk')
                 ->on('producto');
-
-            $table->foreign('venta_fk')
-                ->references('venta_pk')
-                ->on('venta');
         });
     }
 

@@ -16,16 +16,11 @@ return new class extends Migration
             $table->string('nombre_producto', 50);
             $table->unsignedBigInteger('tipo_producto_fk');
             $table->decimal('precio_producto');
-            $table->unsignedBigInteger('proveedor_fk')->nullable();
             $table->smallInteger('estatus_producto');
 
             $table->foreign('tipo_producto_fk')
                 ->references('tipo_producto_pk')
                 ->on('tipo_producto');
-
-            $table->foreign('proveedor_fk')
-                ->references('proveedor_pk')
-                ->on('proveedor');
         });
     }
 
