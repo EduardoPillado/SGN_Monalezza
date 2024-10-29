@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('img/monalezza.ico') }}" rel="icon">
     <title>Sistema de Gestión de Pizzería</title>
+    {{-- Tailwind --}}
+    @vite('resources/css/app.css')
 </head>
 <body class="pizza-body" x-data="{ sidebarOpen: false }">
     @include('sidebar')
@@ -78,6 +80,7 @@
             
             <!-- Columna derecha -->
             <div class="right-column">
+                <!-- Tu contenido para la columna derecha permanece igual -->
                 <div class="menu-grid">
                     @foreach($productos as $producto)
                         <div class="menu-item" onclick="toggleProductSelection(this, {{ $producto->producto_pk }}, '{{ $producto->nombre_producto }}', {{ $producto->precio_producto }}, '{{ $producto->tipo_producto->nombre_tipo_producto }}')">
