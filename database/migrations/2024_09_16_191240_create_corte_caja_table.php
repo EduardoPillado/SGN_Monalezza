@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('venta', function (Blueprint $table) {
-            $table->id('venta_pk')->autoIncrement();
-            $table->integer('cantidad_venta');
-            $table->decimal('monto_venta');
+        Schema::create('corte_caja', function (Blueprint $table) {
+            $table->id('corte_caja_pk')->autoIncrement();
+            $table->dateTime('fecha_corte_inicio');
+            $table->dateTime('fecha_corte_fin');
+            $table->integer('cantidad_ventas');
+            $table->decimal('ganancia_total');
         });
     }
 
@@ -23,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('venta');
+        Schema::dropIfExists('corte_caja');
     }
 };

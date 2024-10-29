@@ -1,11 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Pedido_controller;
 use App\Http\Controllers\Usuario_controller;
 use App\Http\Controllers\Empleado_controller;
 use App\Http\Controllers\Cliente_controller;
 use App\Http\Controllers\Proveedor_controller;
 use App\Http\Controllers\Producto_controller;
+use App\Http\Controllers\Corte_caja_controller;
 
 Route::get('/', function () {
     $USUARIO_PK = session('usuario_pk');
@@ -15,6 +17,24 @@ Route::get('/', function () {
         return redirect()->route('login')->with('warning', 'Inicia sesión antes');
     }
 })->name('inicio');
+
+// Pedido ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Route::get('/', [Pedido_controller::class, 'mostrarParaInsertar'])->name('pedido.mostrarParaInsertar');
+Route::post('/registrandoPedido', [Pedido_controller::class, 'insertar'])->name('pedido.insertar');
+Route::get('/ventas', [Pedido_controller::class, 'mostrar'])->name('pedido.mostrar');
+Route::match(['get', 'put'], '/marcandoPendientePedido/{pedido_pk}', [Pedido_controller::class, 'pendiente'])->name('pedido.pendiente');
+Route::match(['get', 'put'], '/marcandoEntregaPedido/{pedido_pk}', [Pedido_controller::class, 'entregado'])->name('pedido.entregado');
+Route::match(['get', 'put'], '/marcandoCancelacionPedido/{pedido_pk}', [Pedido_controller::class, 'cancelado'])->name('pedido.cancelado');
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Corte de caja ---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Route::post('/generandoCorte', [Corte_caja_controller::class, 'generarCorte'])->name('corteDeCaja.generarCorte');
+Route::get('/cortes', [Corte_caja_controller::class, 'mostrar'])->name('corteDeCaja.mostrar');
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // Usuario ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 

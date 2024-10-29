@@ -13,9 +13,6 @@ class Ingrediente extends Model
     protected $primaryKey='ingrediente_pk';
     protected $fillable = [
         'nombre_ingrediente',
-        'cantidad_actual',
-        'um',
-        'um_minima',
         'estatus_ingrediente'
     ];
     public $timestamps=false;

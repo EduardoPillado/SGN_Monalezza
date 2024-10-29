@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('monto_total');
             $table->string('numero_transaccion', 50)->nullable();
             $table->unsignedBigInteger('tipo_pago_fk');
-            $table->text('notas_remision');
+            $table->text('notas_remision')->nullable();
             $table->smallInteger('estatus_pedido');
 
             $table->foreign('cliente_fk')

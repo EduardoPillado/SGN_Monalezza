@@ -29,4 +29,7 @@ class Empleado extends Model
     public function usuario(){
         return $this->belongsTo(Usuario::class, 'usuario_fk');
     }
+    public function corte_empleado(){
+        return $this->hasMany(Corte_empleado::class, 'empleado_fk');
+    }
 }

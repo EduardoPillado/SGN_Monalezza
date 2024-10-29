@@ -14,9 +14,7 @@ class Detalle_pedido extends Model
     protected $fillable = [
         'pedido_fk',
         'producto_fk',
-        'venta_fk',
-        'cantidad_producto',
-        'precio_unitario'
+        'cantidad_producto'
     ];
     public $timestamps=false;
     public function pedido(){
@@ -24,8 +22,5 @@ class Detalle_pedido extends Model
     }
     public function producto(){
         return $this->belongsTo(Producto::class, 'producto_fk');
-    }
-    public function venta(){
-        return $this->belongsTo(Venta::class, 'venta_fk');
     }
 }

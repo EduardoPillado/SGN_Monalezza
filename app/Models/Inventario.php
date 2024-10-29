@@ -14,9 +14,13 @@ class Inventario extends Model
     protected $fillable = [
         'ingrediente_fk',
         'producto_fk',
+        'tipo_gasto_fk',
+        'proveedor_fk',
+        'precio_proveedor',
         'fecha_inventario',
         'cantidad_inventario',
-        'gasto_fk'
+        'cantidad_inventario_minima'
+        
     ];
     public $timestamps=false;
     public function ingrediente(){
@@ -25,7 +29,10 @@ class Inventario extends Model
     public function producto(){
         return $this->belongsTo(Producto::class, 'producto_fk');
     }
-    public function gasto(){
-        return $this->belongsTo(Gasto::class, 'gasto_fk');
+    public function tipo_gasto(){
+        return $this->belongsTo(Tipo_gasto::class, 'tipo_gasto_fk');
+    }
+    public function proveedor(){
+        return $this->belongsTo(Proveedor::class, 'proveedor_fk');
     }
 }

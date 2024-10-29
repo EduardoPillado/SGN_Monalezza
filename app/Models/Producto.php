@@ -15,7 +15,6 @@ class Producto extends Model
         'nombre_producto',
         'tipo_producto_fk',
         'precio_producto',
-        'proveedor_fk',
         'estatus_producto'
     ];
     public $timestamps=false;
@@ -33,8 +32,5 @@ class Producto extends Model
     }
     public function tipo_producto(){
         return $this->belongsTo(Tipo_producto::class, 'tipo_producto_fk');
-    }
-    public function proveedor(){
-        return $this->belongsTo(Proveedor::class, 'proveedor_fk');
     }
 }

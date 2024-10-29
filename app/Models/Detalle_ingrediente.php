@@ -13,8 +13,7 @@ class Detalle_ingrediente extends Model
     protected $primaryKey='detalle_ingrediente_pk';
     protected $fillable = [
         'producto_fk',
-        'ingrediente_fk',
-        'cantidad_usada'
+        'ingrediente_fk'
     ];
     public $timestamps=false;
     public function producto(){

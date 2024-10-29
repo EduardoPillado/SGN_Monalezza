@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Usuario;
+use App\Models\Empleado;
 
 class Admin_Seeder extends Seeder
 {
@@ -25,5 +27,13 @@ class Admin_Seeder extends Seeder
         $usuario->estatus_usuario = 1;
 
         $usuario->save();
+
+        $empleado = new Empleado();
+
+        $empleado->usuario_fk = 1;
+        $empleado->fecha_contratacion = '2024-10-25';
+        $empleado->estatus_empleado = 1;
+
+        $empleado->save();
     }
 }
