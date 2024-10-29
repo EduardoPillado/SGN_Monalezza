@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('producto', function (Blueprint $table) {
             $table->id('producto_pk')->autoIncrement();
-            $table->string('nombre_producto', 50);
+            $table->string('nombre_producto', 100);
             $table->unsignedBigInteger('tipo_producto_fk');
             $table->decimal('precio_producto');
             $table->smallInteger('estatus_producto');

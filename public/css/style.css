@@ -165,6 +165,49 @@
     background-color: #e74c3c;
 }
 
+/* Estilos nuevos para pedidos */
+
+.menu-item {
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.menu-item.selected {
+    background-color: #f0f8ff;
+}
+
+.menu-item input[type="checkbox"] {
+    display: none;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.order-item input[type="number"] {
+    width: 80px;
+    height: 40px;
+    font-size: 16px;
+    padding: 5px;
+}
+
+.order-item button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+/* Fin Estilos nuevos para pedidos */
+
 /* Responsive design */
 @media (max-width: 768px) {
     .content-container {

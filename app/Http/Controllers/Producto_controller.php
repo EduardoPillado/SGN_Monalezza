@@ -12,7 +12,6 @@ class Producto_controller extends Controller
             'nombre_producto' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:producto,nombre_producto'],
             'tipo_producto_fk' => ['required', 'exists:tipo_producto,tipo_producto_pk'],
             'precio_producto' => ['required', 'numeric', 'min:0.01', 'max:999999.99'],
-            'proveedor_fk' => ['nullable', 'exists:proveedor,proveedor_pk'],
         ], [
             'nombre_producto.required' => 'El nombre del producto es obligatorio.',
             'nombre_producto.regex' => 'El nombre del producto solo puede contener letras, números y espacios.',
@@ -26,8 +25,6 @@ class Producto_controller extends Controller
             'precio_producto.numeric' => 'El precio del producto debe ser un valor numérico.',
             'precio_producto.min' => 'El precio del producto debe ser mayor o igual a 0.01.',
             'precio_producto.max' => 'El precio del producto no debe exceder 999999.99.',
-
-            'proveedor_fk.exists' => 'El proveedor seleccionado no es válido.',
         ]);
 
         $producto=new Producto();
@@ -35,7 +32,6 @@ class Producto_controller extends Controller
         $producto->nombre_producto=$req->nombre_producto;
         $producto->tipo_producto_fk=$req->tipo_producto_fk;
         $producto->precio_producto=$req->precio_producto;
-        $producto->proveedor_fk=$req->proveedor_fk;
         $producto->estatus_producto=1;
 
         $producto->save();
@@ -130,7 +126,6 @@ class Producto_controller extends Controller
             'nombre_producto' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:producto,nombre_producto,' . $producto_pk . ',producto_pk'],
             'tipo_producto_fk' => ['exists:tipo_producto,tipo_producto_pk'],
             'precio_producto' => ['numeric', 'min:0.01', 'max:999999.99'],
-            'proveedor_fk' => ['nullable', 'exists:proveedor,proveedor_pk'],
         ], [
             'nombre_producto.regex' => 'El nombre del producto solo puede contener letras, números y espacios.',
             'nombre_producto.max' => 'El nombre del producto no puede tener más de :max caracteres.',
@@ -141,14 +136,11 @@ class Producto_controller extends Controller
             'precio_producto.numeric' => 'El precio del producto debe ser un valor numérico.',
             'precio_producto.min' => 'El precio del producto debe ser mayor o igual a 0.01.',
             'precio_producto.max' => 'El precio del producto no debe exceder 999999.99.',
-
-            'proveedor_fk.exists' => 'El proveedor seleccionado no es válido.',
         ]);
 
         $datosProducto->nombre_producto=$req->nombre_producto;
         $datosProducto->tipo_producto_fk=$req->tipo_producto_fk;
         $datosProducto->precio_producto=$req->precio_producto;
-        $datosProducto->proveedor_fk=$req->proveedor_fk;
 
         $datosProducto->save();
         

@@ -9,6 +9,10 @@
     <script src="https://kit.fontawesome.com/69e6d6a4a5.js" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    {{-- Alpine.js CDN --}}
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    {{-- jQuery --}}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     {{-- Tailwind --}}
     @vite('resources/css/app.css')
     {{-- CSS --}}
@@ -52,14 +56,15 @@
                 </button>
             </div>
             <ul>
-                <li class="mb-2"><a href="{{ route('inicio') }}" class="block p-2 hover:bg-gray-100 rounded">Inicio</a></li>
+                <li class="mb-2"><a href="{{ url('/') }}" class="block p-2 hover:bg-gray-100 rounded">Inicio</a></li>
                 <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Ventas</a></li>
                 <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Inventario</a></li>
+                <li class="mb-2"><a href="{{ route('producto.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Productos</a></li>
                 <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Reportes</a></li>
                 <li class="mb-2"><a href="{{ route('cliente.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Clientes</a></li>
                 <li class="mb-2"><a href="{{ route('empleado.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Empleados</a></li>
                 <li class="mb-2"><a href="{{ route('proveedor.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Proveedores</a></li>
-                <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Realizar corte de caja</a></li>
+                <li class="mb-2"><a href="{{ route('corteDeCaja.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Realizar corte de caja</a></li>
                 <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Configuración del sistema</a></li>
                 <li class="mb-2"><a href="{{ route('usuario.logout') }}" class="block p-2 hover:bg-gray-100 rounded">Cerrar sesión</a></li>
             </ul>
@@ -76,7 +81,7 @@
         </div>
         <div class="relative z-10 flex justify-between items-center">
             <button class="text-2xl" onclick="toggleSidebar()">☰</button>
-            <a href="{{ route('inicio') }}">
+            <a href="{{ url('/') }}">
                 <img src="{{ asset('img/logo_lamonalezza.webp') }}" class="w-16 h-16 bg-black rounded-full flex items-center justify-center text-white text-xs text-center">
             </a>
         </div>

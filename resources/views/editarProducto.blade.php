@@ -47,15 +47,6 @@
                             <label for="precio_producto" class="block text-sm font-medium text-gray-700">Precio</label>
                             <input type="number" id="precio_producto" name="precio_producto" value="{{ $datosProducto->precio_producto }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         </div>
-                        <div class="mb-4">
-                            <label for="proveedor_fk" class="block text-sm font-medium text-gray-700">Proveedor del producto</label>
-                            <select name="proveedor_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                <option value="">Selecciona el proveedor</option>
-                                @foreach ($datosProveedor as $dato)
-                                    <option @if ($dato->proveedor_pk == $datosProducto->proveedor_fk) selected @endif value="{{ $dato->proveedor_pk }}">{{ $dato->nombre_proveedor }}</option>
-                                @endforeach
-                            </select>
-                        </div>
                     </div>
                     <div class="mt-6 text-right">
                         <button type="submit" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
