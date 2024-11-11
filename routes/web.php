@@ -8,6 +8,8 @@ use App\Http\Controllers\Cliente_controller;
 use App\Http\Controllers\Proveedor_controller;
 use App\Http\Controllers\Producto_controller;
 use App\Http\Controllers\Corte_caja_controller;
+use App\Http\Controllers\Inventario_controller;
+use App\Http\Controllers\Ingrediente_controller;
 
 Route::get('/', function () {
     $USUARIO_PK = session('usuario_pk');
@@ -26,6 +28,7 @@ Route::get('/ventas', [Pedido_controller::class, 'mostrar'])->name('pedido.mostr
 Route::match(['get', 'put'], '/marcandoPendientePedido/{pedido_pk}', [Pedido_controller::class, 'pendiente'])->name('pedido.pendiente');
 Route::match(['get', 'put'], '/marcandoEntregaPedido/{pedido_pk}', [Pedido_controller::class, 'entregado'])->name('pedido.entregado');
 Route::match(['get', 'put'], '/marcandoCancelacionPedido/{pedido_pk}', [Pedido_controller::class, 'cancelado'])->name('pedido.cancelado');
+Route::get('/ticket/{pedido_pk}', [Pedido_controller::class, 'mostrarTicket'])->name('ticket.mostrar');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -96,6 +99,23 @@ Route::match(['get', 'put'], '/dandoDeAltaProducto/{producto_pk}', [Producto_con
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+// Inventario ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Route::get('/inventario', [Inventario_controller::class, 'mostrar'])->name('inventario.mostrar');
+Route::post('/agregandoStock', [Inventario_controller::class, 'insertar'])->name('inventario.insertar');
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Ingrediente -----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Route::get('/ingredientes', [Ingrediente_controller::class, 'mostrar'])->name('ingrediente.mostrar');
+Route::post('/registrandoIngrediente', [Ingrediente_controller::class, 'insertar'])->name('ingrediente.insertar');
+Route::get('/editarIngrediente/{ingrediente_pk}', [Ingrediente_controller::class, 'datosParaEdicion'])->name('ingrediente.datosParaEdicion');
+Route::put('/editandoIngrediente/{ingrediente_pk}', [Ingrediente_controller::class, 'actualizar'])->name('ingrediente.actualizar');
+Route::match(['get', 'put'], '/dandoDeBajaIngrediente/{ingrediente_pk}', [Ingrediente_controller::class, 'baja'])->name('ingrediente.baja');
+Route::match(['get', 'put'], '/dandoDeAltaIngrediente/{ingrediente_pk}', [Ingrediente_controller::class, 'alta'])->name('ingrediente.alta');
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 // require __DIR__.'/auth.php';

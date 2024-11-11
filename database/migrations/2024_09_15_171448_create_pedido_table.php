@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('numero_transaccion', 50)->nullable();
             $table->unsignedBigInteger('tipo_pago_fk');
             $table->text('notas_remision')->nullable();
+            $table->decimal('pago');
+            $table->decimal('cambio');
             $table->smallInteger('estatus_pedido');
 
             $table->foreign('cliente_fk')

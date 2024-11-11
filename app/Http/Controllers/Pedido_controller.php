@@ -10,6 +10,8 @@ use App\Models\Empleado;
 use App\Models\Medio_pedido;
 use App\Models\Tipo_pago;
 use App\Models\Producto;
+use App\Models\Detalle_ingrediente;
+use App\Models\Inventario;
 
 class Pedido_controller extends Controller
 {
@@ -20,21 +22,31 @@ class Pedido_controller extends Controller
         $tiposPago=Tipo_pago::where('estatus_tipo_pago', '=', 1)->get();
         $productos=Producto::where('estatus_producto', '=', 1)->get();
 
-        return view('inicio', compact('clientes', 'empleados', 'mediosPedido', 'tiposPago', 'productos'));
+        $USUARIO_PK = session('usuario_pk');
+        if ($USUARIO_PK) {
+            $ROL = session('nombre_rol');
+            if ($ROL == 'Administrador') {
+                return view('inicio', compact('clientes', 'empleados', 'mediosPedido', 'tiposPago', 'productos'));
+            } else {
+                return back()->with('message', 'No puedes acceder');
+            }
+        } else {
+            return redirect('/login');
+        }
     }
 
     public function insertar(Request $req) {
         $pedido = new Pedido();
         $pedido->cliente_fk = $req->cliente_fk;
-        $USUARIO_PK = session('usuario_pk');
-        $pedido->empleado_fk = $USUARIO_PK;
-        // $pedido->empleado_fk = $req->empleado_fk;
+        $pedido->empleado_fk = session('usuario_pk');
         $pedido->fecha_hora_pedido = $req->fecha_hora_pedido;
         $pedido->medio_pedido_fk = $req->medio_pedido_fk;
         $pedido->monto_total = $req->monto_total;
         $pedido->numero_transaccion = $req->numero_transaccion;
         $pedido->tipo_pago_fk = $req->tipo_pago_fk;
         $pedido->notas_remision = $req->notas_remision;
+        $pedido->pago = $req->pago;
+        $pedido->cambio = $req->cambio;
         $pedido->estatus_pedido = 1;
     
         if ($pedido->save()) {
@@ -46,17 +58,47 @@ class Pedido_controller extends Controller
                         $detallePedido->producto_fk = $producto_fk;
                         $detallePedido->cantidad_producto = $detalle['cantidad_producto'];
                         $detallePedido->save();
+    
+                        // Obtener ingredientes necesarios para el producto
+                        $ingredientes = Detalle_ingrediente::where('producto_fk', $producto_fk)->get();
+                        foreach ($ingredientes as $ingrediente) {
+                            $ingrediente_fk = $ingrediente->ingrediente_fk;
+                            $cantidad_necesaria = $ingrediente->cantidad_necesaria * $detalle['cantidad_producto'];
+    
+                            // Consultar el inventario para este ingrediente
+                            $inventario = Inventario::where('ingrediente_fk', $ingrediente_fk)->first();
+                            if ($inventario) {
+                                // Sumar la cantidad necesaria a la cantidad parcial
+                                $inventario->cantidad_parcial += $cantidad_necesaria;
+    
+                                // Verificar si cantidad_parcial excede cantidad_paquete
+                                while ($inventario->cantidad_parcial >= $inventario->cantidad_paquete) {
+                                    $inventario->cantidad_parcial -= $inventario->cantidad_paquete;
+                                    $inventario->cantidad_inventario--; // Descontar un paquete completo
+                                }
+    
+                                $inventario->save();
+                            } else {
+                                return back()->with('error', 'No hay suficiente inventario para el ingrediente requerido.');
+                            }
+                        }
                     } else {
-                        return back()->with('error', 'Información incompleta de los productos seleccionados');
+                        return back()->with('error', 'Información incompleta de los productos seleccionados.');
                     }
                 }
-                return back()->with('success', 'Pedido registrado');
+                return redirect()->route('ticket.mostrar', ['pedido_pk' => $pedido->pedido_pk])->with('success', 'Pedido registrado');
             } else {
-                return back()->with('error', 'No se seleccionaron productos válidos para el pedido');
+                return back()->with('error', 'No se seleccionaron productos válidos para el pedido.');
             }
         } else {
-            return back()->with('error', 'Hay algún problema con la información');
+            return back()->with('error', 'Hay algún problema con la información.');
         }
+    }    
+
+    public function mostrarTicket($pedido_pk){
+        $pedido = Pedido::with('cliente', 'productos', 'empleado', 'medio_pedido', 'tipo_pago')
+            ->findOrFail($pedido_pk);
+        return view('ticket', compact('pedido'));
     }
     
     public function mostrar(){
@@ -85,7 +127,7 @@ class Pedido_controller extends Controller
                     $datosPedido->estatus_pedido = 1;
                     $datosPedido->save();
 
-                    return back()->with('success', 'Pedido cancelado');
+                    return back()->with('success', 'Cancelación deshecha');
                 } else {
                     return back()->with('error', 'Hay algún problema con la información');
                 }

@@ -57,9 +57,10 @@
             </div>
             <ul>
                 <li class="mb-2"><a href="{{ url('/') }}" class="block p-2 hover:bg-gray-100 rounded">Inicio</a></li>
-                <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Ventas</a></li>
-                <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Inventario</a></li>
+                <li class="mb-2"><a href="{{ route('pedido.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Ventas</a></li>
+                <li class="mb-2"><a href="{{ route('inventario.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Inventario</a></li>
                 <li class="mb-2"><a href="{{ route('producto.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Productos</a></li>
+                <li class="mb-2"><a href="{{ route('ingrediente.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Ingredientes</a></li>
                 <li class="mb-2"><a href="#" class="block p-2 hover:bg-gray-100 rounded">Reportes</a></li>
                 <li class="mb-2"><a href="{{ route('cliente.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Clientes</a></li>
                 <li class="mb-2"><a href="{{ route('empleado.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Empleados</a></li>

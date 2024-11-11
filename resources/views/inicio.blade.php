@@ -19,60 +19,87 @@
     <div class="main-container">
         <div class="content-container">
             <!-- Columna izquierda -->
-            <div class="left-column">
-                <form action="{{ route('pedido.insertar') }}" method="POST">
+            <div class="left-column bg-white shadow-lg rounded-lg p-6 w-full md:w-1/2 lg:w-1/3">
+                <form action="{{ route('pedido.insertar') }}" method="POST" class="space-y-4 h-full flex flex-col">
                     @csrf
-                    <div class="order-summary">
-                        <h3>Resumen del Pedido</h3>
-                        <div id="order-items" class="order-items">
-                            <div id="productInputs">
+                    <div class="order-summary h-64">
+                        <h3 class="text-lg font-medium mb-4">Resumen del Pedido</h3>
+                        <div id="order-items" class="order-items overflow-y-auto h-[calc(100%-2rem)]">
+                            <div id="productInputs" class="space-y-2">
                                 <!-- Productos seleccionados aquí -->
                             </div>
                         </div>
-                        <div class="order-total">
-                            <span>Total:</span>
-                            <span id="totalAmount">$ 0.00</span>
+                        <div class="order-total flex justify-between items-center mt-4">
+                            <span class="font-medium">Total:</span>
+                            <span id="totalAmount" class="font-bold text-lg">$ 0.00</span>
                         </div>
                     </div>
 
-                    <!-- Campos del pedido -->
-                    <label for="cliente_fk">Cliente:</label>
-                    <select name="cliente_fk" id="cliente_fk" required>
-                        <option value="">Selecciona un cliente</option>
-                        @foreach($clientes as $cliente)
-                            <option value="{{ $cliente->cliente_pk }}">{{ $cliente->nombre_cliente }}</option>
-                        @endforeach
-                    </select>
-                    
-                    <label for="empleado">Empleado:</label>
-                    <input type="text" value="{{ $USUARIO }}" readonly>
-                    {{-- <input type="hidden" name="empleado_fk" id="empleado_fk" value="{{ $USUARIO_PK }}"> --}}
-                    
-                    <label for="medio_pedido">Medio de Pedido:</label>
-                    <select name="medio_pedido_fk" id="medio_pedido" required>
-                        <option value="">Selecciona un medio de pedido</option>
-                        @foreach($mediosPedido as $medio)
-                            <option value="{{ $medio->medio_pedido_pk }}">{{ $medio->nombre_medio_pedido }}</option>
-                        @endforeach
-                    </select>
-                    
-                    <label for="tipo_pago_fk">Tipo de Pago:</label>
-                    <select name="tipo_pago_fk" id="tipo_pago_fk" required>
-                        <option value="">Selecciona un tipo de pago</option>
-                        @foreach($tiposPago as $tipo)
-                            <option value="{{ $tipo->tipo_pago_pk }}">{{ $tipo->nombre_tipo_pago }}</option>
-                        @endforeach
-                    </select>
+                    <div class="space-y-4 overflow-y-auto flex-1 pb-8">
+                        <!-- Campos del pedido -->
+                        <div>
+                            <label for="cliente_fk" class="block font-medium mb-2">Cliente:</label>
+                            <select name="cliente_fk" id="cliente_fk" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                                <option value="">Selecciona un cliente</option>
+                                @foreach($clientes as $cliente)
+                                    <option value="{{ $cliente->cliente_pk }}">{{ $cliente->nombre_cliente }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <label for="notas_remision">Notas de remisión:</label>
-                    <textarea name="notas_remision" id="notas_remision" cols="30" rows="10"></textarea>
+                        <div>
+                            <label for="empleado" class="block font-medium mb-2">Empleado:</label>
+                            <input type="text" value="{{ $USUARIO }}" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
 
-                    <label for="fecha_hora_pedido">Fecha y Hora del Pedido:</label>
-                    <input type="datetime-local" name="fecha_hora_pedido" id="fecha_hora_pedido" value="{{ \Carbon\Carbon::now()->format('Y-m-d\TH:i') }}" required>
+                        <div>
+                            <label for="medio_pedido" class="block font-medium mb-2">Medio de Pedido:</label>
+                            <select name="medio_pedido_fk" id="medio_pedido" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                                <option value="">Selecciona un medio de pedido</option>
+                                @foreach($mediosPedido as $medio)
+                                    <option value="{{ $medio->medio_pedido_pk }}">{{ $medio->nombre_medio_pedido }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <input type="hidden" name="monto_total" id="monto_total" value="0">
+                        <div>
+                            <label for="tipo_pago_fk" class="block font-medium mb-2">Tipo de Pago:</label>
+                            <select name="tipo_pago_fk" id="tipo_pago_fk" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                                <option value="">Selecciona un tipo de pago</option>
+                                @foreach($tiposPago as $tipo)
+                                    <option value="{{ $tipo->tipo_pago_pk }}">{{ $tipo->nombre_tipo_pago }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                    <button type="submit">Registrar Pedido</button>
+                        <div>
+                            <label for="notas_remision" class="block font-medium mb-2">Notas de remisión:</label>
+                            <textarea name="notas_remision" id="notas_remision" cols="30" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+
+                        <div>
+                            <label for="pago" class="block font-medium mb-2">Pago:</label>
+                            <input type="number" name="pago" id="pago" value="{{ old('pago') }}" min="0" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+
+                        <div>
+                            <label for="cambio" class="block font-medium mb-2">Cambio</label>
+                            <input type="number" id="cambio" name="cambio" value="{{ old('cambio') }}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" readonly>
+                        </div>
+
+                        <div>
+                            <label for="fecha_hora_pedido" class="block font-medium mb-2">Fecha y Hora del Pedido:</label>
+                            <input type="datetime-local" name="fecha_hora_pedido" id="fecha_hora_pedido" value="{{ \Carbon\Carbon::now()->format('Y-m-d\TH:i') }}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+
+                        <input type="hidden" name="monto_total" id="monto_total" value="0">
+
+                        <div class="flex justify-self-start">
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md">
+                                Registrar Pedido
+                            </button>
+                        </div>
+                    </div>
                 </form>
             </div>
             
@@ -192,7 +219,48 @@
                     document.getElementById('totalAmount').textContent = `$ ${total.toFixed(2)}`;
                     document.getElementById('monto_total').value = total.toFixed(2);
                 }
+
+
+
+                // Obtén los elementos del formulario
+                const montoTotalInput = document.getElementById('monto_total');
+                const pagoInput = document.getElementById('pago');
+                const cambioInput = document.getElementById('cambio');
+
+                // Función para actualizar el cambio
+                function actualizarCambio() {
+                    const montoTotal = parseFloat(montoTotalInput.value) || 0;
+                    const pago = parseFloat(pagoInput.value) || 0;
+
+                    // Si el pago es mayor o igual al monto total, calcula el cambio
+                    const cambio = pago >= montoTotal ? pago - montoTotal : 0;
+
+                    // Actualiza el campo de cambio
+                    cambioInput.value = cambio.toFixed(2);  // Redondeamos a 2 decimales
+                }
+
+                // Añadir eventos para calcular el cambio en tiempo real
+                pagoInput.addEventListener('input', actualizarCambio);
             </script>
+
+            @if ($errors->any())
+                <script>
+                    Swal.fire({
+                        title: 'Errores de validación',
+                        html: '{!! implode('<br>', $errors->all()) !!}',
+                        icon: 'error',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 5000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer);
+                            toast.addEventListener('mouseleave', Swal.resumeTimer);
+                        }
+                    });
+                </script>
+            @endif
 
         </div>
     </div>

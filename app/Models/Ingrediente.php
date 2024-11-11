@@ -13,6 +13,7 @@ class Ingrediente extends Model
     protected $primaryKey='ingrediente_pk';
     protected $fillable = [
         'nombre_ingrediente',
+        'cantidad_paquete',
         'estatus_ingrediente'
     ];
     public $timestamps=false;
@@ -23,6 +24,6 @@ class Ingrediente extends Model
         return $this->hasMany(Inventario::class, 'ingrediente_fk');
     }
     public function productos() {
-        return $this->belongsToMany(Producto::class, 'producto_ingrediente', 'ingrediente_fk', 'producto_fk');
+        return $this->belongsToMany(Producto::class, 'detalle_ingrediente', 'ingrediente_fk', 'producto_fk');
     }
 }

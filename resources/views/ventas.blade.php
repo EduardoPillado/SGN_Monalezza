@@ -48,7 +48,11 @@
                                 @else
                                     <td class="py-2"><em>Sin número de transacción</em></td>
                                 @endif
-                                <td class="py-2">{{ $dato->notas_remision }}</td>
+                                @if ( $dato->numero_transaccion )
+                                    <td class="py-2">{{ $dato->notas_remision }}</td>
+                                @else
+                                    <td class="py-2"><em>Sin notas de remisión</em></td>
+                                @endif
                                 @if ( $dato->estatus_pedido == 1 )
                                     <td class="py-2">Pendiente</td>
                                 @elseif ( $dato->estatus_pedido == 0 )
@@ -68,7 +72,7 @@
                                     @if ( $dato->estatus_pedido != 2 )
                                         <a href="{{ route('pedido.cancelado', $dato->pedido_pk) }}" onclick="confirmarCancelacion(event)" class="bg-red-500 text-white px-2 py-1 rounded">Cancelar</a>
                                     @elseif ( $dato->estatus_pedido == 2 )
-                                        <a href="{{ route('pedido.pendiente', $dato->pedido_pk) }}" onclick="confirmarDesCancelacion(event)" class="bg-green-500 text-white px-2 py-1 rounded">Des cancelar</a>
+                                        <a href="{{ route('pedido.pendiente', $dato->pedido_pk) }}" onclick="confirmarDesCancelacion(event)" class="bg-green-500 text-white px-2 py-1 rounded">Deshacer cancelación</a>
                                     @endif
                                 </td>
                             </tr>

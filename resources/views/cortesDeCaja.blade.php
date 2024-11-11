@@ -181,7 +181,6 @@
     
             // Encabezado de la sección de impresión
             printWindow.document.write('<div class="print-section">');
-            printWindow.document.write('<div class="header-text"><span>Fecha inicial</span><span>Fecha final</span></div>');
             
             // Agregar la fila de datos y los detalles (excluyendo la columna de acciones)
             printWindow.document.write('<table>');
