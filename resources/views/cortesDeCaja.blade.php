@@ -19,7 +19,7 @@
         <div class="flex-grow overflow-y-auto p-4">
             <h1 class="text-2xl font-bold mb-4">Cortes de Caja</h1>
             <div class="bg-white shadow-md rounded-lg p-4">
-                <table id="tabla-cortesDeCaja" class="w-full">
+                <table id="tabla-corte-caja" class="w-full">
                     <thead>
                         <tr class="border-b">
                             <th class="text-left py-2">Fecha inicial</th>
@@ -30,8 +30,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ( $datosCorteCaja as $dato )
-                            <tr class="border-b cursor-pointer" onclick="toggleDetails('detalle-{{ $dato->corte_caja_pk }}')" title="CLIC PARA VER DETALLES">
+                        @foreach ($datosCorteCaja as $dato)
+                            <tr class="border-b cursor-pointer" title="CLIC PARA VER DETALLES" data-empleados='@json($dato->empleados)'>
                                 <td class="py-2">{{ $dato->fecha_corte_inicio }}</td>
                                 <td class="py-2">{{ $dato->fecha_corte_fin }}</td>
                                 <td class="py-2">{{ $dato->cantidad_ventas }}</td>
@@ -40,19 +40,6 @@
                                     <button onclick="printRecord({{ $dato->corte_caja_pk }})" type="button" class="bg-blue-500 text-white px-4 py-2 rounded">
                                         <span>Imprimir corte</span>
                                     </button>
-                                </td>
-                            </tr>
-
-                            <tr id="detalle-{{ $dato->corte_caja_pk }}" class="hidden">
-                                <td colspan="10" class="p-4 bg-gray-50">
-                                    <strong>Empleados que realizaron las ventas:</strong>
-                                    <ul>
-                                        @foreach ($dato->corte_empleado as $detalle)
-                                            <li>
-                                                {{ $detalle->empleado->usuario->usuario }}
-                                            </li>
-                                        @endforeach
-                                    </ul>
                                 </td>
                             </tr>
                         @endforeach
@@ -65,33 +52,56 @@
         </div>
 
         <script>
-            $.fn.dataTable.ext.errMode = 'none';
             // Tabla con DataTable
             $(document).ready(function () {
-                $('#tabla-cortesDeCaja').DataTable({
-                    "language": {
-                    "search": "Buscar:",
-                    "info": "Mostrando página _PAGE_ de _PAGES_",
-                    "infoEmpty": "No hay registros disponibles",
-                    "infoFiltered": "(filtrado de _MAX_ registros totales)",
-                    "zeroRecords": "Sin cortes registrados",
-                    "lengthMenu": "Mostrar _MENU_ registros por página",
-                        "paginate": {
-                            "first": "Primero",
-                            "last": "Último",
-                            "next": "Siguiente",
-                            "previous": "Anterior"
+                const table = $('#tabla-corte-caja').DataTable({
+                    language: {
+                        search: "Buscar:",
+                        info: "Mostrando página _PAGE_ de _PAGES_",
+                        infoEmpty: "No hay registros disponibles",
+                        infoFiltered: "(filtrado de _MAX_ registros totales)",
+                        zeroRecords: "Sin registros de cortes de caja",
+                        lengthMenu: "Mostrar _MENU_ registros por página",
+                        paginate: {
+                            first: "Primero",
+                            last: "Último",
+                            next: "Siguiente",
+                            previous: "Anterior"
                         }
                     }
                 });
-            });
 
-            function toggleDetails(id) {
-                const row = document.getElementById(id);
-                if (row) {
-                    row.classList.toggle('hidden');
+                // Añadir el evento de clic para expandir detalles
+                $('#tabla-corte-caja tbody').on('click', 'tr', function () {
+                    const row = table.row(this);
+                    const empleados = $(this).data('empleados'); // Acceder a los empleados desde el atributo data-empleados
+
+                    if (row.child.isShown()) {
+                        // Si está expandido, lo oculta
+                        row.child.hide();
+                        $(this).removeClass('shown');
+                    } else {
+                        // Si no está expandido, lo muestra
+                        row.child(formatDetails(empleados)).show();
+                        $(this).addClass('shown');
+                    }
+                });
+
+                // Función para formatear el contenido de los detalles
+                function formatDetails(empleados) {
+                    let contenido = 'No hay empleados asociados.';
+                    
+                    if (empleados && empleados.length > 0) {
+                        contenido = empleados
+                            .map(empleado => empleado.usuario ? `${empleado.usuario.usuario}` : 'Usuario no disponible')
+                            .join(', ');
+                    }
+
+                    return `<div class="p-4 bg-gray-50">
+                                <strong>Empleados que realizaron ventas:</strong> ${contenido}
+                            </div>`;
                 }
-            }
+            });
         </script>
 
         <!-- Modal de corte de caja -->
@@ -147,7 +157,7 @@
     <script>
         function printRecord(recordId) {
             // Obtener la fila del registro específico usando el ID
-            var recordRow = document.querySelector(`#tabla-cortesDeCaja tbody tr:nth-child(${recordId * 2 - 1})`);
+            var recordRow = document.querySelector(`#tabla-corte-caja tbody tr:nth-child(${recordId * 2 - 1})`);
             var detailsRow = document.getElementById(`detalle-${recordId}`);
             
             // Clonar la fila del registro y excluir la última columna (acciones)

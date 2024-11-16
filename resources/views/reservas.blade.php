@@ -16,10 +16,11 @@
 }">
 
     @php
-        use Carbon\Carbon;
-
         use App\Models\Cliente;
-        $datosCliente=Tipo_producto::all();
+        $datosCliente=Cliente::all();
+
+        use App\Models\Mesa;
+        $datosMesa=Mesa::all();
     @endphp
 
     <div class="h-screen flex flex-col">
@@ -116,7 +117,7 @@
                     }
 
                     return `<div class="p-4 bg-gray-50">
-                                <strong>Mesas reservas:</strong> ${contenido}
+                                <strong>Mesas reservadas:</strong> ${contenido}
                             </div>`;
                 }
             });
@@ -184,12 +185,30 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label for="fecha_hora_reserva" class="block text-sm font-medium text-gray-700">Fecha y hora de reserva</label>
-                                <input type="datetime-local" id="fecha_hora_reserva" name="fecha_hora_reserva" value="{{ \Carbon\Carbon::now()->format('Y-m-d\TH:i') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                <label for="fecha_hora_reserva" class="block text-sm font-medium text-gray-700">Fecha y hora de reservación</label>
+                                <input type="datetime-local" id="fecha_hora_reserva" name="fecha_hora_reserva" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
                                 <label for="notas" class="block text-sm font-medium text-gray-700">Notas</label>
                                 <textarea name="notas" id="notas" cols="30" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                            </div>
+                            <div class="mb-4">
+                                <div id="mesas-container">
+                                    <div class="flex items-center mb-2">
+                                        <div class="flex flex-col w-3/4">
+                                            <label for="mesas[]" class="block text-sm font-medium text-gray-700">Mesa</label>
+                                            <select name="mesas[]" class="w-full rounded-md border-gray-300 mb-2" required>
+                                                <option value="">Selecciona número de mesa</option>
+                                                @foreach ($datosMesa as $dato)
+                                                    <option value="{{ $dato->mesa_pk }}">{{ $dato->numero_mesa }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="flex w-1/4 justify-center">
+                                            <button type="button" onclick="agregarMesa()" class="px-3 py-1 bg-blue-500 text-white rounded">+</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="items-center px-4 py-3">
                                 <button type="button" @click="modalOpen = false" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
@@ -204,6 +223,35 @@
                 </div>
             </div>
         </div>
+
+        <script>
+            function agregarMesa() {
+                const container = document.getElementById('mesas-container');
+                const newMesa = document.createElement('div');
+                
+                newMesa.classList.add('flex', 'items-center', 'mb-2');
+                
+                newMesa.innerHTML = `
+                    <div class="flex flex-col w-3/4">
+                        <select name="mesas[]" class="w-full rounded-md border-gray-300 mb-2" required>
+                            <option value="">Selecciona número de mesa</option>
+                            @foreach ($datosMesa as $dato)
+                                <option value="{{ $dato->mesa_pk }}">{{ $dato->numero_mesa }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex w-1/4 justify-center">
+                        <button type="button" onclick="eliminarMesa(this)" class="px-2 py-1 bg-red-500 text-white rounded">-</button>
+                    </div>
+                `;
+        
+                container.appendChild(newMesa);
+            }
+        
+            function eliminarMesa(button) {
+                button.parentNode.parentNode.remove();
+            }
+        </script>
 
         @if ($errors->any())
             <script>

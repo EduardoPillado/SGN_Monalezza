@@ -102,7 +102,7 @@ class Pedido_controller extends Controller
     }
     
     public function mostrar(){
-        $datosPedido = Pedido::all();
+        $datosPedido = Pedido::with('detalle_pedido.producto.tipo_producto')->get();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
             $ROL = session('nombre_rol');

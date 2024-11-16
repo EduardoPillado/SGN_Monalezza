@@ -19,7 +19,7 @@
         <div class="flex-grow overflow-y-auto p-4">
             <h1 class="text-2xl font-bold mb-4">Ventas</h1>
             <div class="bg-white shadow-md rounded-lg p-4">
-                <table id="tabla-ventas" class="w-full">
+                <table id="tabla-pedidos" class="w-full">
                     <thead>
                         <tr class="border-b">
                             <th class="text-left py-2">Cliente</th>
@@ -36,7 +36,7 @@
                     </thead>
                     <tbody>
                         @foreach ( $datosPedido as $dato )
-                            <tr class="border-b cursor-pointer" onclick="toggleDetails('detalle-{{ $dato->pedido_pk }}')" title="CLIC PARA VER DETALLES">
+                            <tr class="border-b cursor-pointer" title="CLIC PARA VER DETALLES" data-detalles='@json($dato->detalle_pedido)'>
                                 <td class="py-2">{{ $dato->cliente->nombre_cliente }}</td>
                                 <td class="py-2">{{ $dato->empleado->usuario->usuario }}</td>
                                 <td class="py-2">{{ $dato->fecha_hora_pedido }}</td>
@@ -76,28 +76,6 @@
                                     @endif
                                 </td>
                             </tr>
-
-                            <tr id="detalle-{{ $dato->pedido_pk }}" class="hidden">
-                                <td colspan="10" class="p-4 bg-gray-50">
-                                    <strong>Productos:</strong>
-                                    <ul>
-                                        @foreach ($dato->detalle_pedido as $detalle)
-                                            @php
-                                                $subtotal = $detalle->cantidad_producto * $detalle->producto->precio_producto;
-                                            @endphp
-                                            <li>
-                                                {{ $detalle->producto->nombre_producto }} 
-                                                ({{ $detalle->producto->tipo_producto->nombre_tipo_producto }}) - 
-                                                {{ $detalle->cantidad_producto }} unidades - 
-                                                Precio: ${{ $detalle->producto->precio_producto }}
-                                                @if ( $detalle->cantidad_producto >= 2 )
-                                                     - Subtotal: ${{ $subtotal }}
-                                                @endif
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </td>
-                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -105,33 +83,63 @@
         </div>
 
         <script>
-            $.fn.dataTable.ext.errMode = 'none';
-            // Tabla con DataTable
             $(document).ready(function () {
-                $('#tabla-ventas').DataTable({
-                    "language": {
-                    "search": "Buscar:",
-                    "info": "Mostrando página _PAGE_ de _PAGES_",
-                    "infoEmpty": "No hay registros disponibles",
-                    "infoFiltered": "(filtrado de _MAX_ registros totales)",
-                    "zeroRecords": "Sin ventas registradas",
-                    "lengthMenu": "Mostrar _MENU_ registros por página",
-                        "paginate": {
-                            "first": "Primero",
-                            "last": "Último",
-                            "next": "Siguiente",
-                            "previous": "Anterior"
+                const table = $('#tabla-pedidos').DataTable({
+                    language: {
+                        search: "Buscar:",
+                        info: "Mostrando página _PAGE_ de _PAGES_",
+                        infoEmpty: "No hay registros disponibles",
+                        infoFiltered: "(filtrado de _MAX_ registros totales)",
+                        zeroRecords: "Sin registros de pedidos",
+                        lengthMenu: "Mostrar _MENU_ registros por página",
+                        paginate: {
+                            first: "Primero",
+                            last: "Último",
+                            next: "Siguiente",
+                            previous: "Anterior"
                         }
                     }
                 });
-            });
 
-            function toggleDetails(id) {
-                const row = document.getElementById(id);
-                if (row) {
-                    row.classList.toggle('hidden');
+                // Añadir el evento de clic para expandir detalles
+                $('#tabla-pedidos tbody').on('click', 'tr', function () {
+                    const row = table.row(this);
+                    const detalles = $(this).data('detalles'); // Acceder a los detalles desde el atributo data-detalles
+
+                    if (row.child.isShown()) {
+                        // Si está expandido, lo oculta
+                        row.child.hide();
+                        $(this).removeClass('shown');
+                    } else {
+                        // Si no está expandido, lo muestra
+                        row.child(formatDetails(detalles)).show();
+                        $(this).addClass('shown');
+                    }
+                });
+
+                // Función para formatear el contenido de los detalles
+                function formatDetails(detalles) {
+                    let contenido = 'No hay productos asociados.';
+                    
+                    if (detalles && detalles.length > 0) {
+                        contenido = '<ul>' + detalles.map(detalle => {
+                            const producto = detalle.producto ? detalle.producto.nombre_producto : 'Producto no disponible';
+                            const tipoProducto = detalle.producto && detalle.producto.tipo_producto ? detalle.producto.tipo_producto.nombre_tipo_producto : 'Tipo no disponible';
+                            const precio = detalle.producto ? detalle.producto.precio_producto : 0;
+                            const subtotal = detalle.cantidad_producto * precio;
+                            
+                            return `<li>
+                                ${producto} (${tipoProducto}) - ${detalle.cantidad_producto} unidades - Precio: $${precio}
+                                ${detalle.cantidad_producto >= 2 ? ` - Subtotal: $${subtotal}` : ''}
+                            </li>`;
+                        }).join('') + '</ul>';
+                    }
+
+                    return `<div class="p-4 bg-gray-50">
+                                <strong>Productos:</strong> ${contenido}
+                            </div>`;
                 }
-            }
+            });
 
             // Alerta de confirmación de entrega
             function confirmarEntrega(event) {

@@ -134,52 +134,51 @@ class Producto_controller extends Controller
         }
     }
 
-    public function actualizar(Request $req, $producto_pk)
-{
-    $datosProducto = Producto::findOrFail($producto_pk);
+    public function actualizar(Request $req, $producto_pk){
+        $datosProducto = Producto::findOrFail($producto_pk);
 
-    $req->validate([
-        'nombre_producto' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:producto,nombre_producto,' . $producto_pk . ',producto_pk'],
-        'tipo_producto_fk' => ['exists:tipo_producto,tipo_producto_pk'],
-        'precio_producto' => ['numeric', 'min:0.01', 'max:999999.99'],
-        'ingredientes.*' => ['nullable', 'exists:ingrediente,ingrediente_pk'],
-    ], [
-        'nombre_producto.regex' => 'El nombre del producto solo puede contener letras, números y espacios.',
-        'nombre_producto.max' => 'El nombre del producto no puede tener más de :max caracteres.',
-        'nombre_producto.unique' => 'El nombre del producto ya existe.',
+        $req->validate([
+            'nombre_producto' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:producto,nombre_producto,' . $producto_pk . ',producto_pk'],
+            'tipo_producto_fk' => ['exists:tipo_producto,tipo_producto_pk'],
+            'precio_producto' => ['numeric', 'min:0.01', 'max:999999.99'],
+            'ingredientes.*' => ['nullable', 'exists:ingrediente,ingrediente_pk'],
+        ], [
+            'nombre_producto.regex' => 'El nombre del producto solo puede contener letras, números y espacios.',
+            'nombre_producto.max' => 'El nombre del producto no puede tener más de :max caracteres.',
+            'nombre_producto.unique' => 'El nombre del producto ya existe.',
 
-        'tipo_producto_fk.exists' => 'El tipo de producto seleccionado no es válido.',
+            'tipo_producto_fk.exists' => 'El tipo de producto seleccionado no es válido.',
 
-        'precio_producto.numeric' => 'El precio del producto debe ser un valor numérico.',
-        'precio_producto.min' => 'El precio del producto debe ser mayor o igual a 0.01.',
-        'precio_producto.max' => 'El precio del producto no debe exceder 999999.99.',
+            'precio_producto.numeric' => 'El precio del producto debe ser un valor numérico.',
+            'precio_producto.min' => 'El precio del producto debe ser mayor o igual a 0.01.',
+            'precio_producto.max' => 'El precio del producto no debe exceder 999999.99.',
 
-        'ingredientes.*.exists' => 'El ingrediente seleccionado no es válido.',
-    ]);
+            'ingredientes.*.exists' => 'El ingrediente seleccionado no es válido.',
+        ]);
 
-    $datosProducto->nombre_producto = $req->nombre_producto;
-    $datosProducto->tipo_producto_fk = $req->tipo_producto_fk;
-    $datosProducto->precio_producto = $req->precio_producto;
-    $datosProducto->save();
+        $datosProducto->nombre_producto = $req->nombre_producto;
+        $datosProducto->tipo_producto_fk = $req->tipo_producto_fk;
+        $datosProducto->precio_producto = $req->precio_producto;
+        $datosProducto->save();
 
-    $ingredientes = $req->ingredientes ? array_filter($req->ingredientes) : [];
-    
-    Detalle_ingrediente::where('producto_fk', $producto_pk)->delete();
+        $ingredientes = $req->ingredientes ? array_filter($req->ingredientes) : [];
+        
+        Detalle_ingrediente::where('producto_fk', $producto_pk)->delete();
 
-    foreach ($ingredientes as $index => $ingrediente_pk) {
-        if (isset($req->cantidades_necesarias[$index])) {
-            $detalle = new Detalle_ingrediente();
-            $detalle->producto_fk = $producto_pk;
-            $detalle->ingrediente_fk = $ingrediente_pk;
-            $detalle->cantidad_necesaria = $req->cantidades_necesarias[$index];
-            $detalle->save();
+        foreach ($ingredientes as $index => $ingrediente_pk) {
+            if (isset($req->cantidades_necesarias[$index])) {
+                $detalle = new Detalle_ingrediente();
+                $detalle->producto_fk = $producto_pk;
+                $detalle->ingrediente_fk = $ingrediente_pk;
+                $detalle->cantidad_necesaria = $req->cantidades_necesarias[$index];
+                $detalle->save();
+            }
+        }
+        
+        if ($datosProducto->producto_pk) {
+            return redirect('/productos')->with('success', 'Datos de producto actualizados');
+        } else {
+            return back()->with('error', 'Hay algún problema con la información');
         }
     }
-    
-    if ($datosProducto->producto_pk) {
-        return redirect('/productos')->with('success', 'Datos de producto actualizados');
-    } else {
-        return back()->with('error', 'Hay algún problema con la información');
-    }
-}
 }
