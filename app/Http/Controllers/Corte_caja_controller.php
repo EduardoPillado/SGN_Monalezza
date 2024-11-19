@@ -43,6 +43,11 @@ class Corte_caja_controller extends Controller
 
     public function mostrar(){
         $datosCorteCaja = Corte_caja::with('empleados.usuario')->get();
-        return view('cortesDeCaja', compact('datosCorteCaja'));
+        $USUARIO_PK = session('usuario_pk');
+        if ($USUARIO_PK) {
+            return view('cortesDeCaja', compact('datosCorteCaja'));
+        } else {
+            return redirect('/login');
+        }
     }
 }

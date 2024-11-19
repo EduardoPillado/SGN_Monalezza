@@ -3,13 +3,22 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '8721c717952c49da19ca4d01e4853ea717303a49',
+        'reference' => '091c4c86ef42028aa76992c699b354b3bd1c15c7',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => true,
     ),
     'versions' => array(
+        'azuyalabs/yasumi' => array(
+            'pretty_version' => '2.7.0',
+            'version' => '2.7.0.0',
+            'reference' => '37d1215d4f4012d3185bb9990c76ca17a4ff1c30',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../azuyalabs/yasumi',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'bacon/bacon-qr-code' => array(
             'pretty_version' => 'v3.0.1',
             'version' => '3.0.1.0',
@@ -424,7 +433,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '8721c717952c49da19ca4d01e4853ea717303a49',
+            'reference' => '091c4c86ef42028aa76992c699b354b3bd1c15c7',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

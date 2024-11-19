@@ -26,18 +26,18 @@
                             <th class="text-left py-2">Fecha final</th>
                             <th class="text-left py-2">Cantidad de ventas</th>
                             <th class="text-left py-2">Ganancias totales</th>
-                            <th class="text-right py-2">Acciones</th>
+                            <th class="no-print text-right py-2">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($datosCorteCaja as $dato)
-                            <tr class="border-b cursor-pointer" title="CLIC PARA VER DETALLES" data-empleados='@json($dato->empleados)'>
+                            <tr id="registro-{{ $dato->corte_caja_pk }}" class="border-b cursor-pointer" title="CLIC PARA VER DETALLES" data-empleados='@json($dato->empleados)'>
                                 <td class="py-2">{{ $dato->fecha_corte_inicio }}</td>
                                 <td class="py-2">{{ $dato->fecha_corte_fin }}</td>
                                 <td class="py-2">{{ $dato->cantidad_ventas }}</td>
                                 <td class="py-2">${{ $dato->ganancia_total }}</td>
-                                <td class="text-right py-2">
-                                    <button onclick="printRecord({{ $dato->corte_caja_pk }})" type="button" class="bg-blue-500 text-white px-4 py-2 rounded">
+                                <td class="no-print text-right py-2">
+                                    <button onclick="printRecord('registro-{{ $dato->corte_caja_pk }}')" type="button" class="bg-blue-500 text-white px-4 py-2 rounded">
                                         <span>Imprimir corte</span>
                                     </button>
                                 </td>
@@ -55,6 +55,7 @@
             // Tabla con DataTable
             $(document).ready(function () {
                 const table = $('#tabla-corte-caja').DataTable({
+                    paging: false,
                     language: {
                         search: "Buscar:",
                         info: "Mostrando página _PAGE_ de _PAGES_",
@@ -62,12 +63,12 @@
                         infoFiltered: "(filtrado de _MAX_ registros totales)",
                         zeroRecords: "Sin registros de cortes de caja",
                         lengthMenu: "Mostrar _MENU_ registros por página",
-                        paginate: {
-                            first: "Primero",
-                            last: "Último",
-                            next: "Siguiente",
-                            previous: "Anterior"
-                        }
+                        // paginate: {
+                        //     first: "Primero",
+                        //     last: "Último",
+                        //     next: "Siguiente",
+                        //     previous: "Anterior"
+                        // }
                     }
                 });
 
@@ -156,26 +157,27 @@
     
     <script>
         function printRecord(recordId) {
-            // Obtener la fila del registro específico usando el ID
-            var recordRow = document.querySelector(`#tabla-corte-caja tbody tr:nth-child(${recordId * 2 - 1})`);
-            var detailsRow = document.getElementById(`detalle-${recordId}`);
-            
-            // Clonar la fila del registro y excluir la última columna (acciones)
-            var clonedRecordRow = recordRow.cloneNode(true);
-            clonedRecordRow.removeChild(clonedRecordRow.lastElementChild);
-    
-            // Clonar la fila de detalles, si existe
-            var detailsContent = detailsRow ? detailsRow.cloneNode(true).outerHTML : '';
-    
+            const noPrintElements = document.querySelectorAll('.no-print');
+            noPrintElements.forEach(el => el.style.display = 'none');
+
+            var recordRow = document.getElementById(recordId); // Seleccionar por ID único
+            if (!recordRow) {
+                alert('No se pudo encontrar el registro para imprimir.');
+                return;
+            }
+
+            // Obtener datos de empleados
+            const empleados = JSON.parse(recordRow.dataset.empleados || '[]');
+
             // Crear la ventana de impresión
             var printWindow = window.open('', '', 'width=800,height=600');
             printWindow.document.write('<html><head><title>Corte de Caja</title></head><body>');
-    
+
             // Encabezado con logo
             printWindow.document.write('<div style="text-align: center; margin-bottom: 20px;">');
             printWindow.document.write('<img src="{{ asset("img/logo_lamonalezza.webp") }}" alt="Logo" style="width: 150px; max-width: 100%; height: auto;" />');
             printWindow.document.write('</div>');
-            
+
             // Estilos personalizados para impresión
             printWindow.document.write('<style type="text/css" media="print"> \
                 body { font-family: Arial, sans-serif; } \
@@ -184,28 +186,37 @@
                 th, td { border: 1px solid #000; padding: 10px; text-align: center; } \
                 th { background-color: #f2f2f2; font-weight: bold; } \
                 .section-title { font-weight: bold; margin-top: 20px; text-align: left; width: 60%; margin: 0 auto; } \
-                .header-text { display: flex; justify-content: space-between; font-weight: bold; margin: 20px auto; width: 60%; } \
-                .no-print { display: none; } \
                 @page { margin: 1cm; } \
             </style>');
-    
-            // Encabezado de la sección de impresión
+
+            // Tabla principal
             printWindow.document.write('<div class="print-section">');
-            
-            // Agregar la fila de datos y los detalles (excluyendo la columna de acciones)
             printWindow.document.write('<table>');
             printWindow.document.write('<tr><th>Fecha inicial</th><th>Fecha final</th><th>Cantidad de ventas</th><th>Ganancias totales</th></tr>');
-            printWindow.document.write(clonedRecordRow.outerHTML);
-            if (detailsContent) {
-                printWindow.document.write(detailsContent);
-            }
+            printWindow.document.write(recordRow.outerHTML);
             printWindow.document.write('</table>');
-    
+
+            if (empleados.length > 0) {
+                printWindow.document.write('<table style="width: 60%; margin: 0 auto; border-collapse: collapse;">');
+                printWindow.document.write('<tr><th>Empleados que realizaron ventas:</th></tr>');
+                empleados.forEach(empleado => {
+                    const usuario = empleado.usuario ? empleado.usuario.usuario : 'Empleado no disponible';
+                    printWindow.document.write(`<tr><td>${usuario}</td></tr>`);
+                });
+                printWindow.document.write('</table>');
+            } else {
+                printWindow.document.write('<p style="text-align: center;">No hay empleados asociados.</p>');
+            }
+
             printWindow.document.write('</div>');
             printWindow.document.write('</body></html>');
             printWindow.document.close();
-            printWindow.print();
+            printWindow.onload = () => {
+                printWindow.print();
+                noPrintElements.forEach(el => el.style.display = ''); // Restaurar visibilidad
+                printWindow.close();
+            };
         }
-    </script>    
+    </script>
 </body>
 </html>
