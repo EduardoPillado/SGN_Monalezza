@@ -57,10 +57,10 @@
             </div>
             <ul>
                 <li class="mb-2"><a href="{{ url('/') }}" class="block p-2 hover:bg-gray-100 rounded">Inicio</a></li>
-                <li class="mb-2"><a href="{{ route('pedido.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Ventas</a></li>
+                {{-- <li class="mb-2"><a href="{{ route('pedido.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Ventas</a></li> --}}
                 <li class="mb-2"><a href="{{ route('reserva.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Reservaciones</a></li>
                 <li class="mb-2"><a href="{{ route('inventario.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Inventario</a></li>
-                <li class="mb-2"><a href="{{ route('producto.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Productos</a></li>
+                {{-- <li class="mb-2"><a href="{{ route('producto.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Productos</a></li> --}}
                 <li class="mb-2"><a href="{{ route('ingrediente.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Ingredientes</a></li>
                 <li class="mb-2"><a href="{{ route('asistencia.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Asistencias</a></li>
                 <li class="mb-2"><a href="{{ route('nomina.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Nómina</a></li>

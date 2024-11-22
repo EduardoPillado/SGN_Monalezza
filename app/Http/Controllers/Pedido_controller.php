@@ -24,12 +24,7 @@ class Pedido_controller extends Controller
 
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $ROL = session('nombre_rol');
-            if ($ROL == 'Administrador') {
-                return view('inicio', compact('clientes', 'empleados', 'mediosPedido', 'tiposPago', 'productos'));
-            } else {
-                return back()->with('message', 'No puedes acceder');
-            }
+            return view('inicio', compact('clientes', 'empleados', 'mediosPedido', 'tiposPago', 'productos'));
         } else {
             return redirect('/login');
         }
@@ -105,12 +100,7 @@ class Pedido_controller extends Controller
         $datosPedido = Pedido::with('detalle_pedido.producto.tipo_producto')->get();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $ROL = session('nombre_rol');
-            if ($ROL == 'Administrador') {
-                return view('ventas', compact('datosPedido'));
-            } else {
-                return back()->with('message', 'No puedes acceder');
-            }
+            return view('ventas', compact('datosPedido'));
         } else {
             return redirect('/login');
         }
@@ -120,19 +110,14 @@ class Pedido_controller extends Controller
         $datosPedido = Pedido::findOrFail($pedido_pk);
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $ROL = session('nombre_rol');
-            if ($ROL == 'Administrador') {
-                if ($datosPedido) {
+            if ($datosPedido) {
 
-                    $datosPedido->estatus_pedido = 1;
-                    $datosPedido->save();
+                $datosPedido->estatus_pedido = 1;
+                $datosPedido->save();
 
-                    return back()->with('success', 'Cancelación deshecha');
-                } else {
-                    return back()->with('error', 'Hay algún problema con la información');
-                }
+                return back()->with('success', 'Cancelación deshecha');
             } else {
-                return back()->with('message', 'No puedes acceder');
+                return back()->with('error', 'Hay algún problema con la información');
             }
         } else {
             return redirect('/login');
@@ -143,19 +128,14 @@ class Pedido_controller extends Controller
         $datosPedido = Pedido::findOrFail($pedido_pk);
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $ROL = session('nombre_rol');
-            if ($ROL == 'Administrador') {
-                if ($datosPedido) {
+            if ($datosPedido) {
 
-                    $datosPedido->estatus_pedido = 0;
-                    $datosPedido->save();
+                $datosPedido->estatus_pedido = 0;
+                $datosPedido->save();
 
-                    return back()->with('success', 'Pedido entregado');
-                } else {
-                    return back()->with('error', 'Hay algún problema con la información');
-                }
+                return back()->with('success', 'Pedido entregado');
             } else {
-                return back()->with('message', 'No puedes acceder');
+                return back()->with('error', 'Hay algún problema con la información');
             }
         } else {
             return redirect('/login');
@@ -166,19 +146,14 @@ class Pedido_controller extends Controller
         $datosPedido = Pedido::findOrFail($pedido_pk);
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $ROL = session('nombre_rol');
-            if ($ROL == 'Administrador') {
-                if ($datosPedido) {
+            if ($datosPedido) {
 
-                    $datosPedido->estatus_pedido = 2;
-                    $datosPedido->save();
+                $datosPedido->estatus_pedido = 2;
+                $datosPedido->save();
 
-                    return back()->with('success', 'Pedido cancelado');
-                } else {
-                    return back()->with('error', 'Hay algún problema con la información');
-                }
+                return back()->with('success', 'Pedido cancelado');
             } else {
-                return back()->with('message', 'No puedes acceder');
+                return back()->with('error', 'Hay algún problema con la información');
             }
         } else {
             return redirect('/login');

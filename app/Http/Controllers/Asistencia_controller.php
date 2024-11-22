@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Asistencia;
+use App\Models\Empleado;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 
@@ -72,12 +73,16 @@ class Asistencia_controller extends Controller
 
     public function salida(){
         $USUARIO_PK = session('usuario_pk');
-
         if (!$USUARIO_PK) {
             return redirect('/login');
         }
+        $empleado = Empleado::where('usuario_fk', $USUARIO_PK)->first();
 
-        $asistencia = Asistencia::where('empleado_fk', $USUARIO_PK)
+        if (!$empleado) {
+            return back()->with('error', 'No se encontró un empleado relacionado con el usuario actual.');
+        }
+
+        $asistencia = Asistencia::where('empleado_fk', $empleado->empleado_pk)
             ->whereDate('fecha_asistencia', Carbon::now()->format('Y-m-d'))
             ->whereNull('hora_salida')
             ->first();

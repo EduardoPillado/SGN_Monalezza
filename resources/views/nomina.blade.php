@@ -103,7 +103,11 @@
                             </div>
                             <div class="mb-4">
                                 <label for="salario_base" class="block text-sm font-medium text-gray-700">Salario</label>
-                                <input type="number" id="salario_base" name="salario_base" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                <input type="number" id="salario_base" name="salario_base" value="0.00" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="compensacion_extra" class="block text-sm font-medium text-gray-700">Compensación extra ($)</label>
+                                <input type="number" id="compensacion_extra" name="compensacion_extra" value="0.00" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
                                 <label for="fecha_inicio" class="block text-sm font-medium text-gray-700">Fecha inicial</label>
