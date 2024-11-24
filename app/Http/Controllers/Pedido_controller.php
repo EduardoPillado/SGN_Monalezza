@@ -45,50 +45,109 @@ class Pedido_controller extends Controller
         $pedido->estatus_pedido = 1;
     
         if ($pedido->save()) {
+            $productos_faltantes = [];  // Array para acumular los productos o ingredientes faltantes
+            
             if (!empty($req->productos) && is_array($req->productos)) {
                 foreach ($req->productos as $producto_fk => $detalle) {
                     if (isset($detalle['cantidad_producto'])) {
+                        // Registrar el detalle del pedido
                         $detallePedido = new Detalle_pedido();
                         $detallePedido->pedido_fk = $pedido->pedido_pk;
                         $detallePedido->producto_fk = $producto_fk;
                         $detallePedido->cantidad_producto = $detalle['cantidad_producto'];
                         $detallePedido->save();
-    
-                        // Obtener ingredientes necesarios para el producto
-                        $ingredientes = Detalle_ingrediente::where('producto_fk', $producto_fk)->get();
-                        foreach ($ingredientes as $ingrediente) {
-                            $ingrediente_fk = $ingrediente->ingrediente_fk;
-                            $cantidad_necesaria = $ingrediente->cantidad_necesaria * $detalle['cantidad_producto'];
-    
-                            // Consultar el inventario para este ingrediente
-                            $inventario = Inventario::where('ingrediente_fk', $ingrediente_fk)->first();
+        
+                        // Verificar el tipo de producto
+                        $producto = Producto::find($producto_fk);
+                        if (!$producto) {
+                            return redirect()->back()->with('registro_error', 'Producto no encontrado.');
+                        }
+        
+                        if ($producto->tipo_producto_fk === 6) {
+                            // Procesar bebidas: restar del inventario directo
+                            $inventario = Inventario::where('producto_fk', $producto_fk)->first();
+        
                             if ($inventario) {
-                                // Sumar la cantidad necesaria a la cantidad parcial
-                                $inventario->cantidad_parcial += $cantidad_necesaria;
-    
-                                // Verificar si cantidad_parcial excede cantidad_paquete
-                                while ($inventario->cantidad_parcial >= $inventario->cantidad_paquete) {
-                                    $inventario->cantidad_parcial -= $inventario->cantidad_paquete;
-                                    $inventario->cantidad_inventario--; // Descontar un paquete completo
+                                $cantidad_requerida = $detalle['cantidad_producto'];
+        
+                                // Restar de las unidades parciales primero
+                                if ($inventario->cantidad_parcial >= $cantidad_requerida) {
+                                    $inventario->cantidad_parcial -= $cantidad_requerida;
+                                } else {
+                                    $cantidad_requerida -= $inventario->cantidad_parcial;
+                                    $inventario->cantidad_parcial = 0;
+        
+                                    // Restar paquetes completos
+                                    $paquetes_necesarios = ceil($cantidad_requerida / $inventario->cantidad_paquete);
+                                    if ($inventario->cantidad_inventario >= $paquetes_necesarios) {
+                                        $inventario->cantidad_inventario -= $paquetes_necesarios;
+                                        $sobrante = ($paquetes_necesarios * $inventario->cantidad_paquete) - $cantidad_requerida;
+                                        $inventario->cantidad_parcial = max(0, $sobrante);
+                                    } else {
+                                        // Si no hay suficiente stock, agregamos el producto a la lista de faltantes
+                                        $productos_faltantes[] = $producto->nombre_producto;
+                                    }
                                 }
-    
+        
                                 $inventario->save();
                             } else {
-                                return back()->with('error', 'No hay suficiente inventario para el ingrediente requerido.');
+                                return redirect()->back()->with('registro_error', 'La bebida no está registrada en el inventario.');
+                            }
+                        } else {
+                            // Procesar pizzas: restar ingredientes
+                            $ingredientes = Detalle_ingrediente::where('producto_fk', $producto_fk)->get();
+        
+                            foreach ($ingredientes as $ingrediente) {
+                                $ingrediente_fk = $ingrediente->ingrediente_fk;
+                                $cantidad_necesaria = $ingrediente->cantidad_necesaria * $detalle['cantidad_producto'];
+        
+                                $inventario = Inventario::where('ingrediente_fk', $ingrediente_fk)->first();
+        
+                                if ($inventario) {
+                                    if ($inventario->cantidad_parcial >= $cantidad_necesaria) {
+                                        $inventario->cantidad_parcial -= $cantidad_necesaria;
+                                    } else {
+                                        $cantidad_necesaria -= $inventario->cantidad_parcial;
+                                        $inventario->cantidad_parcial = 0;
+        
+                                        $paquetes_necesarios = ceil($cantidad_necesaria / $inventario->cantidad_paquete);
+                                        if ($inventario->cantidad_inventario >= $paquetes_necesarios) {
+                                            $inventario->cantidad_inventario -= $paquetes_necesarios;
+                                            $sobrante = ($paquetes_necesarios * $inventario->cantidad_paquete) - $cantidad_necesaria;
+                                            $inventario->cantidad_parcial = $sobrante;
+                                        } else {
+                                            // Si no hay suficiente stock, agregamos el ingrediente a la lista de faltantes
+                                            $productos_faltantes[] = $ingrediente->ingrediente->nombre_ingrediente;
+                                        }
+                                    }
+        
+                                    $inventario->save();
+                                } else {
+                                    return redirect()->back()->with('registro_error', 'El ingrediente no está registrado en el inventario.');
+                                }
                             }
                         }
                     } else {
-                        return back()->with('error', 'Información incompleta de los productos seleccionados.');
+                        return redirect()->back()->with('registro_error', 'Información incompleta de los productos seleccionados.');
                     }
                 }
-                return redirect()->route('ticket.mostrar', ['pedido_pk' => $pedido->pedido_pk])->with('success', 'Pedido registrado');
+    
+                if (!empty($productos_faltantes)) {
+                    return redirect('/')
+                        ->with('falta_stock', 'Faltan estos productos o ingredientes: ' . implode(', ', $productos_faltantes))
+                        ->with('pedido_pk', $pedido->pedido_pk);
+                } else {
+                    return redirect('/')
+                        ->with('pedido_exitoso', 'Pedido registrado con éxito.')
+                        ->with('pedido_pk', $pedido->pedido_pk);
+                }
             } else {
-                return back()->with('error', 'No se seleccionaron productos válidos para el pedido.');
+                return redirect()->back()->with('registro_error', 'No se seleccionaron productos válidos para el pedido.');
             }
         } else {
-            return back()->with('error', 'Hay algún problema con la información.');
+            return redirect()->back()->with('registro_error', 'Hubo un problema al registrar el pedido.');
         }
-    }    
+    }
 
     public function mostrarTicket($pedido_pk){
         $pedido = Pedido::with('cliente', 'productos', 'empleado', 'medio_pedido', 'tipo_pago')

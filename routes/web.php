@@ -13,6 +13,7 @@ use App\Http\Controllers\Ingrediente_controller;
 use App\Http\Controllers\Reserva_controller;
 use App\Http\Controllers\Asistencia_controller;
 use App\Http\Controllers\Nomina_controller;
+use App\Http\Controllers\Servicio_controller;
 
 Route::get('/', function () {
     $USUARIO_PK = session('usuario_pk');
@@ -123,6 +124,7 @@ Route::match(['get', 'put'], '/dandoDeAltaProducto/{producto_pk}', [Producto_con
 
 Route::get('/inventario', [Inventario_controller::class, 'mostrar'])->name('inventario.mostrar');
 Route::post('/agregandoStock', [Inventario_controller::class, 'insertar'])->name('inventario.insertar');
+Route::get('/inventarioCritico', [Inventario_controller::class, 'mostrarPocoStock'])->name('inventario.mostrarPocoStock');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -145,6 +147,15 @@ Route::get('/editarReserva/{reserva_pk}', [Reserva_controller::class, 'datosPara
 Route::put('/editandoReserva/{reserva_pk}', [Reserva_controller::class, 'actualizar'])->name('reserva.actualizar');
 Route::match(['get', 'put'], '/dandoDeBajaReserva/{reserva_pk}', [Reserva_controller::class, 'baja'])->name('reserva.baja');
 Route::match(['get', 'put'], '/dandoDeAltaReserva/{reserva_pk}', [Reserva_controller::class, 'alta'])->name('reserva.alta');
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Gasto -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Route::get('/gastos', [Servicio_controller::class, 'mostrar'])->name('gasto.mostrar');
+Route::post('/registrandoGasto', [Servicio_controller::class, 'insertar'])->name('gasto.insertar');
+Route::get('/editarGasto/{servicio_pk}', [Servicio_controller::class, 'datosParaEdicion'])->name('gasto.datosParaEdicion');
+Route::put('/editandoGasto/{servicio_pk}', [Servicio_controller::class, 'actualizar'])->name('gasto.actualizar');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

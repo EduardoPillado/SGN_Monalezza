@@ -59,12 +59,7 @@ class Reserva_controller extends Controller
         $datosReserva = Reserva::with('mesas')->get();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $ROL = session('nombre_rol');
-            if ($ROL == 'Administrador') {
-                return view('reservas', compact('datosReserva'));
-            } else {
-                return back()->with('message', 'No puedes acceder');
-            }
+            return view('reservas', compact('datosReserva'));
         } else {
             return redirect('/login');
         }

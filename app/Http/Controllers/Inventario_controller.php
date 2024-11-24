@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Inventario;
+use App\Models\Servicio;
 
 class Inventario_controller extends Controller
 {
@@ -51,7 +52,6 @@ class Inventario_controller extends Controller
         ]);
 
         $inventario=new Inventario();
-
         $inventario->ingrediente_fk=$req->ingrediente_fk;
         $inventario->producto_fk=$req->producto_fk;
         $inventario->tipo_gasto_fk=$req->tipo_gasto_fk;
@@ -61,10 +61,15 @@ class Inventario_controller extends Controller
         $inventario->cantidad_inventario=$req->cantidad_inventario;
         $inventario->cantidad_paquete=$req->cantidad_paquete;
         $inventario->cantidad_inventario_minima=$req->cantidad_inventario_minima;
-
         $inventario->save();
+
+        $servicio=new Servicio();
+        $servicio->tipo_gasto_fk=$req->tipo_gasto_fk;
+        $servicio->cantidad_pagada_servicio=$req->precio_proveedor * $req->cantidad_inventario;
+        $servicio->fecha_pago_servicio=$req->fecha_inventario;
+        $servicio->save();
         
-        if ($inventario->inventario_pk) {
+        if ($inventario->inventario_pk && $servicio->servicio_pk) {
             return back()->with('success', 'Agregado a stock');
         } else {
             return back()->with('error', 'Hay algún problema con la información');
@@ -75,12 +80,17 @@ class Inventario_controller extends Controller
         $datosInventario = Inventario::all();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $ROL = session('nombre_rol');
-            if ($ROL == 'Administrador') {
-                return view('inventario', compact('datosInventario'));
-            } else {
-                return back()->with('message', 'No puedes acceder');
-            }
+            return view('inventario', compact('datosInventario'));
+        } else {
+            return redirect('/login');
+        }
+    }
+
+    public function mostrarPocoStock(){
+        $datosInventarioCritico = Inventario::whereColumn('cantidad_inventario', '<=', 'cantidad_inventario_minima')->get();
+        $USUARIO_PK = session('usuario_pk');
+        if ($USUARIO_PK) {
+            return view('inventarioCritico', compact('datosInventarioCritico'));
         } else {
             return redirect('/login');
         }

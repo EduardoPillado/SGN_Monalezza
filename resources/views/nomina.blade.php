@@ -34,6 +34,7 @@
                             <th class="text-left py-2">Salario base</th>
                             <th class="text-left py-2">Horas extras</th>
                             <th class="text-left py-2">Deducciones</th>
+                            <th class="text-left py-2">Compensaciones extra</th>
                             <th class="text-left py-2">Salario neto</th>
                         </tr>
                     </thead>
@@ -44,7 +45,8 @@
                                 <td class="py-2">{{ $dato->fecha_pago }}</td>
                                 <td class="py-2">{{ $dato->salario_base }}</td>
                                 <td class="py-2">{{ $dato->horas_extra }}</td>
-                                <td class="py-2">{{ $dato->deducciones }}</td>
+                                <td class="py-2">${{ $dato->deducciones }}</td>
+                                <td class="py-2">${{ $dato->compensacion_extra }}</td>
                                 <td class="py-2">{{ $dato->salario_neto }}</td>
                             </tr>
                         @endforeach

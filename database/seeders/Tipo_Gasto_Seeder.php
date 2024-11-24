@@ -28,6 +28,7 @@ class Tipo_Gasto_Seeder extends Seeder
             ['tipo_gasto_pk' => 12, 'nombre_tipo_gasto' => 'Membresías', 'estatus_tipo_gasto' => 1],
             ['tipo_gasto_pk' => 13, 'nombre_tipo_gasto' => 'Desechables', 'estatus_tipo_gasto' => 1],
             ['tipo_gasto_pk' => 14, 'nombre_tipo_gasto' => 'Ingredientes', 'estatus_tipo_gasto' => 1],
+            ['tipo_gasto_pk' => 15, 'nombre_tipo_gasto' => 'Bebidas', 'estatus_tipo_gasto' => 1],
         ]);
     }
 }

@@ -39,13 +39,15 @@ class Producto_controller extends Controller
 
         $producto->save();
 
-        if ($req->has('ingredientes')) {
+        if ($req->has('ingredientes') && is_array($req->ingredientes) && count($req->ingredientes) > 0) {
             foreach ($req->ingredientes as $index => $ingrediente_pk) {
-                $detalle=new Detalle_ingrediente();
-                $detalle->producto_fk=$producto->producto_pk;
-                $detalle->ingrediente_fk=$ingrediente_pk;
-                $detalle->cantidad_necesaria = $req->cantidades_necesarias[$index];
-                $detalle->save();
+                if (!is_null($ingrediente_pk) && isset($req->cantidades_necesarias[$index])) {
+                    $detalle = new Detalle_ingrediente();
+                    $detalle->producto_fk = $producto->producto_pk;
+                    $detalle->ingrediente_fk = $ingrediente_pk;
+                    $detalle->cantidad_necesaria = $req->cantidades_necesarias[$index];
+                    $detalle->save();
+                }
             }
         }
         

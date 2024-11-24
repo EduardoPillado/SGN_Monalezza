@@ -19,7 +19,9 @@
         use Carbon\Carbon;
 
         use App\Models\Producto;
-        $datosProducto=Producto::where('estatus_producto', '=', 1)->get();
+        $datosProducto = Producto::where('estatus_producto', 1)
+            ->whereNotIn('tipo_producto_fk', [1, 2, 3, 4])
+            ->get();
 
         use App\Models\Ingrediente;
         $datosIngrediente=Ingrediente::where('estatus_ingrediente', '=', 1)->get();
@@ -44,9 +46,11 @@
                             <th class="text-left py-2">Fecha de ultima actualización</th>
                             <th class="text-left py-2">Cantidad en existencia</th>
                             <th class="text-left py-2">Cantidad de cada paquete</th>
+                            <th class="text-left py-2">Restante del último paquete</th>
                             <th class="text-left py-2">Proveedor</th>
                             <th class="text-left py-2">Precio de proveedor</th>
                             <th class="text-left py-2">Tipo de gasto</th>
+                            <th class="text-left py-2">Estado</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,14 +62,20 @@
                                     <td class="py-2">{{ $dato->producto->nombre_producto }}</td>
                                 @endif
                                 <td class="py-2">{{ $dato->fecha_inventario }}</td>
-                                <td class="py-2">{{ $dato->cantidad_inventario }}</td>
-                                <td class="py-2">{{ $dato->cantidad_paquete }}</td>
+                                <td class="py-2">{{ $dato->cantidad_inventario }} u</td>
+                                <td class="py-2">{{ $dato->cantidad_paquete }} gr/ml/u</td>
+                                <td class="py-2">{{ $dato->cantidad_parcial }} gr/ml/u</td>
                                 <td class="py-2">{{ $dato->proveedor->nombre_proveedor }}</td>
                                 <td class="py-2">${{ $dato->precio_proveedor }}</td>
                                 @if ( $dato->tipo_gasto )
                                     <td class="py-2">{{ $dato->tipo_gasto->nombre_tipo_gasto }}</td>
                                 @else
                                     <td class="py-2"><em>Sin tipo de gasto asociado</em></td>
+                                @endif
+                                @if( $dato->cantidad_inventario <= $dato->cantidad_minima )
+                                    <td class="py-2" style="color: red; font-weight: bold;">En riesgo</td>
+                                @else
+                                    <td class="py-2" style="color: green;">Disponible</td>
                                 @endif
                             </tr>
                         @endforeach
@@ -162,7 +172,7 @@
                                 <input type="number" id="cantidad_inventario" name="cantidad_inventario" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="cantidad_paquete" class="block text-sm font-medium text-gray-700">Cantidad del paquete (gr/ml)</label>
+                                <label for="cantidad_paquete" class="block text-sm font-medium text-gray-700">Cantidad del paquete (gr/ml/u)</label>
                                 <input type="number" id="cantidad_paquete" name="cantidad_paquete" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">

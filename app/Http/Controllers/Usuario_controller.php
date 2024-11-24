@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inventario;
 use Illuminate\Http\Request;
 use App\Models\Usuario;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -24,13 +25,18 @@ class Usuario_controller extends Controller
             if ($usuario->estatus_usuario == 1) {
                 session(['usuario_pk' => $usuario->usuario_pk, 'usuario' => $usuario->usuario]);
                 session(['rol_pk' => $usuario->rol->rol_pk, 'nombre_rol' => $usuario->rol->nombre_rol]);
+    
+                $inventarioCritico = Inventario::whereColumn('cantidad_inventario', '<=', 'cantidad_inventario_minima')->get();
+                if ($inventarioCritico->count() > 0) {
+                    session()->flash('alerta_inventario', 'Hay productos en riesgo de agotarse en el inventario.');
+                }
+    
                 return redirect('/asistencia/entrada')->with('success', 'Bienvenido Usuario');
             } else {
                 return redirect('/login')->with('error', 'El usuario no es válido');
             }
-        } else {
-            return redirect('/login')->with('error', 'Datos incorrectos');
         }
+        
     }
 
     private function obtenerUsuarioPorNombre($usuario){

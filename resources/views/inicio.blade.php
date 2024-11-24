@@ -130,12 +130,16 @@
                             Total ventas 💰
                         </div>
                     </a>
-                    <div class="info-button profits">
-                        Ganancias 💼
-                    </div>
-                    <div class="info-button low-stock">
-                        Productos poco Stock 📉
-                    </div>
+                    <a href="{{ route('gasto.mostrar') }}">
+                        <div class="info-button profits">
+                            Ganancias 💼
+                        </div>
+                    </a>
+                    <a href="{{ route('inventario.mostrarPocoStock') }}">
+                        <div class="info-button low-stock">
+                            Productos poco Stock 📉
+                        </div>
+                    </a>
                 </div>
             </div>
             
@@ -261,6 +265,48 @@
                             toast.addEventListener('mouseenter', Swal.stopTimer);
                             toast.addEventListener('mouseleave', Swal.resumeTimer);
                         }
+                    });
+                </script>
+            @endif
+
+            @if (Session::has('pedido_exitoso'))
+                <script>
+                    Swal.fire({
+                        icon: 'success',
+                        text: '{{ Session::get('pedido_exitoso') }}',
+                        confirmButtonText: 'Ver Ticket',
+                        allowOutsideClick: false,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "{{ route('ticket.mostrar', ['pedido_pk' => Session::get('pedido_pk')]) }}";
+                        }
+                    });
+                </script>
+            @endif
+
+            @if (Session::has('falta_stock'))
+                <script>
+                    Swal.fire({
+                        icon: 'warning',
+                        text: '{{ Session::get('falta_stock') }}',
+                        confirmButtonText: 'Ver Ticket',
+                        allowOutsideClick: false,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "{{ route('ticket.mostrar', ['pedido_pk' => Session::get('pedido_pk')]) }}";
+                        }
+                    });
+                </script>
+            @endif
+
+            @if (Session::has('registro_error'))
+                <script>
+                    Swal.fire({
+                        icon: 'error',
+                        text: '{{ Session::get('registro_error') }}',
+                        showConfirmButton: true,
+                        confirmButtonText: 'Entendido',
+                        allowOutsideClick: false,
                     });
                 </script>
             @endif

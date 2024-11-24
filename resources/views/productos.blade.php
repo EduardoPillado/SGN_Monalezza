@@ -56,7 +56,7 @@
                             </tr>
                         @endforeach
                     </tbody>
-                </table>                
+                </table>
             </div>
             <div class="mt-4 text-right">
                 <button @click="modalOpen = true" class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo producto</button>
@@ -191,7 +191,7 @@
                                     <div class="flex items-center mb-2">
                                         <div class="flex flex-col w-3/4">
                                             <label for="ingredientes[]" class="block text-sm font-medium text-gray-700">Ingrediente</label>
-                                            <select name="ingredientes[]" class="w-full rounded-md border-gray-300 mb-2" required>
+                                            <select name="ingredientes[]" class="w-full rounded-md border-gray-300 mb-2">
                                                 <option value="">Selecciona un ingrediente</option>
                                                 @foreach ($datosIngrediente as $dato)
                                                     <option value="{{ $dato->ingrediente_pk }}">{{ $dato->nombre_ingrediente }}</option>
@@ -199,7 +199,7 @@
                                             </select>
                             
                                             <label for="cantidades_necesarias[]" class="block text-sm font-medium text-gray-700">Cantidad requerida (gr/ml)</label>
-                                            <input type="number" name="cantidades_necesarias[]" class="w-full rounded-md border-gray-300" required>
+                                            <input type="number" name="cantidades_necesarias[]" class="w-full rounded-md border-gray-300">
                                         </div>
                                         <div class="flex w-1/4 justify-center">
                                             <button type="button" onclick="agregarIngrediente()" class="px-3 py-1 bg-blue-500 text-white rounded">+</button>
@@ -231,7 +231,7 @@
                 
                 newIngredient.innerHTML = `
                     <div class="flex flex-col w-3/4">
-                        <select name="ingredientes[]" class="w-full rounded-md border-gray-300 mb-2" required>
+                        <select name="ingredientes[]" class="w-full rounded-md border-gray-300 mb-2">
                             <option value="">Selecciona un ingrediente</option>
                             @foreach ($datosIngrediente as $dato)
                                 <option value="{{ $dato->ingrediente_pk }}">{{ $dato->nombre_ingrediente }}</option>
@@ -239,7 +239,7 @@
                         </select>
         
                         <label class="block text-sm font-medium text-gray-700">Cantidad requerida (gr/ml)</label>
-                        <input type="number" name="cantidades_necesarias[]" class="w-full rounded-md border-gray-300" required>
+                        <input type="number" name="cantidades_necesarias[]" class="w-full rounded-md border-gray-300">
                     </div>
                     <div class="flex w-1/4 justify-center">
                         <button type="button" onclick="eliminarIngrediente(this)" class="px-2 py-1 bg-red-500 text-white rounded">-</button>
