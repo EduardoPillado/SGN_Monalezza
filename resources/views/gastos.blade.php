@@ -41,10 +41,10 @@
                     <tbody>
                         @foreach ($datosServicio as $dato)
                             <tr class="border-b">
-                                <td>{{ $dato['tipo_gasto'] }}</td>
-                                <td>${{ $dato['cantidad_pagada'] }}</td>
-                                <td>{{ $dato['fecha_pago'] }}</td>
-                                <td>{{ $dato['origen'] }}</td>
+                                <td class="py-2">{{ $dato['tipo_gasto'] }}</td>
+                                <td class="py-2">${{ $dato['cantidad_pagada'] }}</td>
+                                <td class="py-2">{{ $dato['fecha_pago'] }}</td>
+                                <td class="py-2">{{ $dato['origen'] }}</td>
                                 <td class="text-right py-2">
                                     <a href="{{ route('gasto.datosParaEdicion', $dato['pk']) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
                                 </td>

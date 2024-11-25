@@ -50,6 +50,7 @@
                             <th class="text-left py-2">Precio de proveedor</th>
                             <th class="text-left py-2">Tipo de gasto</th>
                             <th class="text-left py-2">Estado</th>
+                            <th class="text-right py-2">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,11 +72,14 @@
                                 @else
                                     <td class="py-2"><em>Sin tipo de gasto asociado</em></td>
                                 @endif
-                                @if( $dato->cantidad_inventario <= $dato->cantidad_minima )
+                                @if ( $dato->cantidad_inventario <= $dato->cantidad_inventario_minima )
                                     <td class="py-2" style="color: red; font-weight: bold;">En riesgo</td>
                                 @else
-                                    <td class="py-2" style="color: green;">Disponible</td>
+                                    <td class="py-2" style="color: green; font-weight: bold;">Disponible</td>
                                 @endif
+                                <td class="text-right py-2">
+                                    <a href="{{ route('inventario.datosParaEdicion', $dato->inventario_pk) }}" title="Actualizar Stock" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Stock +</a>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

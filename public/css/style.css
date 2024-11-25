@@ -227,3 +227,14 @@
         grid-template-columns: 1fr 1fr;
     }
 }
+
+/* Span de stock crítico en inicio */
+
+.info-button .absolute {
+    position: absolute;
+    font-size: 0.8rem;
+    background-color: #bd3525;
+    transform: translate(50%, -50%);
+}
+
+/* Fin Span de stock crítico en inicio */

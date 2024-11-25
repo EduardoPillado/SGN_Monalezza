@@ -136,8 +136,13 @@
                         </div>
                     </a>
                     <a href="{{ route('inventario.mostrarPocoStock') }}">
-                        <div class="info-button low-stock">
+                        <div class="info-button low-stock relative">
                             Productos poco Stock 📉
+                            @if(isset($cantidadCritico) && $cantidadCritico > 0)
+                                <span class="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
+                                    {{ $cantidadCritico }}
+                                </span>
+                            @endif
                         </div>
                     </a>
                 </div>

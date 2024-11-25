@@ -69,26 +69,31 @@ class Pedido_controller extends Controller
         
                             if ($inventario) {
                                 $cantidad_requerida = $detalle['cantidad_producto'];
-        
+                            
                                 // Restar de las unidades parciales primero
                                 if ($inventario->cantidad_parcial >= $cantidad_requerida) {
                                     $inventario->cantidad_parcial -= $cantidad_requerida;
                                 } else {
+                                    // Calcular el sobrante necesario después de usar las parciales
                                     $cantidad_requerida -= $inventario->cantidad_parcial;
                                     $inventario->cantidad_parcial = 0;
-        
-                                    // Restar paquetes completos
+                            
+                                    // Calcular paquetes necesarios
                                     $paquetes_necesarios = ceil($cantidad_requerida / $inventario->cantidad_paquete);
-                                    if ($inventario->cantidad_inventario >= $paquetes_necesarios) {
-                                        $inventario->cantidad_inventario -= $paquetes_necesarios;
-                                        $sobrante = ($paquetes_necesarios * $inventario->cantidad_paquete) - $cantidad_requerida;
-                                        $inventario->cantidad_parcial = max(0, $sobrante);
-                                    } else {
-                                        // Si no hay suficiente stock, agregamos el producto a la lista de faltantes
-                                        $productos_faltantes[] = $producto->nombre_producto;
-                                    }
+                            
+                                    // Restar los paquetes completos disponibles, permitiendo negativos
+                                    $inventario->cantidad_inventario -= $paquetes_necesarios;
+                            
+                                    // Ajustar la cantidad parcial con el sobrante negativo
+                                    $sobrante = ($paquetes_necesarios * $inventario->cantidad_paquete) - $cantidad_requerida;
+                                    $inventario->cantidad_parcial = $sobrante; // Este puede ser negativo
                                 }
-        
+                            
+                                // **Verificar si quedó en negativo y añadir a productos faltantes**
+                                if ($inventario->cantidad_inventario < 0 || $inventario->cantidad_parcial < 0) {
+                                    $productos_faltantes[] = $producto->nombre_producto;
+                                }
+                            
                                 $inventario->save();
                             } else {
                                 return redirect()->back()->with('registro_error', 'La bebida no está registrada en el inventario.');
@@ -107,20 +112,26 @@ class Pedido_controller extends Controller
                                     if ($inventario->cantidad_parcial >= $cantidad_necesaria) {
                                         $inventario->cantidad_parcial -= $cantidad_necesaria;
                                     } else {
+                                        // Calcular el sobrante necesario después de usar las parciales
                                         $cantidad_necesaria -= $inventario->cantidad_parcial;
                                         $inventario->cantidad_parcial = 0;
-        
+                                
+                                        // Calcular paquetes necesarios
                                         $paquetes_necesarios = ceil($cantidad_necesaria / $inventario->cantidad_paquete);
-                                        if ($inventario->cantidad_inventario >= $paquetes_necesarios) {
-                                            $inventario->cantidad_inventario -= $paquetes_necesarios;
-                                            $sobrante = ($paquetes_necesarios * $inventario->cantidad_paquete) - $cantidad_necesaria;
-                                            $inventario->cantidad_parcial = $sobrante;
-                                        } else {
-                                            // Si no hay suficiente stock, agregamos el ingrediente a la lista de faltantes
-                                            $productos_faltantes[] = $ingrediente->ingrediente->nombre_ingrediente;
-                                        }
+                                
+                                        // Restar los paquetes completos disponibles, permitiendo negativos
+                                        $inventario->cantidad_inventario -= $paquetes_necesarios;
+                                
+                                        // Ajustar la cantidad parcial con el sobrante negativo
+                                        $sobrante = ($paquetes_necesarios * $inventario->cantidad_paquete) - $cantidad_necesaria;
+                                        $inventario->cantidad_parcial = $sobrante; // Este puede ser negativo
                                     }
-        
+                                
+                                    // **Verificar si quedó en negativo y añadir a productos faltantes**
+                                    if ($inventario->cantidad_inventario < 0 || $inventario->cantidad_parcial < 0) {
+                                        $productos_faltantes[] = $ingrediente->ingrediente->nombre_ingrediente;
+                                    }
+                                
                                     $inventario->save();
                                 } else {
                                     return redirect()->back()->with('registro_error', 'El ingrediente no está registrado en el inventario.');

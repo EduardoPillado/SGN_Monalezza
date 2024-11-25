@@ -125,6 +125,8 @@ Route::match(['get', 'put'], '/dandoDeAltaProducto/{producto_pk}', [Producto_con
 Route::get('/inventario', [Inventario_controller::class, 'mostrar'])->name('inventario.mostrar');
 Route::post('/agregandoStock', [Inventario_controller::class, 'insertar'])->name('inventario.insertar');
 Route::get('/inventarioCritico', [Inventario_controller::class, 'mostrarPocoStock'])->name('inventario.mostrarPocoStock');
+Route::get('/actualizarStock/{inventario_pk}', [Inventario_controller::class, 'datosParaEdicion'])->name('inventario.datosParaEdicion');
+Route::put('/actualizandoStock/{inventario_pk}', [Inventario_controller::class, 'actualizar'])->name('inventario.actualizar');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

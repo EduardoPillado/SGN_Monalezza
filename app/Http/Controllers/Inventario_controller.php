@@ -23,52 +23,61 @@ class Inventario_controller extends Controller
             'ingrediente_fk.exists' => 'El ingrediente seleccionado no es válido.',
 
             'producto_fk.exists' => 'El producto seleccionado no es válido.',
-            
+
             'tipo_gasto_fk.exists' => 'El tipo de gasto seleccionado no es válido.',
-        
+
             'proveedor_fk.required' => 'El proveedor es obligatorio.',
             'proveedor_fk.exists' => 'El proveedor seleccionado no es válido.',
-        
+
             'precio_proveedor.required' => 'El precio del proveedor es obligatorio.',
             'precio_proveedor.numeric' => 'El precio del proveedor debe ser un valor numérico.',
             'precio_proveedor.min' => 'El precio del proveedor debe ser mayor o igual a 0.01.',
             'precio_proveedor.max' => 'El precio del proveedor no debe exceder 999999.99.',
-        
+
             'fecha_inventario.required' => 'La fecha de inventario es obligatoria.',
             'fecha_inventario.date_format' => 'La fecha de inventario debe estar en el formato válido (Y-m-d\TH:i).',
-        
+
             'cantidad_inventario.required' => 'La cantidad en stock es obligatoria.',
             'cantidad_inventario.integer' => 'La cantidad en stock debe ser un número entero.',
             'cantidad_inventario.min' => 'La cantidad en stock no puede ser negativa.',
 
-            'cantidad_paquete.required' => 'La cantidad del paquete es obligatorio.',
+            'cantidad_paquete.required' => 'La cantidad del paquete es obligatoria.',
             'cantidad_paquete.numeric' => 'La cantidad del paquete debe ser un valor numérico.',
             'cantidad_paquete.min' => 'La cantidad del paquete debe ser mayor o igual a 0.01.',
             'cantidad_paquete.max' => 'La cantidad del paquete no debe exceder 999999.99.',
-        
+
             'cantidad_inventario_minima.required' => 'La cantidad mínima en inventario es obligatoria.',
             'cantidad_inventario_minima.integer' => 'La cantidad mínima en inventario debe ser un número entero.',
             'cantidad_inventario_minima.min' => 'La cantidad mínima en inventario no puede ser negativa.',
         ]);
 
-        $inventario=new Inventario();
-        $inventario->ingrediente_fk=$req->ingrediente_fk;
-        $inventario->producto_fk=$req->producto_fk;
-        $inventario->tipo_gasto_fk=$req->tipo_gasto_fk;
-        $inventario->proveedor_fk=$req->proveedor_fk;
-        $inventario->precio_proveedor=$req->precio_proveedor;
-        $inventario->fecha_inventario=$req->fecha_inventario;
-        $inventario->cantidad_inventario=$req->cantidad_inventario;
-        $inventario->cantidad_paquete=$req->cantidad_paquete;
-        $inventario->cantidad_inventario_minima=$req->cantidad_inventario_minima;
+        $existeInventario = Inventario::where('ingrediente_fk', $req->ingrediente_fk)
+            ->where('producto_fk', $req->producto_fk)
+            ->where('proveedor_fk', $req->proveedor_fk)
+            ->exists();
+
+        if ($existeInventario) {
+            return back()->withErrors(['error' => 'El registro ya existe en el inventario.']);
+        }
+
+        $inventario = new Inventario();
+        $inventario->ingrediente_fk = $req->ingrediente_fk;
+        $inventario->producto_fk = $req->producto_fk;
+        $inventario->tipo_gasto_fk = $req->tipo_gasto_fk;
+        $inventario->proveedor_fk = $req->proveedor_fk;
+        $inventario->precio_proveedor = $req->precio_proveedor;
+        $inventario->fecha_inventario = $req->fecha_inventario;
+        $inventario->cantidad_inventario = $req->cantidad_inventario;
+        $inventario->cantidad_paquete = $req->cantidad_paquete;
+        $inventario->cantidad_inventario_minima = $req->cantidad_inventario_minima;
         $inventario->save();
 
-        $servicio=new Servicio();
-        $servicio->tipo_gasto_fk=$req->tipo_gasto_fk;
-        $servicio->cantidad_pagada_servicio=$req->precio_proveedor * $req->cantidad_inventario;
-        $servicio->fecha_pago_servicio=$req->fecha_inventario;
+        $servicio = new Servicio();
+        $servicio->tipo_gasto_fk = $req->tipo_gasto_fk;
+        $servicio->cantidad_pagada_servicio = $req->precio_proveedor * $req->cantidad_inventario;
+        $servicio->fecha_pago_servicio = $req->fecha_inventario;
         $servicio->save();
-        
+
         if ($inventario->inventario_pk && $servicio->servicio_pk) {
             return back()->with('success', 'Agregado a stock');
         } else {
@@ -88,11 +97,65 @@ class Inventario_controller extends Controller
 
     public function mostrarPocoStock(){
         $datosInventarioCritico = Inventario::whereColumn('cantidad_inventario', '<=', 'cantidad_inventario_minima')->get();
+        $cantidadCritico = $datosInventarioCritico->count();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            return view('inventarioCritico', compact('datosInventarioCritico'));
+            return view('inventarioCritico', compact('datosInventarioCritico', 'cantidadCritico'));
         } else {
             return redirect('/login');
+        }
+    }
+
+    public function datosParaEdicion($inventario_pk){
+        $datosInventario = Inventario::findOrFail($inventario_pk);
+        $USUARIO_PK = session('usuario_pk');
+        if ($USUARIO_PK) {
+            $ROL = session('nombre_rol');
+            if ($ROL == 'Administrador') {
+                return view('actualizarStock', compact('datosInventario'));
+            } else {
+                return back()->with('warning', 'No puedes acceder');
+            }
+        } else {
+            return redirect('/login');
+        }
+    }
+
+    public function actualizar(Request $req, $inventario_pk){
+        $inventario = Inventario::findOrFail($inventario_pk);
+
+        $req->validate([
+            'cantidad_nueva' => ['required', 'integer', 'min:1'],
+            'precio_proveedor' => ['required', 'numeric', 'min:0.01', 'max:999999.99'],
+        ], [
+            'cantidad_nueva.required' => 'La cantidad adicional es obligatoria.',
+            'cantidad_nueva.integer' => 'La cantidad adicional debe ser un número entero.',
+            'cantidad_nueva.min' => 'La cantidad adicional debe ser al menos 1.',
+
+            'precio_proveedor.required' => 'El precio por unidad es obligatorio.',
+            'precio_proveedor.numeric' => 'El precio por unidad debe ser un valor numérico.',
+            'precio_proveedor.min' => 'El precio por unidad debe ser mayor o igual a 0.01.',
+            'precio_proveedor.max' => 'El precio por unidad no debe exceder 999999.99.',
+        ]);
+        $cantidadNueva = $req->cantidad_nueva;
+        $precioPorUnidad = $req->precio_proveedor;
+        $gastoAdicional = $cantidadNueva * $precioPorUnidad;
+
+        $inventario->cantidad_inventario += $cantidadNueva;
+        $inventario->precio_proveedor = $precioPorUnidad;
+        $inventario->fecha_inventario = now();
+        $inventario->save();
+
+        $servicio = new Servicio();
+        $servicio->tipo_gasto_fk = $inventario->tipo_gasto_fk;
+        $servicio->cantidad_pagada_servicio = $gastoAdicional;
+        $servicio->fecha_pago_servicio = now();
+        $servicio->save();
+
+        if ($inventario->inventario_pk && $servicio->servicio_pk) {
+            return redirect('/inventario')->with('success', 'Stock actualizado');
+        } else {
+            return back()->with('error', 'Hay algún problema con la información');
         }
     }
 }

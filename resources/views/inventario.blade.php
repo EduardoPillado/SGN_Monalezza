@@ -51,6 +51,7 @@
                             <th class="text-left py-2">Precio de proveedor</th>
                             <th class="text-left py-2">Tipo de gasto</th>
                             <th class="text-left py-2">Estado</th>
+                            <th class="text-right py-2">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -72,11 +73,14 @@
                                 @else
                                     <td class="py-2"><em>Sin tipo de gasto asociado</em></td>
                                 @endif
-                                @if( $dato->cantidad_inventario <= $dato->cantidad_minima )
+                                @if ( $dato->cantidad_inventario <= $dato->cantidad_inventario_minima )
                                     <td class="py-2" style="color: red; font-weight: bold;">En riesgo</td>
                                 @else
-                                    <td class="py-2" style="color: green;">Disponible</td>
+                                    <td class="py-2" style="color: green; font-weight: bold;">Disponible</td>
                                 @endif
+                                <td class="text-right py-2">
+                                    <a href="{{ route('inventario.datosParaEdicion', $dato->inventario_pk) }}" title="Actualizar Stock" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Stock +</a>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -164,7 +168,7 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label for="precio_proveedor" class="block text-sm font-medium text-gray-700">Precio del proveedor</label>
+                                <label for="precio_proveedor" class="block text-sm font-medium text-gray-700">Precio del proveedor por unidad</label>
                                 <input type="number" id="precio_proveedor" name="precio_proveedor" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
