@@ -130,9 +130,9 @@
                             Total ventas 💰
                         </div>
                     </a>
-                    <a href="{{ route('gasto.mostrar') }}">
+                    <a href="{{ route('reserva.mostrar') }}">
                         <div class="info-button profits">
-                            Ganancias 💼
+                            Reservaciones 🕐
                         </div>
                     </a>
                     <a href="{{ route('inventario.mostrarPocoStock') }}">

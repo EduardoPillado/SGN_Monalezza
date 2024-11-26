@@ -34,7 +34,9 @@
                             <th class="text-left py-2">Tipo de producto</th>
                             <th class="text-left py-2">Precio</th>
                             <th class="text-left py-2">Estatus</th>
-                            <th class="text-right py-2">Acciones</th>
+                            @if ( session('usuario_pk') == 1 )
+                                <th class="text-right py-2">Acciones</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -45,14 +47,16 @@
                                 <td class="py-2">{{ $dato->tipo_producto->nombre_tipo_producto }}</td>
                                 <td class="py-2">${{ $dato->precio_producto }}</td>
                                 <td class="py-2">{{ $dato->estatus_producto ? 'Activo' : 'Inactivo' }}</td>
-                                <td class="text-right py-2">
-                                    <a href="{{ route('producto.datosParaEdicion', $dato->producto_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
-                                    @if ($dato->estatus_producto)
-                                        <a href="{{ route('producto.baja', $dato->producto_pk) }}" onclick="confirmarBaja(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
-                                    @else
-                                        <a href="{{ route('producto.alta', $dato->producto_pk) }}" onclick="confirmarAlta(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
-                                    @endif
-                                </td>
+                                @if ( session('usuario_pk') == 1 )
+                                    <td class="text-right py-2">
+                                        <a href="{{ route('producto.datosParaEdicion', $dato->producto_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
+                                        @if ($dato->estatus_producto)
+                                            <a href="{{ route('producto.baja', $dato->producto_pk) }}" onclick="confirmarBaja(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
+                                        @else
+                                            <a href="{{ route('producto.alta', $dato->producto_pk) }}" onclick="confirmarAlta(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
+                                        @endif
+                                    </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
