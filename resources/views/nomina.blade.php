@@ -43,11 +43,11 @@
                             <tr class="border-b">
                                 <td class="py-2">{{ $dato->empleado->usuario->nombre }}</td>
                                 <td class="py-2">{{ $dato->fecha_pago }}</td>
-                                <td class="py-2">{{ $dato->salario_base }}</td>
+                                <td class="py-2">${{ $dato->salario_base }}</td>
                                 <td class="py-2">{{ $dato->horas_extra }}</td>
                                 <td class="py-2">${{ $dato->deducciones }}</td>
                                 <td class="py-2">${{ $dato->compensacion_extra }}</td>
-                                <td class="py-2">{{ $dato->salario_neto }}</td>
+                                <td class="py-2">${{ $dato->salario_neto }}</td>
                             </tr>
                         @endforeach
                     </tbody>
