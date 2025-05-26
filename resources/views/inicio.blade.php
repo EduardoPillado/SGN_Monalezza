@@ -108,15 +108,20 @@
             <!-- Columna derecha -->
             <div class="right-column">
                 <!-- Tu contenido para la columna derecha permanece igual -->
-                <div class="menu-grid">
+                <input type="text" id="search-bar" placeholder="Buscar productos..." style="margin-bottom: 20px; padding: 10px; width: 100%; box-sizing: border-box;">
+                <div id="product-container" class="menu-grid">
                     @foreach($productos as $producto)
-                        <div class="menu-item" onclick="toggleProductSelection(this, {{ $producto->producto_pk }}, '{{ $producto->nombre_producto }}', {{ $producto->precio_producto }}, '{{ $producto->tipo_producto->nombre_tipo_producto }}')">
-                            <input type="checkbox" name="producto_fk[]" value="{{ $producto->producto_pk }}">
-                            <div>{{ $producto->nombre_producto }}</div>
-                            <div>{{ $producto->tipo_producto->nombre_tipo_producto }}</div>
-                            <div>${{ $producto->precio_producto }}</div>
-                            <div>🍕</div>
-                        </div>
+                    <div class="menu-item" 
+                         data-nombre="{{ $producto->nombre_producto }}" 
+                         data-tipo="{{ $producto->tipo_producto->nombre_tipo_producto }}" 
+                         data-precio="{{ $producto->precio_producto }}" 
+                         onclick="toggleProductSelection(this, {{ $producto->producto_pk }}, '{{ $producto->nombre_producto }}', {{ $producto->precio_producto }}, '{{ $producto->tipo_producto->nombre_tipo_producto }}')">
+                        <input type="checkbox" name="producto_fk[]" value="{{ $producto->producto_pk }}">
+                        <div>{{ $producto->nombre_producto }}</div>
+                        <div>{{ $producto->tipo_producto->nombre_tipo_producto }}</div>
+                        <div>${{ $producto->precio_producto }}</div>
+                        <div>🍕</div>
+                    </div>
                     @endforeach
                 </div>
                 <div class="info-buttons">
@@ -130,9 +135,9 @@
                             Total ventas 💰
                         </div>
                     </a>
-                    <a href="{{ route('gasto.mostrar') }}">
+                    <a href="{{ route('reserva.mostrar') }}">
                         <div class="info-button profits">
-                            Ganancias 💼
+                            Reservaciones 🕐
                         </div>
                     </a>
                     <a href="{{ route('inventario.mostrarPocoStock') }}">
@@ -147,6 +152,21 @@
                     </a>
                 </div>
             </div>
+
+            <script>
+                $(document).ready(function() {
+                    $('#search-bar').on('keyup', function() {
+                        let value = $(this).val().toLowerCase();
+                        $('#product-container .menu-item').filter(function() {
+                            $(this).toggle(
+                                $(this).data('nombre').toLowerCase().includes(value) ||
+                                $(this).data('tipo').toLowerCase().includes(value) ||
+                                $(this).data('precio').toString().toLowerCase().includes(value)
+                            );
+                        });
+                    });
+                });
+            </script>
             
             <script>
                 const selectedProducts = {};

@@ -34,7 +34,9 @@
                             <th class="text-left py-2">Tipo de producto</th>
                             <th class="text-left py-2">Precio</th>
                             <th class="text-left py-2">Estatus</th>
-                            <th class="text-right py-2">Acciones</th>
+                            @if ( session('usuario_pk') == 1 )
+                                <th class="text-right py-2">Acciones</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -45,14 +47,16 @@
                                 <td class="py-2">{{ $dato->tipo_producto->nombre_tipo_producto }}</td>
                                 <td class="py-2">${{ $dato->precio_producto }}</td>
                                 <td class="py-2">{{ $dato->estatus_producto ? 'Activo' : 'Inactivo' }}</td>
-                                <td class="text-right py-2">
-                                    <a href="{{ route('producto.datosParaEdicion', $dato->producto_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
-                                    @if ($dato->estatus_producto)
-                                        <a href="{{ route('producto.baja', $dato->producto_pk) }}" onclick="confirmarBaja(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
-                                    @else
-                                        <a href="{{ route('producto.alta', $dato->producto_pk) }}" onclick="confirmarAlta(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
-                                    @endif
-                                </td>
+                                @if ( session('usuario_pk') == 1 )
+                                    <td class="text-right py-2">
+                                        <a href="{{ route('producto.datosParaEdicion', $dato->producto_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
+                                        @if ($dato->estatus_producto)
+                                            <a href="{{ route('producto.baja', $dato->producto_pk) }}" onclick="confirmarBaja(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
+                                        @else
+                                            <a href="{{ route('producto.alta', $dato->producto_pk) }}" onclick="confirmarAlta(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
+                                        @endif
+                                    </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
@@ -166,14 +170,21 @@
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nuevo Producto</h3>
                     <div class="mt-2 px-7 py-3">
+                        <p class="text-sm text-gray-600 mb-3">
+
+                            <span class="text-red-500">*</span> Campo necesario</p>
                         <form id="form-producto" action="{{ route('producto.insertar') }}" method="post">
                             @csrf
                             <div class="mb-4">
-                                <label for="nombre_producto" class="block text-sm font-medium text-gray-700">Nombre</label>
+                                <label for="nombre_producto" class="block text-sm font-medium text-gray-700">Nombre
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="text" id="nombre_producto" name="nombre_producto" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="tipo_producto_fk" class="block text-sm font-medium text-gray-700">Tipo de producto</label>
+                                <label for="tipo_producto_fk" class="block text-sm font-medium text-gray-700">Tipo de producto
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <select name="tipo_producto_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Selecciona el tipo de producto</option>
                                     @foreach ($datosTipoProducto as $dato)
@@ -182,7 +193,9 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label for="precio_producto" class="block text-sm font-medium text-gray-700">Precio</label>
+                                <label for="precio_producto" class="block text-sm font-medium text-gray-700">Precio
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="number" id="precio_producto" name="precio_producto" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
 
@@ -190,7 +203,9 @@
                                 <div id="ingredientes-container">
                                     <div class="flex items-center mb-2">
                                         <div class="flex flex-col w-3/4">
-                                            <label for="ingredientes[]" class="block text-sm font-medium text-gray-700">Ingrediente</label>
+                                            <label for="ingredientes[]" class="block text-sm font-medium text-gray-700">Ingrediente
+                                                <span class="text-red-500">*</span>
+                                            </label>
                                             <select name="ingredientes[]" class="w-full rounded-md border-gray-300 mb-2">
                                                 <option value="">Selecciona un ingrediente</option>
                                                 @foreach ($datosIngrediente as $dato)
@@ -198,7 +213,9 @@
                                                 @endforeach
                                             </select>
                             
-                                            <label for="cantidades_necesarias[]" class="block text-sm font-medium text-gray-700">Cantidad requerida (gr/ml)</label>
+                                            <label for="cantidades_necesarias[]" class="block text-sm font-medium text-gray-700">Cantidad requerida (gr/ml)
+                                                <span class="text-red-500">*</span>
+                                            </label>
                                             <input type="number" name="cantidades_necesarias[]" class="w-full rounded-md border-gray-300">
                                         </div>
                                         <div class="flex w-1/4 justify-center">

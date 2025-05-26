@@ -62,12 +62,7 @@ class Producto_controller extends Controller
         $datosProducto = Producto::with('tipo_producto', 'ingredientes')->get();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $ROL = session('nombre_rol');
-            if ($ROL == 'Administrador') {
-                return view('productos', compact('datosProducto'));
-            } else {
-                return back()->with('message', 'No puedes acceder');
-            }
+            return view('productos', compact('datosProducto'));
         } else {
             return redirect('/login');
         }

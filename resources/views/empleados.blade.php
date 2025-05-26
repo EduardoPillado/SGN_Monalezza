@@ -148,22 +148,32 @@
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nuevo Empleado</h3>
                     <div class="mt-2 px-7 py-3">
+                        <p class="text-sm text-gray-600 mb-3">
+                            <span class="text-red-500">*</span> Campo necesario</p>
                         <form id="form-empleado" action="{{ route('empleado.insertar') }}" method="post">
                             @csrf
                             <div class="mb-4">
-                                <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+                                <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="text" id="nombre" name="nombre" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="usuario" class="block text-sm font-medium text-gray-700">Nombre de Usuario</label>
+                                <label for="usuario" class="block text-sm font-medium text-gray-700">Nombre de Usuario
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="text" id="usuario" name="usuario" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="contraseña" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                                <label for="contraseña" class="block text-sm font-medium text-gray-700">Contraseña
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="password" id="contraseña" name="contraseña" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="rol_fk" class="block text-sm font-medium text-gray-700">Rol del empleado</label>
+                                <label for="rol_fk" class="block text-sm font-medium text-gray-700">Rol del empleado
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <select name="rol_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Selecciona el rol del empleado</option>
                                     @foreach ($datosRol as $dato)
@@ -172,7 +182,9 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label for="fecha_contratacion" class="block text-sm font-medium text-gray-700">Fecha de Contratación</label>
+                                <label for="fecha_contratacion" class="block text-sm font-medium text-gray-700">Fecha de Contratación
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="date" id="fecha_contratacion" name="fecha_contratacion" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="items-center px-4 py-3">

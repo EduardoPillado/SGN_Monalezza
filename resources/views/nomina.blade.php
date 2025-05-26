@@ -43,11 +43,11 @@
                             <tr class="border-b">
                                 <td class="py-2">{{ $dato->empleado->usuario->nombre }}</td>
                                 <td class="py-2">{{ $dato->fecha_pago }}</td>
-                                <td class="py-2">{{ $dato->salario_base }}</td>
+                                <td class="py-2">${{ $dato->salario_base }}</td>
                                 <td class="py-2">{{ $dato->horas_extra }}</td>
                                 <td class="py-2">${{ $dato->deducciones }}</td>
                                 <td class="py-2">${{ $dato->compensacion_extra }}</td>
-                                <td class="py-2">{{ $dato->salario_neto }}</td>
+                                <td class="py-2">${{ $dato->salario_neto }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -92,10 +92,14 @@
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Generar Nómina</h3>
                     <div class="mt-2 px-7 py-3">
+                        <p class="text-sm text-gray-600 mb-3">
+                            <span class="text-red-500">*</span> Campo necesario</p>
                         <form id="form-nomina" action="{{ route('nomina.generar') }}" method="post">
                             @csrf
                             <div class="mb-4">
-                                <label for="empleado_fk" class="block text-sm font-medium text-gray-700">Empleado</label>
+                                <label for="empleado_fk" class="block text-sm font-medium text-gray-700">Empleado
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <select name="empleado_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Selecciona al empleado</option>
                                     @foreach ($datosEmpleado as $dato)
@@ -104,19 +108,27 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label for="salario_base" class="block text-sm font-medium text-gray-700">Salario</label>
+                                <label for="salario_base" class="block text-sm font-medium text-gray-700">Salario
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="number" id="salario_base" name="salario_base" value="0.00" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="compensacion_extra" class="block text-sm font-medium text-gray-700">Compensación extra ($)</label>
+                                <label for="compensacion_extra" class="block text-sm font-medium text-gray-700">Compensación extra ($)
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="number" id="compensacion_extra" name="compensacion_extra" value="0.00" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="fecha_inicio" class="block text-sm font-medium text-gray-700">Fecha inicial</label>
+                                <label for="fecha_inicio" class="block text-sm font-medium text-gray-700">Fecha inicial
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="date" id="fecha_inicio" name="fecha_inicio" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="fecha_fin" class="block text-sm font-medium text-gray-700">Fecha final</label>
+                                <label for="fecha_fin" class="block text-sm font-medium text-gray-700">Fecha final
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="date" id="fecha_fin" name="fecha_fin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="items-center px-4 py-3">

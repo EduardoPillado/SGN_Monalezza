@@ -130,10 +130,14 @@
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nuevo Gasto</h3>
                     <div class="mt-2 px-7 py-3">
+                        <p class="text-sm text-gray-600 mb-3">
+                            <span class="text-red-500">*</span> Campo necesario</p>
                         <form id="form-gasto" action="{{ route('gasto.insertar') }}" method="post">
                             @csrf
                             <div class="mb-4">
-                                <label for="tipo_gasto_fk" class="block text-sm font-medium text-gray-700">Tipo de gasto</label>
+                                <label for="tipo_gasto_fk" class="block text-sm font-medium text-gray-700">Tipo de gasto
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <select name="tipo_gasto_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Selecciona el tipo de gasto</option>
                                     @foreach ($datosTipoGasto as $dato)
@@ -142,11 +146,15 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label for="cantidad_pagada_servicio" class="block text-sm font-medium text-gray-700">Cantidad pagada</label>
+                                <label for="cantidad_pagada_servicio" class="block text-sm font-medium text-gray-700">Cantidad pagada
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="number" id="cantidad_pagada_servicio" name="cantidad_pagada_servicio" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="fecha_pago_servicio" class="block text-sm font-medium text-gray-700">Fecha de pago</label>
+                                <label for="fecha_pago_servicio" class="block text-sm font-medium text-gray-700">Fecha de pago
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="date" id="fecha_pago_servicio" name="fecha_pago_servicio" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="items-center px-4 py-3">

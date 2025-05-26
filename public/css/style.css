@@ -98,6 +98,12 @@
 }
 
 /* Estilos para la columna derecha */
+#search-bar {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
 .right-column {
     width: 50%;
     height: 88%;

@@ -111,14 +111,20 @@
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Realizar Corte de Caja</h3>
                     <div class="mt-2 px-7 py-3">
+                        <p class="text-sm text-gray-600 mb-3">
+                            <span class="text-red-500">*</span> Campo necesario</p>
                         <form id="form-corteCaja" action="{{ route('corteDeCaja.generarCorte') }}" method="post">
                             @csrf
                             <div class="mb-4">
-                                <label for="fecha_corte_inicio" class="block text-sm font-medium text-gray-700">Fecha inicial</label>
+                                <label for="fecha_corte_inicio" class="block text-sm font-medium text-gray-700">Fecha inicial
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="datetime-local" id="fecha_corte_inicio" name="fecha_corte_inicio" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="fecha_corte_fin" class="block text-sm font-medium text-gray-700">Fecha final</label>
+                                <label for="fecha_corte_fin" class="block text-sm font-medium text-gray-700">Fecha final
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="datetime-local" id="fecha_corte_fin" name="fecha_corte_fin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="items-center px-4 py-3">

@@ -51,7 +51,9 @@
                             <th class="text-left py-2">Precio de proveedor</th>
                             <th class="text-left py-2">Tipo de gasto</th>
                             <th class="text-left py-2">Estado</th>
-                            <th class="text-right py-2">Acciones</th>
+                            @if ( session('usuario_pk') == 1 )
+                                <th class="text-right py-2">Acciones</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -78,9 +80,11 @@
                                 @else
                                     <td class="py-2" style="color: green; font-weight: bold;">Disponible</td>
                                 @endif
-                                <td class="text-right py-2">
-                                    <a href="{{ route('inventario.datosParaEdicion', $dato->inventario_pk) }}" title="Actualizar Stock" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Stock +</a>
-                                </td>
+                                @if ( session('usuario_pk') == 1 )
+                                    <td class="text-right py-2">
+                                        <a href="{{ route('inventario.datosParaEdicion', $dato->inventario_pk) }}" title="Actualizar Stock" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Stock +</a>
+                                    </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
@@ -119,6 +123,9 @@
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar en Inventario</h3>
                     <div class="mt-2 px-7 py-3">
+                        <p class="text-sm text-gray-600 mb-3">
+
+                        <span class="text-red-500">*</span> Campo necesario</p>
                         <form id="form-inventario" action="{{ route('inventario.insertar') }}" method="post">
                             @csrf
                             <div class="mb-4">
@@ -150,8 +157,11 @@
                             </div>
 
                             <div class="mb-4">
-                                <label for="tipo_gasto_fk" class="block text-sm font-medium text-gray-700">Tipo de gasto</label>
-                                <select name="tipo_gasto_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                <label for="tipo_gasto_fk" class="block text-sm font-medium text-gray-700">Tipo de gasto
+                                    <span class="text-red-500">*</span>
+                                    
+                                </label>
+                                <select name="tipo_gasto_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Selecciona el tipo de gasto</option>
                                     @foreach ($datosTipoGasto as $dato)
                                         <option value="{{ $dato->tipo_gasto_pk }}">{{ $dato->nombre_tipo_gasto }}</option>
@@ -159,7 +169,10 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label for="proveedor_fk" class="block text-sm font-medium text-gray-700">Proveedor del producto</label>
+                                <label for="proveedor_fk" class="block text-sm font-medium text-gray-700">Proveedor del producto
+                                    <span class="text-red-500">*</span>
+
+                                </label>
                                 <select name="proveedor_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                     <option value="">Selecciona el proveedor</option>
                                     @foreach ($datosProveedor as $dato)
@@ -168,23 +181,38 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label for="precio_proveedor" class="block text-sm font-medium text-gray-700">Precio del proveedor por unidad</label>
+                                <label for="precio_proveedor" class="block text-sm font-medium text-gray-700">Precio del proveedor por unidad
+                                    <span class="text-red-500">*</span>
+
+                                </label>
                                 <input type="number" id="precio_proveedor" name="precio_proveedor" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="cantidad_inventario" class="block text-sm font-medium text-gray-700">Cantidad de stock</label>
+                                <label for="cantidad_inventario" class="block text-sm font-medium text-gray-700">Cantidad de stock
+                                    <span class="text-red-500">*</span>
+
+                                </label>
                                 <input type="number" id="cantidad_inventario" name="cantidad_inventario" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="cantidad_paquete" class="block text-sm font-medium text-gray-700">Cantidad del paquete (gr/ml/u)</label>
+                                <label for="cantidad_paquete" class="block text-sm font-medium text-gray-700">Cantidad del paquete (gr/ml/u)
+                                    <span class="text-red-500">*</span>
+
+                                </label>
                                 <input type="number" id="cantidad_paquete" name="cantidad_paquete" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="cantidad_inventario_minima" class="block text-sm font-medium text-gray-700">Cantidad minima de stock</label>
+                                <label for="cantidad_inventario_minima" class="block text-sm font-medium text-gray-700">Cantidad minima de stock
+                                    <span class="text-red-500">*</span>
+
+                                </label>
                                 <input type="number" id="cantidad_inventario_minima" name="cantidad_inventario_minima" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="fecha_inventario" class="block text-sm font-medium text-gray-700">Fecha de inventario</label>
+                                <label for="fecha_inventario" class="block text-sm font-medium text-gray-700">Fecha de inventario
+                                    <span class="text-red-500">*</span>
+
+                                </label>
                                 <input type="datetime-local" id="fecha_inventario" name="fecha_inventario" value="{{ \Carbon\Carbon::now()->format('Y-m-d\TH:i') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="items-center px-4 py-3">
