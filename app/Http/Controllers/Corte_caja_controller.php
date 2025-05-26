@@ -13,6 +13,13 @@ class Corte_caja_controller extends Controller
         $req->validate([
             'fecha_corte_inicio' => 'required|date_format:Y-m-d\TH:i',
             'fecha_corte_fin' => 'required|date_format:Y-m-d\TH:i|after_or_equal:fecha_corte_inicio',
+        ],[
+            'fecha_corte_inicio.required' => 'Debe ingresar una fecha de inicio.',
+            'fecha_corte_inicio.date_format' => 'Debe ingresar una fecha válida en formato YYYY-MM-DD HH:mm para la fecha inicial.',
+            
+            'fecha_corte_fin.required' => 'Debe ingresar una fecha de fin.',
+            'fecha_corte_fin.after_or_equal' => 'La fecha final debe ser posterior o igual a la fecha de inicio.',
+            'fecha_corte_fin.date_format' => 'Debe ingresar una fecha válida en formato YYYY-MM-DD HH:mm para la fecha final.',
         ]);
     
         $corte = new Corte_caja();
@@ -35,7 +42,12 @@ class Corte_caja_controller extends Controller
     }
 
     public function mostrar(){
-        $datosCorteCaja = Corte_caja::all();
-        return view('cortesDeCaja', compact('datosCorteCaja'));
+        $datosCorteCaja = Corte_caja::with('empleados.usuario')->get();
+        $USUARIO_PK = session('usuario_pk');
+        if ($USUARIO_PK) {
+            return view('cortesDeCaja', compact('datosCorteCaja'));
+        } else {
+            return redirect('/login');
+        }
     }
 }

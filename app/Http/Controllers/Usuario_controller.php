@@ -24,7 +24,11 @@ class Usuario_controller extends Controller
             if ($usuario->estatus_usuario == 1) {
                 session(['usuario_pk' => $usuario->usuario_pk, 'usuario' => $usuario->usuario]);
                 session(['rol_pk' => $usuario->rol->rol_pk, 'nombre_rol' => $usuario->rol->nombre_rol]);
-                return redirect('/')->with('success', 'Bienvenido Usuario');
+                if ($usuario->rol_fk == 1) {
+                    return redirect('/')->with('success', 'Bienvenido');
+                } else {
+                    return redirect('/asistencia/entrada')->with('success', 'Bienvenido');
+                }
             } else {
                 return redirect('/login')->with('error', 'El usuario no es válido');
             }

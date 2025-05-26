@@ -16,8 +16,8 @@
         use App\Models\Tipo_producto;
         $datosTipoProducto=Tipo_producto::all();
 
-        use App\Models\Proveedor;
-        $datosProveedor=Proveedor::all();
+        use App\Models\Ingrediente;
+        $datosIngrediente=Ingrediente::where('estatus_ingrediente', '=', 1)->get();
     @endphp
 
     <div class="h-screen flex flex-col">
@@ -48,6 +48,26 @@
                             <input type="number" id="precio_producto" name="precio_producto" value="{{ $datosProducto->precio_producto }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         </div>
                     </div>
+                
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Ingredientes</label>
+                        <div id="ingredientes-container">
+                            @foreach ($datosProducto->ingredientes as $ingrediente)
+                                <div class="flex items-center mb-2 ingrediente-row">
+                                    <select name="ingredientes[]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                        <option value="">Selecciona un ingrediente</option>
+                                        @foreach ($datosIngrediente as $dato)
+                                            <option @if ($dato->ingrediente_pk == $ingrediente->ingrediente_pk) selected @endif value="{{ $dato->ingrediente_pk }}">{{ $dato->nombre_ingrediente }}</option>
+                                        @endforeach
+                                    </select>
+                                    <input type="number" name="cantidades_necesarias[]" value="{{ $ingrediente->pivot->cantidad_necesaria }}" class="ml-2 w-20 rounded-md border-gray-300" required>
+                                    <button type="button" class="ml-2 px-2 py-1 bg-red-500 text-white rounded-md remove-ingrediente">Eliminar</button>
+                                </div>
+                            @endforeach
+                        </div>
+                        <button type="button" id="add-ingrediente" class="mt-2 px-3 py-1 bg-green-500 text-white rounded-md">Agregar Ingrediente</button>
+                    </div>
+                
                     <div class="mt-6 text-right">
                         <button type="submit" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300">
                             Actualizar
@@ -57,6 +77,36 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('add-ingrediente').addEventListener('click', function() {
+            let container = document.getElementById('ingredientes-container');
+            let newRow = document.createElement('div');
+            newRow.classList.add('flex', 'items-center', 'mb-2', 'ingrediente-row');
+            
+            newRow.innerHTML = `
+                <select name="ingredientes[]" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <option value="">Selecciona un ingrediente</option>
+                    @foreach ($datosIngrediente as $dato)
+                        <option value="{{ $dato->ingrediente_pk }}">{{ $dato->nombre_ingrediente }}</option>
+                    @endforeach
+                </select>
+
+                <input type="number" name="cantidades_necesarias[]" class="ml-2 w-20 rounded-md border-gray-300" required>
+
+                <button type="button" class="ml-2 px-2 py-1 bg-red-500 text-white rounded-md remove-ingrediente">Eliminar</button>
+            `;
+            
+            container.appendChild(newRow);
+        });
+    
+        // Eliminar un ingrediente específico del formulario
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('remove-ingrediente')) {
+                e.target.parentElement.remove();
+            }
+        });
+    </script>
 
     @if ($errors->any())
     <script>

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('detalle_ingrediente_pk')->autoIncrement();
             $table->unsignedBigInteger('producto_fk');
             $table->unsignedBigInteger('ingrediente_fk');
+            $table->decimal('cantidad_necesaria');
 
             $table->foreign('producto_fk')
                 ->references('producto_pk')

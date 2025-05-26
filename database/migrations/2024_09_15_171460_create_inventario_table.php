@@ -20,6 +20,8 @@ return new class extends Migration
             $table->decimal('precio_proveedor');
             $table->datetime('fecha_inventario');
             $table->decimal('cantidad_inventario');
+            $table->decimal('cantidad_paquete');
+            $table->decimal('cantidad_parcial')->default(0);
             $table->decimal('cantidad_inventario_minima');
 
             $table->foreign('ingrediente_fk')

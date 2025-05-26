@@ -16,8 +16,9 @@ return new class extends Migration
             $table->unsignedBigInteger('empleado_fk');
             $table->date('fecha_pago');
             $table->decimal('salario_base');
-            $table->decimal('horas_extra');
-            $table->decimal('deducciones');
+            $table->decimal('horas_extra')->default(0);
+            $table->decimal('deducciones')->default(0);
+            $table->decimal('compensacion_extra')->default(0);
             $table->decimal('salario_neto');
 
             $table->foreign('empleado_fk')

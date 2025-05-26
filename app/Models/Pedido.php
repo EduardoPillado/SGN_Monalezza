@@ -22,6 +22,9 @@ class Pedido extends Model
         'notas_remision',
         'estatus_pedido'
     ];
+    protected $casts = [
+        'fecha_hora_pedido' => 'datetime',
+    ];
     public $timestamps=false;
     public function detalle_pedido(){
         return $this->hasMany(Detalle_pedido::class, 'pedido_fk');
@@ -37,5 +40,14 @@ class Pedido extends Model
     }
     public function tipo_pago(){
         return $this->belongsTo(Tipo_pago::class, 'tipo_pago_fk');
+    }
+    public function productos(){
+        return $this->belongsToMany(Producto::class, 'detalle_pedido', 'pedido_fk', 'producto_fk')
+            ->withPivot('cantidad_producto');
+    }
+    public function mostrarTicket($pedido_pk){
+        $pedido = Pedido::with('cliente', 'productos', 'empleado', 'medio_pedido', 'tipo_pago')
+            ->findOrFail($pedido_pk);
+        return view('ticket', compact('pedido'));
     }
 }

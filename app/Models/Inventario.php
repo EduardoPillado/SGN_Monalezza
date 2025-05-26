@@ -19,6 +19,7 @@ class Inventario extends Model
         'precio_proveedor',
         'fecha_inventario',
         'cantidad_inventario',
+        'cantidad_paquete',
         'cantidad_inventario_minima'
         
     ];

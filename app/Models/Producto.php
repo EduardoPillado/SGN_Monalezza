@@ -28,7 +28,8 @@ class Producto extends Model
         return $this->hasMany(Inventario::class, 'producto_fk');
     }
     public function ingredientes() {
-        return $this->belongsToMany(Ingrediente::class, 'producto_ingrediente', 'producto_fk', 'ingrediente_fk');
+        return $this->belongsToMany(Ingrediente::class, 'detalle_ingrediente', 'producto_fk', 'ingrediente_fk')
+            ->withPivot('cantidad_necesaria');
     }
     public function tipo_producto(){
         return $this->belongsTo(Tipo_producto::class, 'tipo_producto_fk');
