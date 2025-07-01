@@ -7,6 +7,7 @@ use App\Http\Controllers\Empleado_controller;
 use App\Http\Controllers\Cliente_controller;
 use App\Http\Controllers\Proveedor_controller;
 use App\Http\Controllers\Producto_controller;
+use App\Http\Controllers\Entradas_caja_controller;
 use App\Http\Controllers\Corte_caja_controller;
 use App\Http\Controllers\Inventario_controller;
 use App\Http\Controllers\Ingrediente_controller;
@@ -33,6 +34,13 @@ Route::match(['get', 'put'], '/marcandoPendientePedido/{pedido_pk}', [Pedido_con
 Route::match(['get', 'put'], '/marcandoEntregaPedido/{pedido_pk}', [Pedido_controller::class, 'entregado'])->name('pedido.entregado');
 Route::match(['get', 'put'], '/marcandoCancelacionPedido/{pedido_pk}', [Pedido_controller::class, 'cancelado'])->name('pedido.cancelado');
 Route::get('/ticket/{pedido_pk}', [Pedido_controller::class, 'mostrarTicket'])->name('ticket.mostrar');
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Entradas de caja ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Route::post('/registrandoEntradaDeCaja', [Entradas_caja_controller::class, 'insertar'])->name('entradas_caja.insertar');
+Route::get('/entradasDeCaja', [Entradas_caja_controller::class, 'mostrar'])->name('entradas_caja.mostrar');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -141,7 +149,7 @@ Route::match(['get', 'put'], '/dandoDeAltaIngrediente/{ingrediente_pk}', [Ingred
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-// Mesa ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// Reserva ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Route::get('/reservas', [Reserva_controller::class, 'mostrar'])->name('reserva.mostrar');
 Route::post('/registrandoReserva', [Reserva_controller::class, 'insertar'])->name('reserva.insertar');

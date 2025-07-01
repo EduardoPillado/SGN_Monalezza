@@ -129,10 +129,14 @@
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nuevo Proveedor</h3>
                     <div class="mt-2 px-7 py-3">
+                        <p class="text-sm text-gray-600 mb-3">
+                            <span class="text-red-500">*</span> Campo necesario</p>
                         <form id="form-proveedor" action="{{ route('proveedor.insertar') }}" method="post">
                             @csrf
                             <div class="mb-4">
-                                <label for="nombre_proveedor" class="block text-sm font-medium text-gray-700">Nombre</label>
+                                <label for="nombre_proveedor" class="block text-sm font-medium text-gray-700">Nombre
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="text" id="nombre_proveedor" name="nombre_proveedor" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="items-center px-4 py-3">

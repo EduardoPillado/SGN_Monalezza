@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +15,7 @@
             margin: 0;
             background-color: #f0f0f0;
         }
-        
+
         .receipt {
             background-color: white;
             padding: 10px;
@@ -23,7 +24,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             box-sizing: border-box;
         }
-        
+
         .logo {
             text-align: center;
             margin-bottom: 10px;
@@ -58,7 +59,8 @@
             padding: 20px;
         }
 
-        th, td {
+        th,
+        td {
             padding: 5px;
             text-align: left;
         }
@@ -84,7 +86,9 @@
         }
 
         @media print {
-            body, .receipt {
+
+            body,
+            .receipt {
                 margin: 0 !important;
                 padding: 0 !important;
                 width: 80mm;
@@ -92,7 +96,12 @@
         }
     </style>
 </head>
+
 <body>
+    @php
+        $origen = request('from'); // 'inicio', 'ventas', o null
+    @endphp
+
     <div class="receipt">
         <div class="logo">
             <img src="{{ asset('img/logo_lamonalezza.webp') }}" alt="La Monalezza Logo">
@@ -101,17 +110,31 @@
         <p class="date">{{ $pedido->fecha_hora_pedido->format('d/m/Y - h:i A') }}</p>
         <div class="center-table">
             <table>
-                <tr><th>ARTÍCULO</th><th>PRECIO</th></tr>
+                <tr>
+                    <th>ARTÍCULO</th>
+                    <th>PRECIO</th>
+                </tr>
                 @foreach ($pedido->productos as $producto)
-                    <tr>
-                        <td>x{{ $producto->pivot->cantidad_producto }} {{ $producto->nombre_producto }} ({{ $producto->tipo_producto->nombre_tipo_producto }})</td>
-                        <td>$ {{ number_format($producto->precio_producto * $producto->pivot->cantidad_producto, 2) }}</td>
-                    </tr>
+                <tr>
+                    <td>x{{ $producto->pivot->cantidad_producto }} {{ $producto->nombre_producto }} ({{ $producto->tipo_producto->nombre_tipo_producto }})</td>
+                    <td>$ {{ number_format($producto->precio_producto * $producto->pivot->cantidad_producto, 2) }}</td>
+                </tr>
                 @endforeach
-                <tr><td colspan="2">&nbsp;</td></tr> 
-                <tr class="total"><td>TOTAL</td><td>$ {{ number_format($pedido->monto_total, 2) }}</td></tr>
-                <tr><td>PAGÓ</td><td>$ {{ number_format($pedido->pago, 2) }}</td></tr>
-                <tr><td>SU CAMBIO</td><td>$ {{ number_format($pedido->cambio, 2) }}</td></tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr class="total">
+                    <td>TOTAL</td>
+                    <td>$ {{ number_format($pedido->monto_total, 2) }}</td>
+                </tr>
+                <tr>
+                    <td>PAGÓ</td>
+                    <td>$ {{ number_format($pedido->pago, 2) }}</td>
+                </tr>
+                <tr>
+                    <td>SU CAMBIO</td>
+                    <td>$ {{ number_format($pedido->cambio, 2) }}</td>
+                </tr>
             </table>
         </div>
         <p class="thanks">¡GRACIAS POR TU COMPRA!</p>
@@ -120,11 +143,11 @@
     <script>
         window.onload = function() {
             window.print();
-
             window.onafterprint = function() {
-                window.location.href = "/";
+                window.close();
             };
         };
     </script>
 </body>
+
 </html>

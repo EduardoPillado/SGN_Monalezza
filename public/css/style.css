@@ -1,3 +1,14 @@
+.fix {
+    display: block; 
+    margin-bottom: 2px;
+    text-align: center;
+}
+
+.less{
+    font-size: 10px;
+    margin-bottom: 20px;
+}
+
 .pizza-body {
     height: 100vh;
     overflow: hidden;
@@ -98,6 +109,12 @@
 }
 
 /* Estilos para la columna derecha */
+#search-bar {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
 .right-column {
     width: 50%;
     height: 88%;
@@ -238,3 +255,11 @@
 }
 
 /* Fin Span de stock crítico en inicio */
+
+/* Corrección de sobrepuesto de DataTables */
+
+.dataTables_wrapper .dataTables_length select {
+    width: 55px;
+}
+
+/* Fin de corrección de sobrepuesto de DataTables */

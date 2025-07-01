@@ -27,7 +27,7 @@
                             <th class="text-left py-2">Fecha y hora</th>
                             <th class="text-left py-2">Medio del pedido</th>
                             <th class="text-left py-2">Total</th>
-                            <th class="text-left py-2">Tipo de pago</th>
+                            <th class="text-left py-2">Método de pago</th>
                             <th class="text-left py-2">Número de transacción</th>
                             <th class="text-left py-2">Notas de remisión</th>
                             <th class="text-left py-2">Estatus</th>
@@ -64,16 +64,18 @@
                                 @endif
                                 <td class="text-right py-2">
                                     @if ( $dato->estatus_pedido == 1 )
-                                        <a href="{{ route('pedido.entregado', $dato->pedido_pk) }}" onclick="confirmarEntrega(event)" class="bg-green-500 text-white px-2 py-1 rounded">Entregado</a>
+                                        <a href="{{ route('pedido.entregado', $dato->pedido_pk) }}" onclick="confirmarEntrega(event)" class="bg-green-500 text-white px-2 py-1 rounded fix">Entregado</a>
                                     @else
-                                        
+                                        {{-- Nada --}}
                                     @endif
 
                                     @if ( $dato->estatus_pedido != 2 )
-                                        <a href="{{ route('pedido.cancelado', $dato->pedido_pk) }}" onclick="confirmarCancelacion(event)" class="bg-red-500 text-white px-2 py-1 rounded">Cancelar</a>
+                                        <a href="{{ route('pedido.cancelado', $dato->pedido_pk) }}" onclick="confirmarCancelacion(event)" class="bg-red-500 text-white px-2 py-1 rounded fix">Cancelar</a>
                                     @elseif ( $dato->estatus_pedido == 2 )
-                                        <a href="{{ route('pedido.pendiente', $dato->pedido_pk) }}" onclick="confirmarDesCancelacion(event)" class="bg-green-500 text-white px-2 py-1 rounded">Deshacer cancelación</a>
+                                        <a href="{{ route('pedido.pendiente', $dato->pedido_pk) }}" onclick="confirmarDesCancelacion(event)" class="bg-green-500 text-white px-2 py-1 rounded fix">Deshacer cancelación</a>
                                     @endif
+
+                                    <a href="{{ route('ticket.mostrar', $dato->pedido_pk) }}" target="_blank" class="bg-blue-500 text-white px-2 py-1 rounded fix">Ticket</a>
                                 </td>
                             </tr>
                         @endforeach

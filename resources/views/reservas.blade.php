@@ -173,10 +173,15 @@
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nueva Reserva</h3>
                     <div class="mt-2 px-7 py-3">
+                        <p class="text-sm text-gray-600 mb-3">
+                            <span class="text-red-500">*</span> Campo necesario</p>
                         <form id="form-reserva" action="{{ route('reserva.insertar') }}" method="post">
                             @csrf
                             <div class="mb-4">
-                                <label for="cliente_fk" class="block text-sm font-medium text-gray-700">Cliente</label>
+                                <label for="cliente_fk" class="block text-sm font-medium text-gray-700">Cliente
+                                    <span class="text-red-500">*</span>
+
+                                </label>
                                 <select name="cliente_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Selecciona el cliente</option>
                                     @foreach ($datosCliente as $dato)
@@ -185,7 +190,9 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label for="fecha_hora_reserva" class="block text-sm font-medium text-gray-700">Fecha y hora de reservación</label>
+                                <label for="fecha_hora_reserva" class="block text-sm font-medium text-gray-700">Fecha y hora de reservación
+                                    <span class="text-red-500">*</span>
+                                </label>
                                 <input type="datetime-local" id="fecha_hora_reserva" name="fecha_hora_reserva" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
@@ -196,7 +203,10 @@
                                 <div id="mesas-container">
                                     <div class="flex items-center mb-2">
                                         <div class="flex flex-col w-3/4">
-                                            <label for="mesas[]" class="block text-sm font-medium text-gray-700">Mesa</label>
+                                            <label for="mesas[]" class="block text-sm font-medium text-gray-700">Mesa
+                                                <span class="text-red-500">*</span>
+
+                                            </label>
                                             <select name="mesas[]" class="w-full rounded-md border-gray-300 mb-2" required>
                                                 <option value="">Selecciona número de mesa</option>
                                                 @foreach ($datosMesa as $dato)

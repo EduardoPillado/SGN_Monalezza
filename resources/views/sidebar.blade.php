@@ -25,11 +25,27 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        .sidebar-hidden {
+          .sidebar-hidden {
             transform: translateX(-100%);
         }
         .sidebar-visible {
             transform: translateX(0);
+        }
+        #sidebar {
+            max-height: 100vh; /* Full viewport height */
+            overflow-y: auto; /* Enable vertical scrolling */
+            scrollbar-width: thin; /* Thin scrollbar for Firefox */
+            scrollbar-color: rgb(107 114 128) rgb(229 231 235); /* Scrollbar colors */
+        }
+        #sidebar::-webkit-scrollbar {
+            width: 8px; /* Thin scrollbar for Chrome, Safari, and newer Edge */
+        }
+        #sidebar::-webkit-scrollbar-track {
+            background: rgb(229 231 235); /* Light gray background for scrollbar track */
+        }
+        #sidebar::-webkit-scrollbar-thumb {
+            background-color: rgb(107 114 128); /* Gray color for scrollbar thumb */
+            border-radius: 4px; /* Rounded corners for scrollbar thumb */
         }
     </style>
 </head>
@@ -57,17 +73,22 @@
             </div>
             <ul>
                 <li class="mb-2"><a href="{{ url('/') }}" class="block p-2 hover:bg-gray-100 rounded">Inicio</a></li>
-                {{-- <li class="mb-2"><a href="{{ route('pedido.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Ventas</a></li> --}}
-                {{-- <li class="mb-2"><a href="{{ route('reserva.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Reservaciones</a></li> --}}
+                <li class="mb-2"><a href="{{ route('pedido.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Ventas</a></li>
+                <li class="mb-2"><a href="{{ route('reserva.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Reservaciones</a></li>
                 <li class="mb-2"><a href="{{ route('inventario.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Inventario</a></li>
-                {{-- <li class="mb-2"><a href="{{ route('producto.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Productos</a></li> --}}
-                <li class="mb-2"><a href="{{ route('ingrediente.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Ingredientes</a></li>
-                <li class="mb-2"><a href="{{ route('gasto.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Gastos</a></li>
-                <li class="mb-2"><a href="{{ route('asistencia.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Asistencias</a></li>
-                <li class="mb-2"><a href="{{ route('nomina.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Nómina</a></li>
+                <li class="mb-2"><a href="{{ route('producto.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Productos</a></li>
+                @if ( $USUARIO_PK == 1 )
+                    <li class="mb-2"><a href="{{ route('ingrediente.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Ingredientes</a></li>
+                    <li class="mb-2"><a href="{{ route('entradas_caja.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Entradas de caja</a></li>
+                    <li class="mb-2"><a href="{{ route('gasto.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Gastos</a></li>
+                    <li class="mb-2"><a href="{{ route('asistencia.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Asistencias</a></li>
+                    <li class="mb-2"><a href="{{ route('nomina.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Nómina</a></li>
+                @endif
                 <li class="mb-2"><a href="{{ route('cliente.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Clientes</a></li>
-                <li class="mb-2"><a href="{{ route('empleado.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Empleados</a></li>
-                <li class="mb-2"><a href="{{ route('proveedor.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Proveedores</a></li>
+                @if ( $USUARIO_PK == 1 )
+                    <li class="mb-2"><a href="{{ route('empleado.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Empleados</a></li>
+                    <li class="mb-2"><a href="{{ route('proveedor.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Proveedores</a></li>
+                @endif
                 <li class="mb-2"><a href="{{ route('corteDeCaja.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Realizar corte de caja</a></li>
                 <li class="mb-2"><a href="{{ route('asistencia.entrada') }}" class="block p-2 hover:bg-gray-100 rounded">Registrar entrada</a></li>
                 <li class="mb-2"><a href="{{ route('asistencia.salida') }}" class="block p-2 hover:bg-gray-100 rounded">Registrar salida</a></li>
@@ -80,12 +101,13 @@
     <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden hidden"></div>
 
     <!-- Encabezado con logo y fondo de iconos de pizza -->
-    <div class="bg-gray-200 p-4 relative overflow-hidden">
-        <div class="absolute inset-0 opacity-10">
-            <!-- Aquí irían los iconos de pizza como background -->
-        </div>
+    <div class="bg-gray-200 p-4 relative">
         <div class="relative z-10 flex justify-between items-center">
             <button class="text-2xl" onclick="toggleSidebar()">☰</button>
+            <div class="text-center">
+                <h1 class="text-2xl sm:text-2xl lg:text-3xl font-bold">Sistema - La Monalezza Pizzería</h1>
+                <h2 class="text-2x1 sm:text-2x1 lg:text-3x1 font-semibold">Dinero en caja: ${{ number_format($resumenCajaHoy['total_caja'], 2) }}</h2>
+            </div>
             <a href="{{ url('/') }}">
                 <img src="{{ asset('img/logo_lamonalezza.webp') }}" class="w-16 h-16 bg-black rounded-full flex items-center justify-center text-white text-xs text-center">
             </a>

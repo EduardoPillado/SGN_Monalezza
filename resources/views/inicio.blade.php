@@ -24,20 +24,23 @@
             <div class="left-column bg-white shadow-lg rounded-lg p-6 w-full md:w-1/2 lg:w-1/3">
                 <form action="{{ route('pedido.insertar') }}" method="POST" class="space-y-4 h-full flex flex-col">
                     @csrf
+
                     <div class="order-summary h-64">
+
                         <h3 class="text-lg font-medium mb-4">Resumen del Pedido</h3>
                         <div id="order-items" class="order-items overflow-y-auto h-[calc(100%-2rem)]">
                             <div id="productInputs" class="space-y-2">
                                 <!-- Productos seleccionados aquí -->
                             </div>
                         </div>
+
                         <div class="order-total flex justify-between items-center mt-4">
                             <span class="font-medium">Total:</span>
                             <span id="totalAmount" class="font-bold text-lg">$ 0.00</span>
                         </div>
                     </div>
 
-                    <div class="space-y-4 overflow-y-auto flex-1 pb-8">
+                    <div class="space-y-4 overflow-y-auto flex-3 pb-8">
                         <!-- Campos del pedido -->
                         <div>
                             <label for="cliente_fk" class="block font-medium mb-2">Cliente:</label>
@@ -101,42 +104,49 @@
                                 Registrar Pedido
                             </button>
                         </div>
+
                     </div>
+
                 </form>
             </div>
             
             <!-- Columna derecha -->
             <div class="right-column">
                 <!-- Tu contenido para la columna derecha permanece igual -->
-                <div class="menu-grid">
+                <input type="text" id="search-bar" placeholder="Buscar productos..." style="margin-bottom: 20px; padding: 10px; width: 100%; box-sizing: border-box;">
+                <div id="product-container" class="menu-grid">
                     @foreach($productos as $producto)
-                        <div class="menu-item" onclick="toggleProductSelection(this, {{ $producto->producto_pk }}, '{{ $producto->nombre_producto }}', {{ $producto->precio_producto }}, '{{ $producto->tipo_producto->nombre_tipo_producto }}')">
-                            <input type="checkbox" name="producto_fk[]" value="{{ $producto->producto_pk }}">
-                            <div>{{ $producto->nombre_producto }}</div>
-                            <div>{{ $producto->tipo_producto->nombre_tipo_producto }}</div>
-                            <div>${{ $producto->precio_producto }}</div>
-                            <div>🍕</div>
-                        </div>
+                    <div class="menu-item" 
+                         data-nombre="{{ $producto->nombre_producto }}" 
+                         data-tipo="{{ $producto->tipo_producto->nombre_tipo_producto }}" 
+                         data-precio="{{ $producto->precio_producto }}" 
+                         onclick="toggleProductSelection(this, {{ $producto->producto_pk }}, '{{ $producto->nombre_producto }}', {{ $producto->precio_producto }}, '{{ $producto->tipo_producto->nombre_tipo_producto }}')">
+                        <input type="checkbox" name="producto_fk[]" value="{{ $producto->producto_pk }}">
+                        <div>{{ $producto->nombre_producto }}</div>
+                        <div>{{ $producto->tipo_producto->nombre_tipo_producto }}</div>
+                        <div>${{ $producto->precio_producto }}</div>
+                        <div>🍕</div>
+                    </div>
                     @endforeach
                 </div>
                 <div class="info-buttons">
                     <a href="{{ route('producto.mostrar') }}">
-                        <div class="info-button products-registered">
+                        <div class="info-button products-registered less">
                             Productos registrados 🍕
                         </div>
                     </a>
                     <a href="{{ route('pedido.mostrar') }}">
-                        <div class="info-button total-sales">
+                        <div class="info-button total-sales less">
                             Total ventas 💰
                         </div>
                     </a>
-                    <a href="{{ route('gasto.mostrar') }}">
-                        <div class="info-button profits">
-                            Ganancias 💼
+                    <a href="{{ route('reserva.mostrar') }}">
+                        <div class="info-button profits less">
+                            Reservaciones 🕐
                         </div>
                     </a>
                     <a href="{{ route('inventario.mostrarPocoStock') }}">
-                        <div class="info-button low-stock relative">
+                        <div class="info-button low-stock relative less">
                             Productos poco Stock 📉
                             @if(isset($cantidadCritico) && $cantidadCritico > 0)
                                 <span class="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
@@ -147,6 +157,21 @@
                     </a>
                 </div>
             </div>
+
+            <script>
+                $(document).ready(function() {
+                    $('#search-bar').on('keyup', function() {
+                        let value = $(this).val().toLowerCase();
+                        $('#product-container .menu-item').filter(function() {
+                            $(this).toggle(
+                                $(this).data('nombre').toLowerCase().includes(value) ||
+                                $(this).data('tipo').toLowerCase().includes(value) ||
+                                $(this).data('precio').toString().toLowerCase().includes(value)
+                            );
+                        });
+                    });
+                });
+            </script>
             
             <script>
                 const selectedProducts = {};

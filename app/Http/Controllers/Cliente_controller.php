@@ -72,12 +72,7 @@ class Cliente_controller extends Controller
         $datosCliente = Cliente::all();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $ROL = session('nombre_rol');
-            if ($ROL == 'Administrador') {
-                return view('clientes', compact('datosCliente'));
-            } else {
-                return back()->with('message', 'No puedes acceder');
-            }
+            return view('clientes', compact('datosCliente'));
         } else {
             return redirect('/login');
         }

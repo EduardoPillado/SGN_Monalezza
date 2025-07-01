@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\Inventario;
+use App\Http\Controllers\Entradas_caja_controller;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +26,10 @@ class AppServiceProvider extends ServiceProvider
             $cantidadCritico = Inventario::whereColumn('cantidad_inventario', '<=', 'cantidad_inventario_minima')->count();
             $view->with('cantidadCritico', $cantidadCritico);
         });
+
+        View::composer('*', function ($view) {
+        $resumenCaja = Entradas_caja_controller::calcularResumenCajaHoy();
+        $view->with('resumenCajaHoy', $resumenCaja);
+    });
     }
 }

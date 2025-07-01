@@ -69,19 +69,14 @@ class Reserva_controller extends Controller
         $datosReserva = Reserva::findOrFail($reserva_pk);
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $ROL = session('nombre_rol');
-            if ($ROL == 'Administrador') {
-                if ($datosReserva) {
+            if ($datosReserva) {
 
-                    $datosReserva->estatus_reserva = 0;
-                    $datosReserva->save();
+                $datosReserva->estatus_reserva = 0;
+                $datosReserva->save();
 
-                    return back()->with('success', 'Reserva dada de baja');
-                } else {
-                    return back()->with('error', 'Hay algún problema con la información');
-                }
+                return back()->with('success', 'Reserva dada de baja');
             } else {
-                return back()->with('message', 'No puedes acceder');
+                return back()->with('error', 'Hay algún problema con la información');
             }
         } else {
             return redirect('/login');
@@ -92,19 +87,14 @@ class Reserva_controller extends Controller
         $datosReserva = Reserva::findOrFail($reserva_pk);
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $ROL = session('nombre_rol');
-            if ($ROL == 'Administrador') {
-                if ($datosReserva) {
+            if ($datosReserva) {
 
-                    $datosReserva->estatus_reserva = 1;
-                    $datosReserva->save();
+                $datosReserva->estatus_reserva = 1;
+                $datosReserva->save();
 
-                    return back()->with('success', 'Reserva dada de alta');
-                } else {
-                    return back()->with('error', 'Hay algún problema con la información');
-                }
+                return back()->with('success', 'Reserva dada de alta');
             } else {
-                return back()->with('message', 'No puedes acceder');
+                return back()->with('error', 'Hay algún problema con la información');
             }
         } else {
             return redirect('/login');
@@ -117,12 +107,7 @@ class Reserva_controller extends Controller
 
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $ROL = session('nombre_rol');
-            if ($ROL == 'Administrador') {
-                return view('editarReserva', compact('datosReserva', 'datosMesa'));
-            } else {
-                return back()->with('warning', 'No puedes acceder');
-            }
+            return view('editarReserva', compact('datosReserva', 'datosMesa'));
         } else {
             return redirect('/login');
         }
