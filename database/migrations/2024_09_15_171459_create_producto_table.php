@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nombre_producto', 100);
             $table->unsignedBigInteger('tipo_producto_fk');
             $table->decimal('precio_producto');
+            $table->string('imagen_producto')->nullable();
             $table->smallInteger('estatus_producto');
 
             $table->foreign('tipo_producto_fk')

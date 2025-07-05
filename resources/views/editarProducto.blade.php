@@ -26,7 +26,7 @@
         <div class="flex-grow overflow-y-auto p-4">
             <h1 class="text-2xl font-bold mb-4">Edición de Producto</h1>
             <div class="bg-white shadow-md rounded-lg p-4">
-                <form action="{{ route('producto.actualizar', $datosProducto->producto_pk) }}" method="post">
+                <form action="{{ route('producto.actualizar', $datosProducto->producto_pk) }}" method="post" enctype="multipart/form-data">
                     @csrf
                     @method('put')
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -48,9 +48,28 @@
                             <input type="number" id="precio_producto" name="precio_producto" value="{{ $datosProducto->precio_producto }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         </div>
                     </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Imagen actual</label>
+                        @if ($datosProducto->imagen_producto)
+                            <div class="w-16 h-16 rounded overflow-hidden border border-gray-300">
+                                <img src="{{ asset($datosProducto->imagen_producto) }}" alt="Imagen actual" class="w-full h-full object-cover">
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 italic">No hay imagen registrada</p>
+                        @endif
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="imagen_producto" class="block text-sm font-medium text-gray-700">Reemplazar imagen</label>
+                        <input type="file" id="imagen_producto" name="imagen_producto" accept="image/*" class="mt-1 block w-full text-sm text-gray-700">
+                    </div>
                 
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700">Ingredientes</label>
+                        <label class="block text-sm font-medium text-gray-700 items-center gap-1">
+                            Ingredientes
+                            <span class="text-blue-500 cursor-help" title="Solo agrega ingredientes si el producto los necesita.">?</span>
+                        </label>
                         <div id="ingredientes-container">
                             @foreach ($datosProducto->ingredientes as $ingrediente)
                                 <div class="flex items-center mb-2 ingrediente-row">

@@ -112,20 +112,20 @@
             
             <!-- Columna derecha -->
             <div class="right-column">
-                <!-- Tu contenido para la columna derecha permanece igual -->
                 <input type="text" id="search-bar" placeholder="Buscar productos..." style="margin-bottom: 20px; padding: 10px; width: 100%; box-sizing: border-box;">
                 <div id="product-container" class="menu-grid">
                     @foreach($productos as $producto)
-                    <div class="menu-item" 
-                         data-nombre="{{ $producto->nombre_producto }}" 
-                         data-tipo="{{ $producto->tipo_producto->nombre_tipo_producto }}" 
-                         data-precio="{{ $producto->precio_producto }}" 
-                         onclick="toggleProductSelection(this, {{ $producto->producto_pk }}, '{{ $producto->nombre_producto }}', {{ $producto->precio_producto }}, '{{ $producto->tipo_producto->nombre_tipo_producto }}')">
-                        <input type="checkbox" name="producto_fk[]" value="{{ $producto->producto_pk }}">
-                        <div>{{ $producto->nombre_producto }}</div>
-                        <div>{{ $producto->tipo_producto->nombre_tipo_producto }}</div>
-                        <div>${{ $producto->precio_producto }}</div>
-                        <div>🍕</div>
+                    <div class="menu-item relative bg-cover bg-center text-white p-4 rounded-lg shadow-md"
+                        style="background-image: url('{{ asset($producto->imagen_producto ?? 'img/sin-imagen.jpg') }}');"
+                        data-nombre="{{ $producto->nombre_producto }}" 
+                        data-tipo="{{ $producto->tipo_producto->nombre_tipo_producto }}" 
+                        data-precio="{{ $producto->precio_producto }}" 
+                        onclick="toggleProductSelection(this, {{ $producto->producto_pk }}, '{{ $producto->nombre_producto }}', {{ $producto->precio_producto }}, '{{ $producto->tipo_producto->nombre_tipo_producto }}')">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg"></div>
+                        <input type="checkbox" name="producto_fk[]" value="{{ $producto->producto_pk }}" class="relative z-10">
+                        <div class="relative z-10 font-bold text-lg">{{ $producto->nombre_producto }}</div>
+                        <div class="relative z-10 text-sm">{{ $producto->tipo_producto->nombre_tipo_producto }}</div>
+                        <div class="relative z-10 font-semibold">${{ $producto->precio_producto }}</div>
                     </div>
                     @endforeach
                 </div>
@@ -177,14 +177,45 @@
                 const selectedProducts = {};
 
                 function toggleProductSelection(div, productId, productName, productPrice, productType) {
-                    const checkbox = div.querySelector('input[type="checkbox"]');
-                    checkbox.checked = !checkbox.checked;
-                    div.classList.toggle('selected', checkbox.checked);
+                    if (!selectedProducts[productId]) {
+                        // Si no está aún, se agrega por primera vez
+                        selectedProducts[productId] = {
+                            name: productName,
+                            price: productPrice,
+                            type: productType,
+                            quantity: 1
+                        };
 
-                    if (checkbox.checked) {
-                        addProductToSummary(productId, productName, productPrice, productType);
+                        // Crea el resumen visual del producto
+                        const productElement = document.createElement('div');
+                        productElement.className = 'order-item';
+                        productElement.id = `order-item-${productId}`;
+                        productElement.innerHTML = `
+                            <span>${productName} (${productType}) - $${productPrice}</span>
+                            <input type="number" value="1" min="1" onchange="updateQuantity(${productId}, this.value)">
+                            <button type="button" onclick="removeProductFromSummary(${productId})">Eliminar</button>
+                        `;
+                        document.getElementById('productInputs').appendChild(productElement);
+
+                        // Input oculto para enviar cantidad
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = `productos[${productId}][cantidad_producto]`;
+                        hiddenInput.id = `input-producto-${productId}`;
+                        hiddenInput.value = 1;
+                        document.querySelector('form').appendChild(hiddenInput);
                     } else {
-                        removeProductFromSummary(productId);
+                        // Si ya existe, incrementa la cantidad
+                        selectedProducts[productId].quantity++;
+
+                        // Actualiza input de cantidad
+                        const input = document.querySelector(`#order-item-${productId} input[type='number']`);
+                        const hiddenInput = document.getElementById(`input-producto-${productId}`);
+
+                        if (input && hiddenInput) {
+                            input.value = selectedProducts[productId].quantity;
+                            hiddenInput.value = selectedProducts[productId].quantity;
+                        }
                     }
 
                     updateTotal();

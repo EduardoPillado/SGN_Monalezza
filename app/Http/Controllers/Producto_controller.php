@@ -14,6 +14,7 @@ class Producto_controller extends Controller
             'nombre_producto' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:producto,nombre_producto'],
             'tipo_producto_fk' => ['required', 'exists:tipo_producto,tipo_producto_pk'],
             'precio_producto' => ['required', 'numeric', 'min:0.01', 'max:999999.99'],
+            'imagen_producto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
             'ingredientes.*' => ['nullable', 'exists:ingrediente,ingrediente_pk'],
         ], [
             'nombre_producto.required' => 'El nombre del producto es obligatorio.',
@@ -28,6 +29,12 @@ class Producto_controller extends Controller
             'precio_producto.numeric' => 'El precio del producto debe ser un valor numérico.',
             'precio_producto.min' => 'El precio del producto debe ser mayor o igual a 0.01.',
             'precio_producto.max' => 'El precio del producto no debe exceder 999999.99.',
+
+            'imagen_producto.image' => 'La imagen debe ser una imagen válida.',
+            'imagen_producto.mimes' => 'La imagen debe ser JPG, JPEG, PNG o WEBP.',
+            'imagen_producto.max' => 'La imagen no debe exceder 3 MB.',
+
+            'ingredientes.*.exists' => 'El ingrediente seleccionado no es válido.',
         ]);
 
         $producto=new Producto();
@@ -35,6 +42,12 @@ class Producto_controller extends Controller
         $producto->nombre_producto=$req->nombre_producto;
         $producto->tipo_producto_fk=$req->tipo_producto_fk;
         $producto->precio_producto=$req->precio_producto;
+        if ($req->hasFile('imagen_producto')) {
+            $archivo = $req->file('imagen_producto');
+            $nombreArchivo = time() . '_' . $archivo->getClientOriginalName();
+            $archivo->move(public_path('img/productos'), $nombreArchivo);
+            $producto->imagen_producto = 'img/productos/' . $nombreArchivo;
+        }
         $producto->estatus_producto=1;
 
         $producto->save();
@@ -138,6 +151,7 @@ class Producto_controller extends Controller
             'nombre_producto' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:producto,nombre_producto,' . $producto_pk . ',producto_pk'],
             'tipo_producto_fk' => ['exists:tipo_producto,tipo_producto_pk'],
             'precio_producto' => ['numeric', 'min:0.01', 'max:999999.99'],
+            'imagen_producto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
             'ingredientes.*' => ['nullable', 'exists:ingrediente,ingrediente_pk'],
         ], [
             'nombre_producto.regex' => 'El nombre del producto solo puede contener letras, números y espacios.',
@@ -150,12 +164,22 @@ class Producto_controller extends Controller
             'precio_producto.min' => 'El precio del producto debe ser mayor o igual a 0.01.',
             'precio_producto.max' => 'El precio del producto no debe exceder 999999.99.',
 
+            'imagen_producto.image' => 'La imagen debe ser una imagen válida.',
+            'imagen_producto.mimes' => 'La imagen debe ser JPG, JPEG, PNG o WEBP.',
+            'imagen_producto.max' => 'La imagen no debe exceder 3 MB.',
+
             'ingredientes.*.exists' => 'El ingrediente seleccionado no es válido.',
         ]);
 
         $datosProducto->nombre_producto = $req->nombre_producto;
         $datosProducto->tipo_producto_fk = $req->tipo_producto_fk;
         $datosProducto->precio_producto = $req->precio_producto;
+        if ($req->hasFile('imagen_producto')) {
+            $archivo = $req->file('imagen_producto');
+            $nombreArchivo = time() . '_' . $archivo->getClientOriginalName();
+            $archivo->move(public_path('img/productos'), $nombreArchivo);
+            $datosProducto->imagen_producto = 'img/productos/' . $nombreArchivo;
+        }
         $datosProducto->save();
 
         $ingredientes = $req->ingredientes ? array_filter($req->ingredientes) : [];

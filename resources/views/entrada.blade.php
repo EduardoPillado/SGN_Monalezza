@@ -17,6 +17,10 @@
 
         $USUARIO_PK = session('usuario_pk');
         $USUARIO = session('usuario');
+        $ROL_PK = session('rol_pk');
+
+        use App\Models\Empleado;
+        $empleados=Empleado::all();
     @endphp
 
     <div class="h-screen flex flex-col">
@@ -30,16 +34,33 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="mb-4">
                             <label for="empleado_fk" class="block text-sm font-medium text-gray-700">Empleado</label>
-                            <input type="text" value="{{ $USUARIO }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" readonly>
-                            <input type="hidden" name="empleado_fk" value="{{ $USUARIO_PK }}">
+                            @if ($ROL_PK == 1)
+                                <select name="empleado_fk" id="empleado_fk" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                                    <option value="{{ $USUARIO_PK }}">{{ $USUARIO }}</option>
+                                    @foreach($empleados as $empleado)
+                                        <option value="{{ $empleado->empleado_pk }}">{{ $empleado->usuario->usuario }}</option>
+                                    @endforeach
+                                </select>
+                            @else
+                                <input type="text" value="{{ $USUARIO }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" readonly>
+                                <input type="hidden" name="empleado_fk" value="{{ $USUARIO_PK }}">
+                            @endif
                         </div>
                         <div class="mb-4">
                             <label for="fecha_asistencia" class="block text-sm font-medium text-gray-700">Fecha de asistencia</label>
-                            <input type="date" id="fecha_asistencia" name="fecha_asistencia" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" readonly>
+                            @if ($ROL_PK == 1)
+                                <input type="date" id="fecha_asistencia" name="fecha_asistencia" value="{{ Carbon::now()->format('Y-m-d') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                            @else
+                                <input type="date" id="fecha_asistencia" name="fecha_asistencia" value="{{ Carbon::now()->format('Y-m-d') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" readonly>
+                            @endif
                         </div>
                         <div class="mb-4">
                             <label for="hora_entrada" class="block text-sm font-medium text-gray-700">Hora de entrada</label>
-                            <input type="time" id="hora_entrada" name="hora_entrada" value="{{ \Carbon\Carbon::now()->format('H:i') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" readonly>
+                            @if ($ROL_PK == 1)
+                                <input type="time" id="hora_entrada" name="hora_entrada" value="{{ Carbon::now()->format('H:i') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                            @else
+                                <input type="time" id="hora_entrada" name="hora_entrada" value="{{ Carbon::now()->format('H:i') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" readonly>
+                            @endif
                         </div>
                     </div>
                     <div class="mt-6 text-right">

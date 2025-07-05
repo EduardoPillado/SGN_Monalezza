@@ -33,6 +33,7 @@
                             <th class="text-left py-2">Nombre</th>
                             <th class="text-left py-2">Tipo de producto</th>
                             <th class="text-left py-2">Precio</th>
+                            <th class="text-left py-2">Imagen</th>
                             <th class="text-left py-2">Estatus</th>
                             @if ( session('usuario_pk') == 1 )
                                 <th class="text-right py-2">Acciones</th>
@@ -46,6 +47,13 @@
                                 <td class="py-2">{{ $dato->nombre_producto }}</td>
                                 <td class="py-2">{{ $dato->tipo_producto->nombre_tipo_producto }}</td>
                                 <td class="py-2">${{ $dato->precio_producto }}</td>
+                                <td class="py-2">
+                                    @if ($dato->imagen_producto)
+                                        <img src="{{ asset($dato->imagen_producto) }}" alt="Imagen del producto" class="w-16 h-16 object-cover rounded shadow">
+                                    @else
+                                        <span class="text-gray-500 italic">Sin imagen</span>
+                                    @endif
+                                </td>
                                 <td class="py-2">{{ $dato->estatus_producto ? 'Activo' : 'Inactivo' }}</td>
                                 @if ( session('usuario_pk') == 1 )
                                     <td class="text-right py-2">
@@ -173,7 +181,7 @@
                         <p class="text-sm text-gray-600 mb-3">
 
                             <span class="text-red-500">*</span> Campo necesario</p>
-                        <form id="form-producto" action="{{ route('producto.insertar') }}" method="post">
+                        <form id="form-producto" action="{{ route('producto.insertar') }}" method="post" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-4">
                                 <label for="nombre_producto" class="block text-sm font-medium text-gray-700">Nombre
@@ -198,12 +206,18 @@
                                 </label>
                                 <input type="number" id="precio_producto" name="precio_producto" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
+                            <div class="mb-4">
+                                <label for="imagen_producto" class="block text-sm font-medium text-gray-700">Imagen del producto</label>
+                                <input type="file" name="imagen_producto" id="imagen_producto" accept="image/*"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            </div>
 
                             <div class="mb-4">
                                 <div id="ingredientes-container">
                                     <div class="flex items-center mb-2">
                                         <div class="flex flex-col w-3/4">
                                             <label for="ingredientes[]" class="block text-sm font-medium text-gray-700">Ingrediente
+                                                <span class="text-blue-500 cursor-help" title="Solo agrega ingredientes si el producto los necesita.">?</span>
                                                 <span class="text-red-500">*</span>
                                             </label>
                                             <select name="ingredientes[]" class="w-full rounded-md border-gray-300 mb-2">
