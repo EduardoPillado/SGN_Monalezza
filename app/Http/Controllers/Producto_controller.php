@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Models\Detalle_ingrediente;
-use App\Models\Ingrediente;
+use App\Models\Tipo_producto;
 
 class Producto_controller extends Controller
 {
@@ -72,13 +72,33 @@ class Producto_controller extends Controller
     }
 
     public function mostrar(){
-        $datosProducto = Producto::with('tipo_producto', 'ingredientes')->get();
+        $datosProducto = Producto::all();
+        $tipos_producto = Tipo_producto::where('estatus_tipo_producto', '=', 1)->get();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            return view('productos', compact('datosProducto'));
+            return view('productos', compact('datosProducto', 'tipos_producto'));
         } else {
             return redirect('/login');
         }
+    }
+
+    public function filtrar(Request $req){
+        // Por tipo de producto
+        $query = Producto::with('tipo_producto');
+        if ($req->filled('tipo_producto_fk')) {
+            $query->where('tipo_producto_fk', $req->tipo_producto_fk);
+        }
+
+        // Por estatus de producto (inactivos, activos)
+        $estatus = $req->input('estatus');
+        if (in_array($estatus, ['0', '1'])) {
+            $query->where('estatus_producto', $estatus);
+        }
+
+        $datosProducto = $query->get();
+        $tipos_producto = Tipo_producto::where('estatus_tipo_producto', '=', 1)->get();
+
+        return view('productos', compact('datosProducto', 'tipos_producto'));
     }
 
     public function baja($producto_pk){
@@ -129,13 +149,12 @@ class Producto_controller extends Controller
 
     public function datosParaEdicion($producto_pk){
         $datosProducto = Producto::with('ingredientes')->findOrFail($producto_pk);
-        $datosIngrediente = Ingrediente::all();
 
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
             $ROL = session('nombre_rol');
             if ($ROL == 'Administrador') {
-                return view('editarProducto', compact('datosProducto', 'datosIngrediente'));
+                return view('editarProducto', compact('datosProducto'));
             } else {
                 return back()->with('warning', 'No puedes acceder');
             }

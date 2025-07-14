@@ -14,7 +14,7 @@
 
     @php
         use App\Models\Tipo_producto;
-        $datosTipoProducto=Tipo_producto::all();
+        $datosTipoProducto=Tipo_producto::where('estatus_tipo_producto', '=', 1)->get();
 
         use App\Models\Ingrediente;
         $datosIngrediente=Ingrediente::where('estatus_ingrediente', '=', 1)->get();
@@ -67,8 +67,8 @@
                 
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 items-center gap-1">
+                            <span class="text-blue-500 text-lg cursor-help" title="Solo agrega ingredientes si el producto los necesita.">?</span>
                             Ingredientes
-                            <span class="text-blue-500 cursor-help" title="Solo agrega ingredientes si el producto los necesita.">?</span>
                         </label>
                         <div id="ingredientes-container">
                             @foreach ($datosProducto->ingredientes as $ingrediente)
@@ -79,7 +79,7 @@
                                             <option @if ($dato->ingrediente_pk == $ingrediente->ingrediente_pk) selected @endif value="{{ $dato->ingrediente_pk }}">{{ $dato->nombre_ingrediente }}</option>
                                         @endforeach
                                     </select>
-                                    <input type="number" name="cantidades_necesarias[]" value="{{ $ingrediente->pivot->cantidad_necesaria }}" class="ml-2 w-20 rounded-md border-gray-300" required>
+                                    <input type="number" name="cantidades_necesarias[]" value="{{ $ingrediente->pivot->cantidad_necesaria }}" class="ml-2 w-25 rounded-md border-gray-300" required>
                                     <button type="button" class="ml-2 px-2 py-1 bg-red-500 text-white rounded-md remove-ingrediente">Eliminar</button>
                                 </div>
                             @endforeach

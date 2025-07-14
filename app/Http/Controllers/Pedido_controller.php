@@ -12,6 +12,7 @@ use App\Models\Tipo_pago;
 use App\Models\Producto;
 use App\Models\Detalle_ingrediente;
 use App\Models\Inventario;
+use Illuminate\Support\Facades\DB;
 
 class Pedido_controller extends Controller
 {
@@ -173,6 +174,159 @@ class Pedido_controller extends Controller
             return view('ventas', compact('datosPedido'));
         } else {
             return redirect('/login');
+        }
+    }
+
+    public function filtrar(Request $req){
+        $fecha = $req->input('fecha');
+        $estatus = $req->input('estatus');
+
+        $query = Pedido::with('detalle_pedido.producto.tipo_producto');
+
+        // Por fecha específica
+        if ($fecha) {
+            $query->whereDate('fecha_hora_pedido', $fecha);
+        }
+
+        // Por estatus de pedido (entregado, pendiente, cancelado)
+        if (in_array($estatus, ['0', '1', '2'])) {
+            $query->where('estatus_pedido', $estatus);
+        }
+
+        $datosPedido = $query->get();
+
+        return view('ventas', compact('datosPedido'));
+    }
+
+    public function datosParaEdicion($pedido_pk){
+        $USUARIO_PK = session('usuario_pk');
+        if ($USUARIO_PK) {
+            $ROL = session('nombre_rol');
+            if ($ROL == 'Administrador') {
+                $datosPedido = Pedido::with('detalle_pedido.producto')->findOrFail($pedido_pk);
+                $clientes = Cliente::all();
+                $empleados=Empleado::where('estatus_empleado', '=', 1)->get();
+                $mediosPedido = Medio_pedido::where('estatus_medio_pedido', '=', 1)->get();
+                $tiposPago = Tipo_pago::where('estatus_tipo_pago', '=', 1)->get();
+                $productos = Producto::where('estatus_producto', '=', 1)->with('tipo_producto')->get();
+
+                return view('editarPedido', compact('datosPedido', 'clientes', 'mediosPedido', 'tiposPago', 'productos'));
+            } else {
+                return back()->with('warning', 'No puedes acceder');
+            }
+        } else {
+            return redirect('/login');
+        }
+    }
+
+    public function actualizar(Request $req, $pedido_pk){
+        DB::beginTransaction();
+        try {
+            $datosPedido = Pedido::findOrFail($pedido_pk);
+
+            // Revertir los productos e ingredientes al inventario antes de cambiar algo
+            foreach ($datosPedido->detalle_pedido as $detalle) {
+                $producto = $detalle->producto;
+                $cantidad = $detalle->cantidad_producto;
+
+                if ($producto->tipo_producto_fk === 6) {
+                    // Es bebida
+                    $inventario = Inventario::where('producto_fk', $producto->producto_pk)->first();
+                    if ($inventario) {
+                        $inventario->cantidad_parcial += $cantidad;
+                        if ($inventario->cantidad_parcial >= $inventario->cantidad_paquete) {
+                            $paquetes_adicionales = floor($inventario->cantidad_parcial / $inventario->cantidad_paquete);
+                            $inventario->cantidad_inventario += $paquetes_adicionales;
+                            $inventario->cantidad_parcial %= $inventario->cantidad_paquete;
+                        }
+                        $inventario->save();
+                    }
+                } else {
+                    // Es pizza u otro con ingredientes
+                    $ingredientes = Detalle_ingrediente::where('producto_fk', $producto->producto_pk)->get();
+                    foreach ($ingredientes as $ingrediente) {
+                        $inventario = Inventario::where('ingrediente_fk', $ingrediente->ingrediente_fk)->first();
+                        if ($inventario) {
+                            $cantidad_devolver = $ingrediente->cantidad_necesaria * $cantidad;
+                            $inventario->cantidad_parcial += $cantidad_devolver;
+                            if ($inventario->cantidad_parcial >= $inventario->cantidad_paquete) {
+                                $paquetes = floor($inventario->cantidad_parcial / $inventario->cantidad_paquete);
+                                $inventario->cantidad_inventario += $paquetes;
+                                $inventario->cantidad_parcial %= $inventario->cantidad_paquete;
+                            }
+                            $inventario->save();
+                        }
+                    }
+                }
+            }
+
+            // Eliminar los detalles anteriores
+            Detalle_pedido::where('pedido_fk', $datosPedido->pedido_pk)->delete();
+
+            // Actualizar campos principales
+            $datosPedido->cliente_fk = $req->cliente_fk;
+            $datosPedido->fecha_hora_pedido = $req->fecha_hora_pedido;
+            $datosPedido->medio_pedido_fk = $req->medio_pedido_fk;
+            $datosPedido->monto_total = $req->monto_total;
+            $datosPedido->numero_transaccion = $req->numero_transaccion;
+            $datosPedido->tipo_pago_fk = $req->tipo_pago_fk;
+            $datosPedido->notas_remision = $req->notas_remision;
+            $datosPedido->pago = $req->pago;
+            $datosPedido->cambio = $req->cambio;
+            $datosPedido->save();
+
+            // Procesar nuevos productos igual que en insertar
+            foreach ($req->productos as $producto_fk => $detalle) {
+                $detallePedido = new Detalle_pedido();
+                $detallePedido->pedido_fk = $datosPedido->pedido_pk;
+                $detallePedido->producto_fk = $producto_fk;
+                $detallePedido->cantidad_producto = $detalle['cantidad_producto'];
+                $detallePedido->save();
+
+                $producto = Producto::find($producto_fk);
+
+                if ($producto->tipo_producto_fk === 6) {
+                    $inventario = Inventario::where('producto_fk', $producto_fk)->first();
+                    $cantidad_requerida = $detalle['cantidad_producto'];
+                    if ($inventario) {
+                        if ($inventario->cantidad_parcial >= $cantidad_requerida) {
+                            $inventario->cantidad_parcial -= $cantidad_requerida;
+                        } else {
+                            $cantidad_requerida -= $inventario->cantidad_parcial;
+                            $inventario->cantidad_parcial = 0;
+                            $paquetes_necesarios = ceil($cantidad_requerida / $inventario->cantidad_paquete);
+                            $inventario->cantidad_inventario -= $paquetes_necesarios;
+                            $inventario->cantidad_parcial = ($paquetes_necesarios * $inventario->cantidad_paquete) - $cantidad_requerida;
+                        }
+                        $inventario->save();
+                    }
+                } else {
+                    $ingredientes = Detalle_ingrediente::where('producto_fk', $producto_fk)->get();
+                    foreach ($ingredientes as $ingrediente) {
+                        $inventario = Inventario::where('ingrediente_fk', $ingrediente->ingrediente_fk)->first();
+                        $cantidad_necesaria = $ingrediente->cantidad_necesaria * $detalle['cantidad_producto'];
+                        if ($inventario) {
+                            if ($inventario->cantidad_parcial >= $cantidad_necesaria) {
+                                $inventario->cantidad_parcial -= $cantidad_necesaria;
+                            } else {
+                                $cantidad_necesaria -= $inventario->cantidad_parcial;
+                                $inventario->cantidad_parcial = 0;
+                                $paquetes_necesarios = ceil($cantidad_necesaria / $inventario->cantidad_paquete);
+                                $inventario->cantidad_inventario -= $paquetes_necesarios;
+                                $inventario->cantidad_parcial = ($paquetes_necesarios * $inventario->cantidad_paquete) - $cantidad_necesaria;
+                            }
+                            $inventario->save();
+                        }
+                    }
+                }
+            }
+
+            DB::commit();
+            return back()->with('success', 'Pedido actualizado')->with('pedido_pk', $datosPedido->pedido_pk);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Error al actualizar el pedido: ' . $e->getMessage());
         }
     }
 

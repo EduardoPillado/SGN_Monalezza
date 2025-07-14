@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Inventario;
 use App\Models\Servicio;
+use App\Models\Producto;
+use App\Models\Ingrediente;
+use App\Models\Tipo_gasto;
+use App\Models\Tipo_producto;
+use App\Models\Proveedor;
 
 class Inventario_controller extends Controller
 {
@@ -95,15 +100,56 @@ class Inventario_controller extends Controller
         }
     }
 
-    public function mostrarPocoStock(){
-        $datosInventarioCritico = Inventario::whereColumn('cantidad_inventario', '<=', 'cantidad_inventario_minima')->get();
-        $cantidadCritico = $datosInventarioCritico->count();
-        $USUARIO_PK = session('usuario_pk');
-        if ($USUARIO_PK) {
-            return view('inventarioCritico', compact('datosInventarioCritico', 'cantidadCritico'));
-        } else {
-            return redirect('/login');
+    public function filtrar(Request $req){
+        $query = Inventario::with(['ingrediente', 'producto', 'proveedor', 'tipo_gasto']);
+
+        // Filtro por fecha
+        if ($req->filled('fecha')) {
+            $query->whereDate('fecha_inventario', $req->fecha);
         }
+
+        // Filtro por tipo de elemento
+        if ($req->input('tipo_elemento_filtrar') === 'producto') {
+            $query->whereNotNull('producto_fk')->whereNull('ingrediente_fk');
+        } elseif ($req->input('tipo_elemento_filtrar') === 'ingrediente') {
+            $query->whereNotNull('ingrediente_fk')->whereNull('producto_fk');
+        }
+
+        // Filtro por proveedor
+        if ($req->filled('proveedor_fk')) {
+            $query->where('proveedor_fk', $req->proveedor_fk);
+        }
+
+        // Filtro por estado (en riesgo / disponible)
+        if ($req->filled('estado')) {
+            if ($req->estado === 'riesgo') {
+                $query->whereColumn('cantidad_inventario', '<=', 'cantidad_inventario_minima');
+            } elseif ($req->estado === 'disponible') {
+                $query->whereColumn('cantidad_inventario', '>', 'cantidad_inventario_minima');
+            }
+        }
+
+        $datosInventario = $query->get();
+
+        $tiposExcluidos = Tipo_producto::where(function($query) {
+            $query->where('nombre_tipo_producto', 'like', '%pizza%')
+                ->orWhere('nombre_tipo_producto', 'like', '%mediana%')
+                ->orWhere('nombre_tipo_producto', 'like', '%familiar%')
+                ->orWhere('nombre_tipo_producto', 'like', '%mega%')
+                ->orWhere('nombre_tipo_producto', 'like', '%cuadrada%');
+        })->pluck('tipo_producto_pk');
+
+        $datosProducto = Producto::where('estatus_producto', 1)
+            ->whereNotIn('tipo_producto_fk', $tiposExcluidos)
+            ->get();
+
+        $datosIngrediente = Ingrediente::where('estatus_ingrediente', 1)->get();
+        $datosTipoGasto = Tipo_gasto::where('estatus_tipo_gasto', 1)->get();
+        $datosProveedor = Proveedor::where('estatus_proveedor', 1)->get();
+
+        return view('inventario', compact(
+            'datosInventario', 'datosProducto', 'datosIngrediente', 'datosTipoGasto', 'datosProveedor'
+        ));
     }
 
     public function datosParaEdicion($inventario_pk){

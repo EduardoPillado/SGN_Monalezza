@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Reserva;
 use App\Models\Reserva_mesa;
 use App\Models\Mesa;
+use App\Models\Cliente;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class Reserva_controller extends Controller
 {
@@ -29,6 +32,36 @@ class Reserva_controller extends Controller
             'mesas.*.required' => 'Es obligatorio seleccionar al menos una mesa.',
             'mesas.*.exists' => 'Una de las mesas seleccionadas no es válida.',
         ]);
+
+        $fechaReserva = Carbon::parse($req->fecha_hora_reserva);
+        $finReserva = $fechaReserva->copy()->addHours(1); // Duración estimada de la reservación
+
+        // Verificar conflicto de mesas en reservas ya existentes
+        $mesasSolicitadas = $req->mesas ? array_filter($req->mesas) : [];
+
+        $mesasOcupadas = Reserva::join('reserva_mesa', 'reserva.reserva_pk', '=', 'reserva_mesa.reserva_fk')
+            ->whereIn('reserva_mesa.mesa_fk', $mesasSolicitadas)
+            ->where('estatus_reserva', '!=', 0) // Ignorar las atendidas
+            ->where(function ($query) use ($fechaReserva, $finReserva) {
+                $query->whereBetween('fecha_hora_reserva', [$fechaReserva, $finReserva])
+                    ->orWhereBetween(DB::raw("DATE_ADD(fecha_hora_reserva, INTERVAL 1 HOUR)"), [$fechaReserva, $finReserva])
+                    ->orWhere(function($q) use ($fechaReserva, $finReserva) {
+                        $q->where('fecha_hora_reserva', '<=', $fechaReserva)
+                        ->where(DB::raw("DATE_ADD(fecha_hora_reserva, INTERVAL 1 HOUR)"), '>=', $finReserva);
+                    });
+            })
+            ->where('estatus_reserva', '!=', 2) // Ignorar canceladas
+            ->select('reserva_mesa.mesa_fk')
+            ->pluck('reserva_mesa.mesa_fk')
+            ->unique()
+            ->toArray();
+
+        if (!empty($mesasOcupadas)) {
+            $nombresMesas = Mesa::whereIn('mesa_pk', $mesasOcupadas)->pluck('numero_mesa')->toArray();
+            return back()->withErrors([
+                'mesas' => 'Las siguientes mesas ya están reservadas en ese horario: ' . implode(', ', $nombresMesas)
+            ])->withInput();
+        }
 
         $reserva=new Reserva();
 
@@ -56,7 +89,7 @@ class Reserva_controller extends Controller
     }
 
     public function mostrar(){
-        $datosReserva = Reserva::with('mesas')->get();
+        $datosReserva = Reserva::with('mesas', 'cliente')->get();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
             return view('reservas', compact('datosReserva'));
@@ -65,25 +98,34 @@ class Reserva_controller extends Controller
         }
     }
 
-    public function baja($reserva_pk){
-        $datosReserva = Reserva::findOrFail($reserva_pk);
-        $USUARIO_PK = session('usuario_pk');
-        if ($USUARIO_PK) {
-            if ($datosReserva) {
+    public function filtrar(Request $req){
+        $query = Reserva::with('cliente');
 
-                $datosReserva->estatus_reserva = 0;
-                $datosReserva->save();
-
-                return back()->with('success', 'Reserva dada de baja');
-            } else {
-                return back()->with('error', 'Hay algún problema con la información');
-            }
-        } else {
-            return redirect('/login');
+        // Filtrar por fecha
+        if ($req->filled('fecha')) {
+            $query->whereDate('fecha_hora_reserva', $req->fecha);
         }
+
+        // Filtrar por cliente
+        if ($req->filled('cliente_fk')) {
+            $query->where('cliente_fk', $req->cliente_fk);
+        }
+
+        // Filtrar por estatus
+        $estatus = $req->input('estatus');
+        if (in_array($estatus, ['0', '1', '2'])) {
+            $query->where('estatus_reserva', $estatus);
+        }
+
+        $datosReserva = $query->orderBy('fecha_hora_reserva', 'desc')->get();
+
+        // Para mostrar los clientes en el select
+        $datosCliente = Cliente::all();
+
+        return view('reservas', compact('datosReserva', 'datosCliente'));
     }
 
-    public function alta($reserva_pk){
+    public function pendiente($reserva_pk){
         $datosReserva = Reserva::findOrFail($reserva_pk);
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
@@ -92,7 +134,43 @@ class Reserva_controller extends Controller
                 $datosReserva->estatus_reserva = 1;
                 $datosReserva->save();
 
-                return back()->with('success', 'Reserva dada de alta');
+                return back()->with('success', 'Cancelación deshecha');
+            } else {
+                return back()->with('error', 'Hay algún problema con la información');
+            }
+        } else {
+            return redirect('/login');
+        }
+    }
+
+    public function atendida($reserva_pk){
+        $datosReserva = Reserva::findOrFail($reserva_pk);
+        $USUARIO_PK = session('usuario_pk');
+        if ($USUARIO_PK) {
+            if ($datosReserva) {
+
+                $datosReserva->estatus_reserva = 0;
+                $datosReserva->save();
+
+                return back()->with('success', 'Reservación atendida');
+            } else {
+                return back()->with('error', 'Hay algún problema con la información');
+            }
+        } else {
+            return redirect('/login');
+        }
+    }
+
+    public function cancelada($reserva_pk){
+        $datosReserva = Reserva::findOrFail($reserva_pk);
+        $USUARIO_PK = session('usuario_pk');
+        if ($USUARIO_PK) {
+            if ($datosReserva) {
+
+                $datosReserva->estatus_reserva = 2;
+                $datosReserva->save();
+
+                return back()->with('success', 'Reservación cancelada');
             } else {
                 return back()->with('error', 'Hay algún problema con la información');
             }
@@ -120,7 +198,7 @@ class Reserva_controller extends Controller
             'cliente_fk' => ['exists:cliente,cliente_pk'],
             'fecha_hora_reserva' => ['date', 'after_or_equal:now'],
             'notas' => ['nullable', 'string', 'max:255'],
-            'mesas.*' => ['exists:mesa,mesa_pk'],
+            'mesas.*' => ['required', 'exists:mesa,mesa_pk'],
         ], [
             'cliente_fk.exists' => 'El cliente seleccionado no es válido.',
         
@@ -130,8 +208,39 @@ class Reserva_controller extends Controller
             'notas.string' => 'Las notas deben ser un texto válido.',
             'notas.max' => 'Las notas no pueden tener más de :max caracteres.',
         
+            'mesas.*.required' => 'Es obligatorio seleccionar al menos una mesa.',
             'mesas.*.exists' => 'Una de las mesas seleccionadas no es válida.',
         ]);
+
+        $fechaReserva = Carbon::parse($req->fecha_hora_reserva);
+        $finReserva = $fechaReserva->copy()->addHours(1); // Duración estimada de la reservación
+
+        $mesasSolicitadas = $req->mesas ? array_filter($req->mesas) : [];
+
+        // Validar que ninguna mesa esté ocupada por otra reservación en ese rango
+        $mesasOcupadas = Reserva::join('reserva_mesa', 'reserva.reserva_pk', '=', 'reserva_mesa.reserva_fk')
+            ->whereIn('reserva_mesa.mesa_fk', $mesasSolicitadas)
+            ->where('reserva.reserva_pk', '!=', $reserva_pk) // Ignorar la reservación actual
+            ->where('estatus_reserva', '!=', 0) // Ignorar las atendidas
+            ->where(function ($query) use ($fechaReserva, $finReserva) {
+                $query->whereBetween('fecha_hora_reserva', [$fechaReserva, $finReserva])
+                    ->orWhereBetween(DB::raw("DATE_ADD(fecha_hora_reserva, INTERVAL 1 HOUR)"), [$fechaReserva, $finReserva])
+                    ->orWhere(function($q) use ($fechaReserva, $finReserva) {
+                        $q->where('fecha_hora_reserva', '<=', $fechaReserva)
+                        ->where(DB::raw("DATE_ADD(fecha_hora_reserva, INTERVAL 1 HOUR)"), '>=', $finReserva);
+                    });
+            })
+            ->where('estatus_reserva', '!=', 2) // Ignorar canceladas
+            ->pluck('reserva_mesa.mesa_fk')
+            ->unique()
+            ->toArray();
+
+        if (!empty($mesasOcupadas)) {
+            $nombresMesas = Mesa::whereIn('mesa_pk', $mesasOcupadas)->pluck('numero_mesa')->toArray();
+            return back()->withErrors([
+                'mesas' => 'Las siguientes mesas ya están reservadas en ese horario: ' . implode(', ', $nombresMesas)
+            ])->withInput();
+        }
 
         $datosReserva->cliente_fk=$req->cliente_fk;
         $datosReserva->fecha_hora_reserva=$req->fecha_hora_reserva;

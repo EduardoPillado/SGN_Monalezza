@@ -27,6 +27,27 @@ class Nomina_controller extends Controller
         }
     }
 
+    public function filtrar(Request $req){
+        // Por empleado
+        $query = Nomina::with('empleado.usuario');
+        if ($req->filled('empleado_fk')) {
+            $query->where('empleado_fk', $req->empleado_fk);
+        }
+
+        // Por fecha específica
+        $fecha = $req->input('fecha');
+        if ($fecha) {
+            $query->whereDate('fecha_pago', $fecha);
+        }
+
+        $datosNomina = $query->get();
+        $empleados = Empleado::with('usuario')
+            ->where('estatus_empleado', '=', 1)
+            ->get();
+
+        return view('nomina', compact('datosNomina', 'empleados'));
+    }
+
     private function obtenerDiasFestivosRango($fechaInicio, $fechaFin) {
         $anios = range($fechaInicio->year, $fechaFin->year);
         $diasFestivos = [];

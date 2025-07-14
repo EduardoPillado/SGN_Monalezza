@@ -43,7 +43,9 @@
                     <div class="space-y-4 overflow-y-auto flex-3 pb-8">
                         <!-- Campos del pedido -->
                         <div>
-                            <label for="cliente_fk" class="block font-medium mb-2">Cliente:</label>
+                            <label for="cliente_fk" class="block font-medium mb-2">Cliente
+                                <span class="text-red-500">*</span>
+                            </label>
                             <select name="cliente_fk" id="cliente_fk" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                                 <option value="">Selecciona un cliente</option>
                                 @foreach($clientes as $cliente)
@@ -53,12 +55,16 @@
                         </div>
 
                         <div>
-                            <label for="empleado" class="block font-medium mb-2">Empleado:</label>
+                            <label for="empleado" class="block font-medium mb-2">Empleado
+                                <span class="text-red-500">*</span>
+                            </label>
                             <input type="text" value="{{ $USUARIO }}" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
                         <div>
-                            <label for="medio_pedido" class="block font-medium mb-2">Medio de Pedido:</label>
+                            <label for="medio_pedido" class="block font-medium mb-2">Medio de Pedido
+                                <span class="text-red-500">*</span>
+                            </label>
                             <select name="medio_pedido_fk" id="medio_pedido" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                                 <option value="">Selecciona un medio de pedido</option>
                                 @foreach($mediosPedido as $medio)
@@ -68,7 +74,9 @@
                         </div>
 
                         <div>
-                            <label for="tipo_pago_fk" class="block font-medium mb-2">Tipo de Pago:</label>
+                            <label for="tipo_pago_fk" class="block font-medium mb-2">Tipo de Pago
+                                <span class="text-red-500">*</span>
+                            </label>
                             <select name="tipo_pago_fk" id="tipo_pago_fk" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                                 <option value="">Selecciona un tipo de pago</option>
                                 @foreach($tiposPago as $tipo)
@@ -78,13 +86,23 @@
                         </div>
 
                         <div>
-                            <label for="notas_remision" class="block font-medium mb-2">Notas de remisión:</label>
+                            <label for="numero_transaccion" class="block font-medium mb-2">Número de Transacción</label>
+                            <input type="text" id="numero_transaccion" name="numero_transaccion" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+
+                        <div>
+                            <label for="notas_remision" class="block font-medium mb-2">Notas de remisión</label>
                             <textarea name="notas_remision" id="notas_remision" cols="30" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
                         </div>
 
                         <div>
-                            <label for="pago" class="block font-medium mb-2">Pago:</label>
+                            <label for="pago" class="block font-medium mb-2">Pago
+                                <span class="text-red-500">*</span>
+                            </label>
                             <input type="number" name="pago" id="pago" value="{{ old('pago') }}" min="0" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            <p id="mensaje_pago" class="mt-1 text-sm font-semibold text-red-600 hidden">
+                                La cantidad pagada es menor al costo del pedido.
+                            </p>
                         </div>
 
                         <div>
@@ -93,8 +111,10 @@
                         </div>
 
                         <div>
-                            <label for="fecha_hora_pedido" class="block font-medium mb-2">Fecha y Hora del Pedido:</label>
-                            <input type="datetime-local" name="fecha_hora_pedido" id="fecha_hora_pedido" value="{{ \Carbon\Carbon::now()->format('Y-m-d\TH:i') }}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            <label for="fecha_hora_pedido" class="block font-medium mb-2">Fecha y Hora del Pedido
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <input type="datetime-local" name="fecha_hora_pedido" id="fecha_hora_pedido" value="{{ Carbon::now()->format('Y-m-d\TH:i') }}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
                         </div>
 
                         <input type="hidden" name="monto_total" id="monto_total" value="0">
@@ -104,6 +124,10 @@
                                 Registrar Pedido
                             </button>
                         </div>
+
+                        <p class="text-right text-sm text-gray-600 mb-3">
+                            <span class="text-red-500">*</span> Campo necesario
+                        </p>
 
                     </div>
 
@@ -115,18 +139,18 @@
                 <input type="text" id="search-bar" placeholder="Buscar productos..." style="margin-bottom: 20px; padding: 10px; width: 100%; box-sizing: border-box;">
                 <div id="product-container" class="menu-grid">
                     @foreach($productos as $producto)
-                    <div class="menu-item relative bg-cover bg-center text-white p-4 rounded-lg shadow-md"
-                        style="background-image: url('{{ asset($producto->imagen_producto ?? 'img/sin-imagen.jpg') }}');"
-                        data-nombre="{{ $producto->nombre_producto }}" 
-                        data-tipo="{{ $producto->tipo_producto->nombre_tipo_producto }}" 
-                        data-precio="{{ $producto->precio_producto }}" 
-                        onclick="toggleProductSelection(this, {{ $producto->producto_pk }}, '{{ $producto->nombre_producto }}', {{ $producto->precio_producto }}, '{{ $producto->tipo_producto->nombre_tipo_producto }}')">
-                        <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg"></div>
-                        <input type="checkbox" name="producto_fk[]" value="{{ $producto->producto_pk }}" class="relative z-10">
-                        <div class="relative z-10 font-bold text-lg">{{ $producto->nombre_producto }}</div>
-                        <div class="relative z-10 text-sm">{{ $producto->tipo_producto->nombre_tipo_producto }}</div>
-                        <div class="relative z-10 font-semibold">${{ $producto->precio_producto }}</div>
-                    </div>
+                        <div class="menu-item relative bg-cover bg-center text-white p-4 rounded-lg shadow-md cursor-pointer"
+                            style="background-image: url('{{ asset($producto->imagen_producto ?? 'img/sin-imagen.jpg') }}');"
+                            data-nombre="{{ $producto->nombre_producto }}" 
+                            data-tipo="{{ $producto->tipo_producto->nombre_tipo_producto }}" 
+                            data-precio="{{ $producto->precio_producto }}" 
+                            onclick="toggleProductSelection(this, {{ $producto->producto_pk }}, '{{ $producto->nombre_producto }}', {{ $producto->precio_producto }}, '{{ $producto->tipo_producto->nombre_tipo_producto }}')">
+                            <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg"></div>
+                            <input type="checkbox" name="producto_fk[]" value="{{ $producto->producto_pk }}" class="relative z-10">
+                            <div class="relative z-10 font-bold text-lg">{{ $producto->nombre_producto }}</div>
+                            <div class="relative z-10 text-sm">{{ $producto->tipo_producto->nombre_tipo_producto }}</div>
+                            <div class="relative z-10 font-semibold">${{ $producto->precio_producto }}</div>
+                        </div>
                     @endforeach
                 </div>
                 <div class="info-buttons">
@@ -140,16 +164,21 @@
                             Total ventas 💰
                         </div>
                     </a>
-                    <a href="{{ route('reserva.mostrar') }}">
-                        <div class="info-button profits less">
+                    <a href="{{ route('reserva.filtrar', ['fecha' => now()->toDateString()]) }}">
+                        <div class="info-button profits relative less">
                             Reservaciones 🕐
+                            @if(isset($cantidadReservasHoy) && $cantidadReservasHoy > 0)
+                                <span class="absolute top-0 left-0 bg-green-700 text-white text-xs font-bold rounded-full px-2 py-1">
+                                    {{ $cantidadReservasHoy }}
+                                </span>
+                            @endif
                         </div>
                     </a>
-                    <a href="{{ route('inventario.mostrarPocoStock') }}">
+                    <a href="{{ route('inventario.filtrar', ['estado' => 'riesgo']) }}">
                         <div class="info-button low-stock relative less">
-                            Productos poco Stock 📉
+                            Inventario poco Stock 📉
                             @if(isset($cantidadCritico) && $cantidadCritico > 0)
-                                <span class="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
+                                <span class="absolute top-0 left-0 bg-red-700 text-white text-xs font-bold rounded-full px-2 py-1">
                                     {{ $cantidadCritico }}
                                 </span>
                             @endif
@@ -374,5 +403,30 @@
 
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const montoTotalInput = document.getElementById('monto_total');
+            const pagoInput = document.getElementById('pago');
+            const cambioInput = document.getElementById('cambio');
+
+            function actualizarCambio() {
+                const montoTotal = parseFloat(montoTotalInput.value) || 0;
+                const pago = parseFloat(pagoInput.value) || 0;
+                const cambio = pago >= montoTotal ? pago - montoTotal : 0;
+
+                cambioInput.value = cambio.toFixed(2);
+
+                const mensaje = document.getElementById('mensaje_pago');
+                if (pago < montoTotal && montoTotal > 0) {
+                    mensaje.classList.remove('hidden');
+                } else {
+                    mensaje.classList.add('hidden');
+                }
+            }
+
+            pagoInput.addEventListener('input', actualizarCambio);
+        });
+    </script>
 </body>
 </html>

@@ -5,15 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('img/monalezza.ico') }}" rel="icon">
-    <title>Gestión de Reservas - La Monalezza</title>
+    <title>Gestión de Reservaciones - La Monalezza</title>
     {{-- Tailwind --}}
     @vite('resources/css/app.css')
 </head>
 
-<body class="h-full bg-gray-100 overflow-hidden" x-data="{ 
-    sidebarOpen: false, 
-    modalOpen: false,
-}">
+<body class="h-full bg-gray-100 overflow-hidden">
 
     @php
         use App\Models\Cliente;
@@ -27,8 +24,63 @@
         @include('sidebar')
 
         <div class="flex-grow overflow-y-auto p-4">
-            <h1 class="text-2xl font-bold mb-4">Reservas</h1>
+            <h1 class="text-2xl font-bold mb-4">Reservaciones</h1>
             <div class="bg-white shadow-md rounded-lg p-4">
+                <div class="mb-4">
+                    <button data-modal-open="modal-filtros" class="bg-blue-600 text-white px-4 py-2 rounded mb-4">
+                        Filtros de reservaciones
+                    </button>
+                </div>
+
+                <div data-modal="modal-filtros" style="display: none;" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 flex">
+                    <div class="bg-white w-full max-w-md rounded-lg shadow-lg p-6 relative">
+                        <h2 class="text-xl font-bold mb-4">Filtrar Reservaciones</h2>
+                        <form action="{{ route('reserva.filtrar') }}" method="GET" class="space-y-4">
+                            <div>
+                                <label for="fecha" class="block font-semibold mb-1">Fecha de reservación:</label>
+                                <input type="date" id="fecha" name="fecha"
+                                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Selecciona una fecha"
+                                    value="{{ request('fecha') ?? '' }}">
+                            </div>
+
+                            <div>
+                                <label for="cliente_fk" class="block font-semibold mb-1">Por cliente:</label>
+                                <select name="cliente_fk" id="cliente_fk" class="w-full border border-gray-300 rounded px-3 py-2">
+                                    <option value="">Todos los clientes</option>
+                                    @foreach($datosCliente as $cliente)
+                                        <option value="{{ $cliente->cliente_pk }}" {{ request('cliente_fk') == $cliente->cliente_pk ? 'selected' : '' }}>
+                                            {{ $cliente->nombre_cliente }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="estatus" class="block font-semibold mb-1">Por estatus:</label>
+                                <select name="estatus" id="estatus" class="w-full border border-gray-300 rounded px-3 py-2">
+                                    <option value="">Todos</option>
+                                    <option value="1" {{ request('estatus') == '1' ? 'selected' : '' }}>Pendientes</option>
+                                    <option value="0" {{ request('estatus') == '0' ? 'selected' : '' }}>Atendidas</option>
+                                    <option value="2" {{ request('estatus') == '2' ? 'selected' : '' }}>Canceladas</option>
+                                </select>
+                            </div>
+
+                            <div class="flex justify-between items-center pt-2">
+                                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                                    Aplicar
+                                </button>
+                                <a href="{{ route('reserva.mostrar') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                                    Quitar filtros
+                                </a>
+                                <button type="button" data-modal-cancel="modal-filtros" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
                 <table id="tabla-reservas" class="w-full">
                     <thead>
                         <tr class="border-b">
@@ -45,19 +97,31 @@
                                 data-mesas='@json($dato->mesas)'>
                                 <td class="py-2">{{ $dato->cliente->nombre_cliente }}</td>
                                 <td class="py-2">{{ $dato->fecha_hora_reserva }}</td>
-                                <td class="py-2">{{ $dato->notas }}</td>
-                                @if ( $dato->estatus_reserva == 1 )
-                                    <td class="py-2">Activo</td>
+                                @if ( $dato->notas )
+                                    <td class="py-2">{{ $dato->notas }}</td>
                                 @else
-                                    <td class="py-2">Inactivo</td>
+                                    <td class="py-2"><em>Sin notas</em></td>
+                                @endif
+                                @if ( $dato->estatus_reserva == 1 )
+                                    <td class="py-2">Pendiente</td>
+                                @elseif ( $dato->estatus_reserva == 0 )
+                                    <td class="py-2">Atendida</td>
+                                @elseif ( $dato->estatus_reserva == 2 )
+                                    <td class="py-2">Cancelada</td>
+                                @else
+                                    <td class="py-2"><em>Sin estatus aplicado</em></td>
                                 @endif
                                 <td class="text-right py-2">
-                                    <a href="{{ route('reserva.datosParaEdicion', $dato->reserva_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
+                                    <a href="{{ route('reserva.datosParaEdicion', $dato->reserva_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded fix">Editar</a>
 
-                                    @if ($dato->estatus_reserva == 1)
-                                        <a href="{{ route('reserva.baja', $dato->reserva_pk) }}" onclick="confirmarBaja(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
-                                    @else
-                                        <a href="{{ route('reserva.alta', $dato->reserva_pk) }}" onclick="confirmarAlta(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
+                                    @if ( $dato->estatus_reserva == 1 )
+                                        <a href="{{ route('reserva.atendida', $dato->reserva_pk) }}" onclick="confirmarAtencion(event)" class="bg-green-500 text-white px-2 py-1 rounded fix">Atendida</a>
+                                    @endif
+
+                                    @if ( $dato->estatus_reserva != 2 )
+                                        <a href="{{ route('reserva.cancelada', $dato->reserva_pk) }}" onclick="confirmarCancelacion(event)" class="bg-red-500 text-white px-2 py-1 rounded fix">Cancelar</a>
+                                    @elseif ( $dato->estatus_reserva == 2 )
+                                        <a href="{{ route('reserva.pendiente', $dato->reserva_pk) }}" onclick="confirmarDesCancelacion(event)" class="bg-black text-white px-2 py-1 rounded fix">Deshacer cancelación</a>
                                     @endif
                                 </td>
                             </tr>
@@ -66,7 +130,7 @@
                 </table>
             </div>
             <div class="mt-4 text-right">
-                <button @click="modalOpen = true" class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo reserva</button>
+                <button data-modal-open class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo reserva</button>
             </div>
         </div>
 
@@ -79,7 +143,7 @@
                         info: "Mostrando página _PAGE_ de _PAGES_",
                         infoEmpty: "No hay registros disponibles",
                         infoFiltered: "(filtrado de _MAX_ registros totales)",
-                        zeroRecords: "Sin reservas registradas",
+                        zeroRecords: "Sin reservaciones registradas",
                         lengthMenu: "Mostrar _MENU_ registros por página",
                         paginate: {
                             first: "Primero",
@@ -122,8 +186,8 @@
                 }
             });
 
-            // Alerta de confirmación de baja
-            function confirmarBaja(event) {
+            // Alerta de confirmación de atención
+            function confirmarAtencion(event) {
                 event.preventDefault();
     
                 const link = event.target.closest('a');
@@ -131,10 +195,10 @@
                 if (link) {
                     Swal.fire({
                         title: '¿Seguro?',
-                        text: '¿Deseas dar de baja la reserva?',
+                        text: '¿Deseas marcar la reservación como atendida?',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, dar de baja',
+                        confirmButtonText: 'Sí, atendida',
                         cancelButtonText: 'Cancelar',
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -144,8 +208,8 @@
                 }
             }
 
-            // Alerta de confirmación de alta
-            function confirmarAlta(event) {
+            // Alerta de confirmación de cancelación
+            function confirmarCancelacion(event) {
                 event.preventDefault();
     
                 const link = event.target.closest('a');
@@ -153,10 +217,32 @@
                 if (link) {
                     Swal.fire({
                         title: '¿Seguro?',
-                        text: '¿Deseas dar de alta la reserva?',
+                        text: '¿Deseas marcar la reservación como cancelada?',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, dar de alta',
+                        confirmButtonText: 'Sí, cancelar',
+                        cancelButtonText: 'No cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = link.href;
+                        }
+                    });
+                }
+            }
+
+            // Alerta de confirmación de des cancelación
+            function confirmarDesCancelacion(event) {
+                event.preventDefault();
+    
+                const link = event.target.closest('a');
+    
+                if (link) {
+                    Swal.fire({
+                        title: '¿Seguro?',
+                        text: '¿Deseas deshacer la cancelación?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, deshacer',
                         cancelButtonText: 'Cancelar',
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -168,7 +254,7 @@
         </script>
 
         <!-- Modal de registro de reserva -->
-        <div x-show="modalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
+        <div data-modal style="display: none;" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nueva Reserva</h3>
@@ -221,7 +307,7 @@
                                 </div>
                             </div>
                             <div class="items-center px-4 py-3">
-                                <button type="button" @click="modalOpen = false" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                <button type="button" data-modal-cancel class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
                                     Cancelar
                                 </button>
                                 <button type="submit" class="mt-3 px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
@@ -235,6 +321,33 @@
         </div>
 
         <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const openModalBtn = document.querySelector('[data-modal-open]');
+                const modal = document.querySelector('[data-modal]');
+                const cancelBtn = document.querySelector('[data-modal-cancel]');
+
+                // Función para abrir el modal
+                function openModal() {
+                    modal.style.display = 'block';
+                }
+
+                // Función para cerrar el modal
+                function closeModal() {
+                    modal.style.display = 'none';
+                }
+
+                // Event listeners
+                openModalBtn.addEventListener('click', openModal);
+                cancelBtn.addEventListener('click', closeModal);
+
+                // Cerrar modal si se hace click fuera de él
+                window.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        closeModal();
+                    }
+                });
+            });
+
             function agregarMesa() {
                 const container = document.getElementById('mesas-container');
                 const newMesa = document.createElement('div');

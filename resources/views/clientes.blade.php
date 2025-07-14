@@ -24,7 +24,7 @@
                             <th class="text-left py-2">Domicilio</th>
                             <th class="text-left py-2">Referencias</th>
                             <th class="text-left py-2">Teléfono</th>
-                            @if ( session('usuario_pk') == 1 )
+                            @if ( session('rol_pk') == 1 )
                                 <th class="text-right py-2">Acciones</th>
                             @endif
                         </tr>
@@ -39,9 +39,15 @@
                                     , #{{ $dato->domicilio->numero_interno }} interno
                                 @endif
                             </td>
-                            <td class="py-2">{{ $dato->domicilio->referencias }}</td>
+                            <td class="py-2">
+                                @if ($dato->domicilio->referencias)
+                                    {{ $dato->domicilio->referencias }}
+                                @else
+                                    <em>Sin referencias</em>
+                                @endif
+                            </td>
                             <td class="py-2">{{ $dato->telefono->telefono }}</td>
-                            @if ( session('usuario_pk') == 1 )
+                            @if ( session('rol_pk') == 1 )
                                 <td class="text-right py-2">
                                     <a href="{{ route('cliente.datosParaEdicion', $dato->cliente_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
                                 </td>
@@ -107,15 +113,11 @@
                                 <input type="number" id="numero_externo" name="numero_externo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="mb-4">
-                                <label for="numero_interno" class="block text-sm font-medium text-gray-700">Número interno
-                                    <span class="text-red-500">*</span>
-                                </label>
+                                <label for="numero_interno" class="block text-sm font-medium text-gray-700">Número interno</label>
                                 <input type="number" id="numero_interno" name="numero_interno" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                             </div>
                             <div class="mb-4">
-                                <label for="referencias" class="block text-sm font-medium text-gray-700">Referencias
-                                    <span class="text-red-500">*</span>
-                                </label>
+                                <label for="referencias" class="block text-sm font-medium text-gray-700">Referencias</label>
                                 <textarea id="referencias" name="referencias" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"></textarea>
                             </div>
                             <div class="mb-4">
@@ -137,25 +139,6 @@
                 </div>
             </div>
         </div>
-
-        @if ($errors->any())
-            <script>
-                Swal.fire({
-                    title: 'Errores de validación',
-                    html: '{!! implode('<br>', $errors->all()) !!}',
-                    icon: 'error',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 5000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer);
-                        toast.addEventListener('mouseleave', Swal.resumeTimer);
-                    }
-                });
-            </script>
-        @endif
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -185,7 +168,25 @@
                 });
             });
         </script>
+
+        @if ($errors->any())
+            <script>
+                Swal.fire({
+                    title: 'Errores de validación',
+                    html: '{!! implode('<br>', $errors->all()) !!}',
+                    icon: 'error',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 5000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer);
+                        toast.addEventListener('mouseleave', Swal.resumeTimer);
+                    }
+                });
+            </script>
+        @endif
     </div>
 </body>
-
 </html>
