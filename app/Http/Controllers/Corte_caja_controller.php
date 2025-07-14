@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Corte_caja;
+use App\Models\Detalle_efectivo;
 use App\Models\Pedido;
+use App\Models\Servicio;
 
 class Corte_caja_controller extends Controller
 {
@@ -25,11 +27,22 @@ class Corte_caja_controller extends Controller
         $corte = new Corte_caja();
         $corte->fecha_corte_inicio = $req->input('fecha_corte_inicio');
         $corte->fecha_corte_fin = $req->input('fecha_corte_fin');
+
+        $suma = Detalle_efectivo::whereBetween('fecha_actual', [$corte->fecha_corte_inicio, $corte->fecha_corte_fin])->get();
+        $corte->suma_efectivo_inicial = $suma->sum('efectivo_inicial');
     
         $ventas = Pedido::whereBetween('fecha_hora_pedido', [$corte->fecha_corte_inicio, $corte->fecha_corte_fin])->get();
 
         $corte->cantidad_ventas = $ventas->count();
         $corte->ganancia_total = $ventas->sum('monto_total');
+
+        $suma_gastos = Servicio::whereBetween('fecha_pago_servicio', [$corte->fecha_corte_inicio, $corte->fecha_corte_fin])->get();
+        $corte->suma_gasto_servicios = $suma_gastos->sum('cantidad_pagada_servicio');
+
+        $diferencia = ($corte->suma_efectivo_inicial + $corte->ganancia_total) - $corte->suma_gasto_servicios;
+
+        $corte->utilidad_neta = $diferencia;
+        
         $corte->save();
     
         $corte->empleados()->sync($ventas->pluck('empleado_fk')->unique()->toArray());

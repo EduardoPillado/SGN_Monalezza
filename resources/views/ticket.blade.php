@@ -107,7 +107,13 @@
             <img src="{{ asset('img/logo_lamonalezza.webp') }}" alt="La Monalezza Logo">
         </div>
         <h1>LA MONALEZZA</h1>
+        <p class="date">DOMICILIO ÁNGEL FLORES NO. 55</p>
         <p class="date">{{ $pedido->fecha_hora_pedido->format('d/m/Y - h:i A') }}</p>
+        @if($pedido->empleado && $pedido->empleado->usuario)
+            <p class="date"><strong>EMPLEADO QUE LO ATENDIÓ:</strong> {{ $pedido->empleado->usuario->nombre }} </p>
+        @endif
+        <p class="date"><strong>CLIENTE:</strong> {{ $pedido->cliente->nombre_cliente ?? 'Cliente genérico' }} </p>
+        <p class="date">FOLIO NO. {{ $pedido->pedido_pk }} </p>
         <div class="center-table">
             <table>
                 <tr>
@@ -115,10 +121,10 @@
                     <th>PRECIO</th>
                 </tr>
                 @foreach ($pedido->productos as $producto)
-                <tr>
-                    <td>x{{ $producto->pivot->cantidad_producto }} {{ $producto->nombre_producto }} ({{ $producto->tipo_producto->nombre_tipo_producto }})</td>
-                    <td>$ {{ number_format($producto->precio_producto * $producto->pivot->cantidad_producto, 2) }}</td>
-                </tr>
+                    <tr>
+                        <td>x{{ $producto->pivot->cantidad_producto }} {{ $producto->nombre_producto }} ({{ $producto->tipo_producto->nombre_tipo_producto }})</td>
+                        <td>$ {{ number_format($producto->precio_producto * $producto->pivot->cantidad_producto, 2) }}</td>
+                    </tr>
                 @endforeach
                 <tr>
                     <td colspan="2">&nbsp;</td>

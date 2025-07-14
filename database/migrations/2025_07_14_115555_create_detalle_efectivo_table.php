@@ -9,13 +9,12 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+     public function up(): void
     {
-        Schema::create('mesa', function (Blueprint $table) {
-            $table->id('mesa_pk')->autoIncrement();
-            $table->integer('numero_mesa');
-            $table->text('ubicacion')->nullable();
-            $table->smallInteger('estatus_mesa');
+        Schema::create('detalle_efectivo', function (Blueprint $table) {
+            $table->id('detalle_efectivo_pk')->autoIncrement();
+            $table->dateTime('fecha_actual');
+            $table->decimal('efectivo_inicial');
         });
     }
 
@@ -24,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('mesa');
+        Schema::dropIfExists('detalle_efectivo');
     }
 };

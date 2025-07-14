@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id('corte_caja_pk')->autoIncrement();
             $table->dateTime('fecha_corte_inicio');
             $table->dateTime('fecha_corte_fin');
+            $table->decimal('suma_efectivo_inicial');
             $table->integer('cantidad_ventas');
             $table->decimal('ganancia_total');
+            $table->decimal('utilidad_neta');
         });
     }
 

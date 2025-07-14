@@ -15,9 +15,9 @@ class Cliente_controller extends Controller
             'nombre_cliente' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:cliente,nombre_cliente'],
             'calle' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50'],
             'numero_externo' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/'],
-            'numero_interno' => ['nullable', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'unique:domicilio,numero_interno'],
+            'numero_interno' => ['nullable', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/'],
             'referencias' => ['nullable', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/'],
-            'telefono' => ['required', 'regex:/^[0-9]{10,15}$/', 'unique:telefono,telefono'],
+            'telefono' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:15', 'min:2'],
         ], [
             'nombre_cliente.required' => 'El nombre del cliente es obligatorio.',
             'nombre_cliente.regex' => 'El nombre del cliente solo puede contener letras, números y espacios.',
@@ -32,13 +32,13 @@ class Cliente_controller extends Controller
             'numero_externo.regex' => 'El número externo solo puede contener letras, números y espacios.',
             
             'numero_interno.regex' => 'El número interno solo puede contener letras, números y espacios.',
-            'numero_interno.unique' => 'El número interno ya está registrado.',
             
             'referencias.regex' => 'Las referencias solo pueden contener letras, números y espacios.',
             
             'telefono.required' => 'El teléfono es obligatorio.',
-            'telefono.regex' => 'El teléfono debe contener entre 10 y 15 dígitos.',
-            'telefono.unique' => 'Este teléfono ya está registrado.',
+            'telefono.regex' => 'El teléfono solo puede contener letras, números y espacios.',
+            'telefono.max' => 'El teléfono debe contener máximo 15 dígitos.',
+            'telefono.min' => 'El teléfono debe contener minimo 2 dígitos.',
         ]);
 
         $domicilio=new Domicilio();
@@ -95,16 +95,14 @@ class Cliente_controller extends Controller
 
     public function actualizar(Request $req, $cliente_pk){
         $datosCliente = Cliente::findOrFail($cliente_pk);
-        $domicilio_pk = $datosCliente->domicilio->domicilio_pk;
-        $telefono_pk = $datosCliente->telefono->telefono_pk;
 
         $req->validate([
             'nombre_cliente' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', Rule::unique('cliente', 'nombre_cliente')->ignore($cliente_pk, 'cliente_pk')], 
             'calle' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50'],
             'numero_externo' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/'],
-            'numero_interno' => ['nullable', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', Rule::unique('domicilio', 'numero_interno')->ignore($domicilio_pk, 'domicilio_pk')],
+            'numero_interno' => ['nullable', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/'],
             'referencias' => ['nullable', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/'],
-            'telefono' => ['regex:/^[0-9]{10,15}$/', Rule::unique('telefono', 'telefono')->ignore($telefono_pk, 'telefono_pk')],
+            'telefono' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:15', 'min:2'],
         ], [
             'nombre_cliente.regex' => 'El nombre del cliente solo puede contener letras, números y espacios.',
             'nombre_cliente.max' => 'El nombre del cliente no debe exceder los 50 caracteres.',
@@ -119,8 +117,9 @@ class Cliente_controller extends Controller
             
             'referencias.regex' => 'Las referencias solo pueden contener letras, números y espacios.',
             
-            'telefono.regex' => 'El teléfono debe contener entre 10 y 15 dígitos.',
-            'telefono.unique' => 'Este teléfono ya está registrado.',
+            'telefono.regex' => 'El teléfono solo puede contener letras, números y espacios.',
+            'telefono.max' => 'El teléfono debe contener máximo 15 dígitos.',
+            'telefono.min' => 'El teléfono debe contener minimo 2 dígitos.',
         ]);
 
         $datosCliente->domicilio->calle=$req->calle;

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pedido', function (Blueprint $table) {
             $table->id('pedido_pk')->autoIncrement();
-            $table->unsignedBigInteger('cliente_fk');
+            $table->unsignedBigInteger('cliente_fk')->nullable();
             $table->unsignedBigInteger('empleado_fk');
             $table->dateTime('fecha_hora_pedido');
             $table->unsignedBigInteger('medio_pedido_fk');

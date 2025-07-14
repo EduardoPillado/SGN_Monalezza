@@ -42,12 +42,14 @@
 
                     <div class="space-y-4 overflow-y-auto flex-3 pb-8">
                         <!-- Campos del pedido -->
+                        <p class="text-right text-sm text-gray-600 mb-3">
+                            <span class="text-red-500">*</span> Campo necesario
+                        </p>
+
                         <div>
-                            <label for="cliente_fk" class="block font-medium mb-2">Cliente
-                                <span class="text-red-500">*</span>
-                            </label>
-                            <select name="cliente_fk" id="cliente_fk" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
-                                <option value="">Selecciona un cliente</option>
+                            <label for="cliente_fk" class="block font-medium mb-2">Cliente</label>
+                            <select name="cliente_fk" id="cliente_fk" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Cliente genérico o Selecciona un cliente</option>
                                 @foreach($clientes as $cliente)
                                     <option value="{{ $cliente->cliente_pk }}">{{ $cliente->nombre_cliente }}</option>
                                 @endforeach
@@ -100,9 +102,6 @@
                                 <span class="text-red-500">*</span>
                             </label>
                             <input type="number" name="pago" id="pago" value="{{ old('pago') }}" min="0" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
-                            <p id="mensaje_pago" class="mt-1 text-sm font-semibold text-red-600 hidden">
-                                La cantidad pagada es menor al costo del pedido.
-                            </p>
                         </div>
 
                         <div>
@@ -124,10 +123,6 @@
                                 Registrar Pedido
                             </button>
                         </div>
-
-                        <p class="text-right text-sm text-gray-600 mb-3">
-                            <span class="text-red-500">*</span> Campo necesario
-                        </p>
 
                     </div>
 
@@ -187,6 +182,45 @@
                 </div>
             </div>
 
+            <!-- Modal de registro de efectivo inicial -->
+            <div 
+            x-data="{
+                modalOpen: false,
+                init() {
+                    const lastShown = localStorage.getItem('modalLastShown');
+                    const today = new Date().toDateString();
+                    
+                    if (!lastShown || lastShown !== today) {
+                        this.modalOpen = true;
+                        localStorage.setItem('modalLastShown', today);
+                    }
+                }
+            }" x-show="modalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
+                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                    <div class="mt-3 text-center">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Apertura de caja</h3>
+                        <div class="mt-2 px-7 py-3">
+                            <p class="text-sm text-gray-600 mb-3">
+                                <span class="text-red-500">*</span> Campo necesario</p>
+                            <form id="form-efectivoInicial" action="{{ route('efectivoInicial.insertar') }}" method="post">
+                                @csrf
+                                <div class="mb-4">
+                                    <label for="efectivo_inicial" class="block text-sm font-medium text-gray-700">Efectivo en caja
+                                        <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="efectivo_inicial" name="efectivo_inicial" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                </div>
+                                <div class="items-center px-4 py-3">
+                                    <button type="submit" class="mt-3 px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
+                                        Guardar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <script>
                 $(document).ready(function() {
                     $('#search-bar').on('keyup', function() {
@@ -220,7 +254,7 @@
                         productElement.className = 'order-item';
                         productElement.id = `order-item-${productId}`;
                         productElement.innerHTML = `
-                            <span>${productName} (${productType}) - $${productPrice}</span>
+                            <span id="product-info-${productId}">${productName} (${productType}) - $${productPrice}</span>
                             <input type="number" value="1" min="1" onchange="updateQuantity(${productId}, this.value)">
                             <button type="button" onclick="removeProductFromSummary(${productId})">Eliminar</button>
                         `;
@@ -233,6 +267,27 @@
                         hiddenInput.id = `input-producto-${productId}`;
                         hiddenInput.value = 1;
                         document.querySelector('form').appendChild(hiddenInput);
+
+                        // Obtener el estado del stock y actualizar
+                        fetch(`/producto/${productId}/estado-stock`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.error) {
+                                    console.log(data.error);
+                                    return;
+                                }
+                                const stockMessage = data.estadoStock === 'En riesgo'
+                                    ? '<span style="color: red; font-weight: bold;"> (Stock en riesgo)</span>'
+                                    : '<span style="color: green; font-weight: bold;"> (Stock disponible)</span>';
+                                
+                                // Actualizar el contenido del span con el mensaje de stock
+                                const productInfo = document.getElementById(`product-info-${productId}`);
+                                productInfo.innerHTML = `${productName} (${productType}) - $${productPrice}${stockMessage}`;
+                            })
+                            .catch(error => {
+                                console.log('Error al obtener el estado del stock:', error);
+                                // Indicador de stock
+                            });
                     } else {
                         // Si ya existe, incrementa la cantidad
                         selectedProducts[productId].quantity++;
@@ -323,6 +378,16 @@
                 const montoTotalInput = document.getElementById('monto_total');
                 const pagoInput = document.getElementById('pago');
                 const cambioInput = document.getElementById('cambio');
+                const submitButton = document.querySelector('button[type="submit"]');
+                // Crear elemento para mostrar la alerta
+                if (!document.getElementById('pago-alert')) {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'text-red-500 mt-1 font-semibold text-sm hidden';
+                    alertDiv.id = 'pago-alert';
+                    alertDiv.textContent = 'La cantidad pagada es menor al costo del pedido';
+                    // Insertar después del input de pago
+                    pagoInput.insertAdjacentElement('afterend', alertDiv);
+                }
 
                 // Función para actualizar el cambio
                 function actualizarCambio() {
@@ -334,10 +399,35 @@
 
                     // Actualiza el campo de cambio
                     cambioInput.value = cambio.toFixed(2);  // Redondeamos a 2 decimales
+
+                    // Validar si el pago es suficiente
+                    const alertDiv = document.getElementById('pago-alert');
+                    const isPagoInsufficient = pago < montoTotal;
+                    
+                    if (isPagoInsufficient) {
+                        // Mostrar alerta y deshabilitar botón
+                        alertDiv.classList.remove('hidden');
+                        pagoInput.classList.add('border-red-500');
+                        pagoInput.classList.remove('border-gray-300');
+                        submitButton.disabled = true;
+                        submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+                        submitButton.classList.remove('hover:bg-blue-600');
+                    } else {
+                        // Ocultar alerta y habilitar botón
+                        alertDiv.classList.add('hidden');
+                        pagoInput.classList.remove('border-red-500');
+                        pagoInput.classList.add('border-gray-300');
+                        submitButton.disabled = false;
+                        submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                        submitButton.classList.add('hover:bg-blue-600');
+                    }
                 }
 
                 // Añadir eventos para calcular el cambio en tiempo real
                 pagoInput.addEventListener('input', actualizarCambio);
+                pagoInput.addEventListener('change', actualizarCambio);
+                // Validar al cargar la página (por si hay valores predefinidos)
+                document.addEventListener('DOMContentLoaded', actualizarCambio);
             </script>
 
             @if ($errors->any())
@@ -403,30 +493,5 @@
 
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const montoTotalInput = document.getElementById('monto_total');
-            const pagoInput = document.getElementById('pago');
-            const cambioInput = document.getElementById('cambio');
-
-            function actualizarCambio() {
-                const montoTotal = parseFloat(montoTotalInput.value) || 0;
-                const pago = parseFloat(pagoInput.value) || 0;
-                const cambio = pago >= montoTotal ? pago - montoTotal : 0;
-
-                cambioInput.value = cambio.toFixed(2);
-
-                const mensaje = document.getElementById('mensaje_pago');
-                if (pago < montoTotal && montoTotal > 0) {
-                    mensaje.classList.remove('hidden');
-                } else {
-                    mensaje.classList.add('hidden');
-                }
-            }
-
-            pagoInput.addEventListener('input', actualizarCambio);
-        });
-    </script>
 </body>
 </html>
