@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('asistencia_pk')->autoIncrement();
             $table->unsignedBigInteger('empleado_fk');
             $table->date('fecha_asistencia');
-            $table->time('hora_entrada');
+            $table->time('hora_entrada')->nullable();
             $table->time('hora_salida')->nullable();
 
             $table->foreign('empleado_fk')

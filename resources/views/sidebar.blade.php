@@ -25,7 +25,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-          .sidebar-hidden {
+        .sidebar-hidden {
             transform: translateX(-100%);
         }
         .sidebar-visible {
@@ -77,20 +77,51 @@
                 <li class="mb-2"><a href="{{ route('reserva.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Reservaciones</a></li>
                 <li class="mb-2"><a href="{{ route('inventario.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Inventario</a></li>
                 <li class="mb-2"><a href="{{ route('producto.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Productos</a></li>
-                @if ( $USUARIO_PK == 1 )
+                @if ( $ROL_PK == 1 )
                     <li class="mb-2"><a href="{{ route('ingrediente.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Ingredientes</a></li>
+                    <li class="mb-2"><a href="{{ route('entradas_caja.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Entradas de caja</a></li>
                     <li class="mb-2"><a href="{{ route('gasto.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Gastos</a></li>
                     <li class="mb-2"><a href="{{ route('asistencia.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Asistencias</a></li>
                     <li class="mb-2"><a href="{{ route('nomina.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Nómina</a></li>
                 @endif
                 <li class="mb-2"><a href="{{ route('cliente.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Clientes</a></li>
-                @if ( $USUARIO_PK == 1 )
+                @if ( $ROL_PK == 1 )
                     <li class="mb-2"><a href="{{ route('empleado.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Empleados</a></li>
                     <li class="mb-2"><a href="{{ route('proveedor.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Proveedores</a></li>
                 @endif
                 <li class="mb-2"><a href="{{ route('corteDeCaja.mostrar') }}" class="block p-2 hover:bg-gray-100 rounded">Realizar corte de caja</a></li>
-                <li class="mb-2"><a href="{{ route('asistencia.entrada') }}" class="block p-2 hover:bg-gray-100 rounded">Registrar entrada</a></li>
-                <li class="mb-2"><a href="{{ route('asistencia.salida') }}" class="block p-2 hover:bg-gray-100 rounded">Registrar salida</a></li>
+                <ul class="space-y-2" x-data="{ open: false }">
+                    <li class="relative">
+                        <button @click="open = !open" class="flex items-center justify-between w-full p-2 rounded hover:bg-gray-100">
+                            Reportes
+                            <svg class="w-4 h-4 ml-2 transform transition-transform duration-200" :class="open ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+
+                        <ul x-show="open" @click.away="open = false" x-transition
+                            class="bg-white shadow-md rounded mt-2 p-2 w-52 absolute z-10">
+                            <li class="mb-2"><a href="{{ route('formReporte.inventario') }}" class="block p-2 hover:bg-gray-100 rounded">Reporte de inventario</a></li>
+                            <li class="mb-2"><a href="{{ route('formReporte.producto') }}" class="block p-2 hover:bg-gray-100 rounded">Reporte de productos</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="space-y-2" x-data="{ open: false }">
+                    <li class="relative">
+                        <button @click="open = !open" class="flex items-center justify-between w-full p-2 rounded hover:bg-gray-100">
+                            Asistencia
+                            <svg class="w-4 h-4 ml-2 transform transition-transform duration-200" :class="open ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+
+                        <ul x-show="open" @click.away="open = false" x-transition
+                            class="bg-white shadow-md rounded mt-2 p-2 w-52 absolute z-10">
+                            <li class="mb-2"><a href="{{ route('asistencia.entrada') }}" class="block p-2 hover:bg-gray-100 rounded">Registrar entrada</a></li>
+                            <li class="mb-2"><a href="{{ route('asistencia.salida') }}" class="block p-2 hover:bg-gray-100 rounded">Registrar salida</a></li>
+                        </ul>
+                    </li>
+                </ul>
                 <li class="mb-2"><a href="{{ route('usuario.logout') }}" class="block p-2 hover:bg-gray-100 rounded">Cerrar sesión</a></li>
             </ul>
         </div>
@@ -100,12 +131,13 @@
     <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden hidden"></div>
 
     <!-- Encabezado con logo y fondo de iconos de pizza -->
-    <div class="bg-gray-200 p-4 relative overflow-hidden">
-        <div class="absolute inset-0 opacity-10">
-            <!-- Aquí irían los iconos de pizza como background -->
-        </div>
-        <div class="relative z-10 flex justify-between items-center">
+    <div class="bg-gray-200 p-4 relative">
+        <div class="relative flex justify-between items-center">
             <button class="text-2xl" onclick="toggleSidebar()">☰</button>
+            <div class="text-center">
+                <h1 class="text-2xl sm:text-2xl lg:text-3xl font-bold">Sistema - La Monalezza Pizzería</h1>
+                <h2 class="text-2x1 sm:text-2x1 lg:text-3x1 font-semibold">Dinero en caja: ${{ number_format($resumenCajaHoy['total_caja'], 2) }}</h2>
+            </div>
             <a href="{{ url('/') }}">
                 <img src="{{ asset('img/logo_lamonalezza.webp') }}" class="w-16 h-16 bg-black rounded-full flex items-center justify-center text-white text-xs text-center">
             </a>

@@ -8,15 +8,9 @@
     <title>Gestión de Productos - La Monalezza</title>
 </head>
 
-<body class="h-full bg-gray-100 overflow-hidden" x-data="{ 
-    sidebarOpen: false, 
-    modalOpen: false,
-}">
+<body class="h-full bg-gray-100 overflow-hidden">
 
     @php
-        use App\Models\Tipo_producto;
-        $datosTipoProducto=Tipo_producto::all();
-
         use App\Models\Ingrediente;
         $datosIngrediente=Ingrediente::where('estatus_ingrediente', '=', 1)->get();
     @endphp
@@ -27,14 +21,62 @@
         <div class="flex-grow overflow-y-auto p-4">
             <h1 class="text-2xl font-bold mb-4">Productos</h1>
             <div class="bg-white shadow-md rounded-lg p-4">
+                <div class="mb-4">
+                    <button data-modal-open="modal-filtros" class="bg-blue-600 text-white px-4 py-2 rounded mb-4">
+                        Filtros de productos
+                    </button>
+                </div>
+
+                <div data-modal="modal-filtros" style="display: none;" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 flex">
+                    <div class="bg-white w-full max-w-md rounded-lg shadow-lg p-6 relative">
+                        <h2 class="text-xl font-bold mb-4">Filtrar Productos</h2>
+                        <form action="{{ route('producto.filtrar') }}" method="GET" class="space-y-4">
+                            <div>
+                                <label for="filtro_tipo_producto" class="block font-semibold mb-1">Por tipo de producto:</label>
+                                <select name="tipo_producto_fk" id="filtro_tipo_producto" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Todos los tipos de producto</option>
+                                    @foreach($tipos_producto as $tipo)
+                                        <option value="{{ $tipo->tipo_producto_pk }}" {{ request('tipo_producto_fk') == $tipo->tipo_producto_pk ? 'selected' : '' }}>
+                                            {{ $tipo->nombre_tipo_producto }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="estatus" class="block font-semibold mb-1">Estatus del producto:</label>
+                                <select id="estatus" name="estatus"
+                                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Todos</option>
+                                    <option value="1" {{ request('estatus') == '1' ? 'selected' : '' }}>Activos</option>
+                                    <option value="0" {{ request('estatus') == '0' ? 'selected' : '' }}>Inactivos</option>
+                                </select>
+                            </div>
+
+                            <div class="flex justify-between items-center pt-2">
+                                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                                    Aplicar
+                                </button>
+                                <a href="{{ route('producto.mostrar') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                                    Quitar filtros
+                                </a>
+                                <button type="button" data-modal-cancel="modal-filtros" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
                 <table id="tabla-productos" class="w-full">
                     <thead>
                         <tr class="border-b">
                             <th class="text-left py-2">Nombre</th>
                             <th class="text-left py-2">Tipo de producto</th>
                             <th class="text-left py-2">Precio</th>
+                            <th class="text-left py-2">Imagen</th>
                             <th class="text-left py-2">Estatus</th>
-                            @if ( session('usuario_pk') == 1 )
+                            @if ( session('rol_pk') == 1 )
                                 <th class="text-right py-2">Acciones</th>
                             @endif
                         </tr>
@@ -46,8 +88,15 @@
                                 <td class="py-2">{{ $dato->nombre_producto }}</td>
                                 <td class="py-2">{{ $dato->tipo_producto->nombre_tipo_producto }}</td>
                                 <td class="py-2">${{ $dato->precio_producto }}</td>
+                                <td class="py-2">
+                                    @if ($dato->imagen_producto)
+                                        <img src="{{ asset($dato->imagen_producto) }}" alt="Imagen del producto" class="w-16 h-16 object-cover rounded shadow">
+                                    @else
+                                        <span class="text-gray-500 italic">Sin imagen</span>
+                                    @endif
+                                </td>
                                 <td class="py-2">{{ $dato->estatus_producto ? 'Activo' : 'Inactivo' }}</td>
-                                @if ( session('usuario_pk') == 1 )
+                                @if ( session('rol_pk') == 1 )
                                     <td class="text-right py-2">
                                         <a href="{{ route('producto.datosParaEdicion', $dato->producto_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
                                         @if ($dato->estatus_producto)
@@ -63,7 +112,7 @@
                 </table>
             </div>
             <div class="mt-4 text-right">
-                <button @click="modalOpen = true" class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo producto</button>
+                <button data-modal-open="modal-form" class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo producto</button>
             </div>
         </div>
 
@@ -165,7 +214,7 @@
         </script>
 
         <!-- Modal de registro de producto -->
-        <div x-show="modalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
+        <div data-modal="modal-form" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nuevo Producto</h3>
@@ -173,7 +222,7 @@
                         <p class="text-sm text-gray-600 mb-3">
 
                             <span class="text-red-500">*</span> Campo necesario</p>
-                        <form id="form-producto" action="{{ route('producto.insertar') }}" method="post">
+                        <form id="form-producto" action="{{ route('producto.insertar') }}" method="post" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-4">
                                 <label for="nombre_producto" class="block text-sm font-medium text-gray-700">Nombre
@@ -187,7 +236,7 @@
                                 </label>
                                 <select name="tipo_producto_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Selecciona el tipo de producto</option>
-                                    @foreach ($datosTipoProducto as $dato)
+                                    @foreach ($tipos_producto as $dato)
                                         <option value="{{ $dato->tipo_producto_pk }}">{{ $dato->nombre_tipo_producto }}</option>
                                     @endforeach
                                 </select>
@@ -198,12 +247,19 @@
                                 </label>
                                 <input type="number" id="precio_producto" name="precio_producto" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
+                            <div class="mb-4">
+                                <label for="imagen_producto" class="block text-sm font-medium text-gray-700">Imagen del producto</label>
+                                <input type="file" name="imagen_producto" id="imagen_producto" accept="image/*"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            </div>
 
                             <div class="mb-4">
                                 <div id="ingredientes-container">
                                     <div class="flex items-center mb-2">
                                         <div class="flex flex-col w-3/4">
-                                            <label for="ingredientes[]" class="block text-sm font-medium text-gray-700">Ingrediente
+                                            <label for="ingredientes[]" class="block text-sm font-medium text-gray-700">
+                                                <span class="text-blue-500 text-lg cursor-help" title="Solo agrega ingredientes si el producto los necesita.">?</span>
+                                                Ingrediente
                                                 <span class="text-red-500">*</span>
                                             </label>
                                             <select name="ingredientes[]" class="w-full rounded-md border-gray-300 mb-2">
@@ -226,7 +282,7 @@
                             </div>
                             
                             <div class="items-center px-4 py-3">
-                                <button type="button" @click="modalOpen = false" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                <button type="button" data-modal-cancel="modal-form" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
                                     Cancelar
                                 </button>
                                 <button type="submit" class="mt-3 px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
@@ -240,6 +296,35 @@
         </div>
 
         <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Abrir modal según su nombre
+                document.querySelectorAll('[data-modal-open]').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const modalName = this.getAttribute('data-modal-open');
+                        const modal = document.querySelector(`[data-modal="${modalName}"]`);
+                        if (modal) modal.style.display = 'block';
+                    });
+                });
+
+                // Cerrar modal desde botón de cancelar
+                document.querySelectorAll('[data-modal-cancel]').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const modalName = this.getAttribute('data-modal-cancel');
+                        const modal = document.querySelector(`[data-modal="${modalName}"]`);
+                        if (modal) modal.style.display = 'none';
+                    });
+                });
+
+                // Cerrar modal haciendo click fuera del contenido
+                window.addEventListener('click', function (event) {
+                    document.querySelectorAll('[data-modal]').forEach(modal => {
+                        if (event.target === modal) {
+                            modal.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
             function agregarIngrediente() {
                 const container = document.getElementById('ingredientes-container');
                 const newIngredient = document.createElement('div');

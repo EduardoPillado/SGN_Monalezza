@@ -1,3 +1,14 @@
+.fix {
+    display: block; 
+    margin-bottom: 2px;
+    text-align: center;
+}
+
+.less{
+    font-size: 10px;
+    margin-bottom: 20px;
+}
+
 .pizza-body {
     height: 100vh;
     overflow: hidden;
@@ -54,47 +65,6 @@
     font-weight: bold;
     display: flex;
     justify-content: space-between;
-}
-
-/* Estilos para el teclado numérico */
-.numpad-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    padding: 15px;
-    background-color: #e0e0e0;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.numpad-button {
-    padding: 15px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-    background-color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.numpad-button:hover {
-    background-color: #f0f0f0;
-}
-
-.numpad-button:active {
-    transform: scale(0.95);
-}
-
-.numpad-button-cobrar {
-    grid-column: span 4;
-    background-color: #4CAF50;
-    color: white;
-}
-
-.numpad-button-cobrar:hover {
-    background-color: #45a049;
 }
 
 /* Estilos para la columna derecha */
@@ -239,8 +209,15 @@
 .info-button .absolute {
     position: absolute;
     font-size: 0.8rem;
-    background-color: #bd3525;
     transform: translate(50%, -50%);
 }
 
 /* Fin Span de stock crítico en inicio */
+
+/* Corrección de sobrepuesto de DataTables */
+
+.dataTables_wrapper .dataTables_length select {
+    width: 55px;
+}
+
+/* Fin de corrección de sobrepuesto de DataTables */

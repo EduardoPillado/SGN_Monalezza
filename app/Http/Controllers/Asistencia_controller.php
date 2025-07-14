@@ -76,8 +76,8 @@ class Asistencia_controller extends Controller
         if (!$USUARIO_PK) {
             return redirect('/login');
         }
-        $empleado = Empleado::where('usuario_fk', $USUARIO_PK)->first();
 
+        $empleado = Empleado::where('usuario_fk', $USUARIO_PK)->first();
         if (!$empleado) {
             return back()->with('error', 'No se encontró un empleado relacionado con el usuario actual.');
         }
@@ -86,6 +86,15 @@ class Asistencia_controller extends Controller
             ->whereDate('fecha_asistencia', Carbon::now()->format('Y-m-d'))
             ->whereNull('hora_salida')
             ->first();
+        
+        $ROL = session('nombre_rol');
+        if (!$asistencia && $ROL == 'Administrador') {
+            $asistencia = new Asistencia();
+            $asistencia->empleado_fk = $empleado->empleado_pk;
+            $asistencia->fecha_asistencia = Carbon::now()->format('Y-m-d');
+            $asistencia->hora_entrada = null;
+            $asistencia->save();
+        }
 
         if (!$asistencia) {
             return back()->with('error', 'No se encontró un registro de entrada para el día actual.');
@@ -96,8 +105,9 @@ class Asistencia_controller extends Controller
 
     public function registrarSalida(Request $req){
         $req->validate([
-            'hora_salida' => ['nullable', 'date_format:H:i', 'after:hora_entrada'],
+            'hora_salida' => ['required', 'date_format:H:i', 'after:hora_entrada'],
         ], [
+            'hora_salida.required' => 'La hora de salida es obligatoria.',
             'hora_salida.date_format' => 'La hora de salida debe ser una hora válida.',
             'hora_salida.after' => 'La hora de salida debe ser posterior a la hora de entrada.',
         ]);
@@ -105,6 +115,24 @@ class Asistencia_controller extends Controller
         $empleado_fk = session('usuario_pk');
         if (!$empleado_fk) {
             return redirect('/login');
+        }
+
+        $ROL = session('nombre_rol');
+        if ($ROL == 'Administrador') {
+            $empleado_fk = $req->input('empleado_fk');
+            $fecha = $req->input('fecha_asistencia');
+
+            // Buscar asistencia existente o crear una nueva si no hay
+            $asistencia = Asistencia::firstOrNew([
+                'empleado_fk' => $empleado_fk,
+                'fecha_asistencia' => $fecha,
+            ]);
+
+            // Solo asignar hora_salida; entrada puede estar vacía
+            $asistencia->hora_salida = $req->hora_salida;
+            $asistencia->save();
+
+            return redirect('/')->with('success', 'Salida registrada como administrador.');
         }
 
         $asistencia = Asistencia::where('empleado_fk', $empleado_fk)

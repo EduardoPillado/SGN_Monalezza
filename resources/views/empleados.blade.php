@@ -7,11 +7,7 @@
     <link href="{{ asset('img/monalezza.ico') }}" rel="icon">
     <title>Gestión de Empleados - La Monalezza</title>
     {{-- Tailwind --}}
-    <style>
-        .modal-hidden {
-            display: none !important;
-        }
-    </style>
+    @vite('resources/css/app.css')
 </head>
 
 <body class="h-full bg-gray-100 overflow-hidden">
@@ -66,7 +62,7 @@
                 </table>
             </div>
             <div class="mt-4 text-right">
-                <button onclick="toggleModal()" class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo empleado</button>
+                <button data-modal-open class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo empleado</button>
             </div>
         </div>
 
@@ -90,12 +86,6 @@
                     }
                 });
             });
-
-            // Función para mostrar/ocultar el modal
-            function toggleModal() {
-                const modal = document.getElementById('modal-empleado');
-                modal.classList.toggle('modal-hidden');
-            }
 
             // Alerta de confirmación de baja
             function confirmarBaja(event) {
@@ -143,7 +133,7 @@
         </script>
 
         <!-- Modal de registro de empleado -->
-        <div id="modal-empleado" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full modal-hidden">
+        <div data-modal style="display: none;" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full modal-hidden">
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nuevo Empleado</h3>
@@ -153,7 +143,7 @@
                         <form id="form-empleado" action="{{ route('empleado.insertar') }}" method="post">
                             @csrf
                             <div class="mb-4">
-                                <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre
+                                <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre Completo
                                     <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" id="nombre" name="nombre" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
@@ -185,10 +175,10 @@
                                 <label for="fecha_contratacion" class="block text-sm font-medium text-gray-700">Fecha de Contratación
                                     <span class="text-red-500">*</span>
                                 </label>
-                                <input type="date" id="fecha_contratacion" name="fecha_contratacion" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                <input type="date" id="fecha_contratacion" name="fecha_contratacion" value="{{ Carbon::now()->format('Y-m-d') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="items-center px-4 py-3">
-                                <button type="button" onclick="toggleModal()" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                <button type="button" data-modal-cancel class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
                                     Cancelar
                                 </button>
                                 <button type="submit" class="mt-3 px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
@@ -200,6 +190,35 @@
                 </div>
             </div>
         </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const openModalBtn = document.querySelector('[data-modal-open]');
+                const modal = document.querySelector('[data-modal]');
+                const cancelBtn = document.querySelector('[data-modal-cancel]');
+
+                // Función para abrir el modal
+                function openModal() {
+                    modal.style.display = 'block';
+                }
+
+                // Función para cerrar el modal
+                function closeModal() {
+                    modal.style.display = 'none';
+                }
+
+                // Event listeners
+                openModalBtn.addEventListener('click', openModal);
+                cancelBtn.addEventListener('click', closeModal);
+
+                // Cerrar modal si se hace click fuera de él
+                window.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        closeModal();
+                    }
+                });
+            });
+        </script>
 
         @if ($errors->any())
             <script>

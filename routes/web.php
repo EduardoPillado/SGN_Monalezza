@@ -7,6 +7,8 @@ use App\Http\Controllers\Empleado_controller;
 use App\Http\Controllers\Cliente_controller;
 use App\Http\Controllers\Proveedor_controller;
 use App\Http\Controllers\Producto_controller;
+use App\Http\Controllers\Entradas_caja_controller;
+use App\Http\Controllers\Reporte_controller;
 use App\Http\Controllers\Corte_caja_controller;
 use App\Http\Controllers\Inventario_controller;
 use App\Http\Controllers\Ingrediente_controller;
@@ -29,10 +31,44 @@ Route::get('/', function () {
 Route::get('/', [Pedido_controller::class, 'mostrarParaInsertar'])->name('pedido.mostrarParaInsertar');
 Route::post('/registrandoPedido', [Pedido_controller::class, 'insertar'])->name('pedido.insertar');
 Route::get('/ventas', [Pedido_controller::class, 'mostrar'])->name('pedido.mostrar');
+Route::get('/editarPedido/{pedido_pk}', [Pedido_controller::class, 'datosParaEdicion'])->name('pedido.datosParaEdicion');
+Route::put('/editandoPedido/{pedido_pk}', [Pedido_controller::class, 'actualizar'])->name('pedido.actualizar');
 Route::match(['get', 'put'], '/marcandoPendientePedido/{pedido_pk}', [Pedido_controller::class, 'pendiente'])->name('pedido.pendiente');
 Route::match(['get', 'put'], '/marcandoEntregaPedido/{pedido_pk}', [Pedido_controller::class, 'entregado'])->name('pedido.entregado');
 Route::match(['get', 'put'], '/marcandoCancelacionPedido/{pedido_pk}', [Pedido_controller::class, 'cancelado'])->name('pedido.cancelado');
 Route::get('/ticket/{pedido_pk}', [Pedido_controller::class, 'mostrarTicket'])->name('ticket.mostrar');
+Route::get('/ventasFiltradas', [Pedido_controller::class, 'filtrar'])->name('pedido.filtrar');
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Entradas de caja ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Route::post('/registrandoEntradaDeCaja', [Entradas_caja_controller::class, 'insertar'])->name('entradas_caja.insertar');
+Route::get('/entradasDeCaja', [Entradas_caja_controller::class, 'mostrar'])->name('entradas_caja.mostrar');
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// Reportes de movimientos -----------------------------------------------------------------------------------------------------------------------------------------------
+
+Route::get('/generarReporteDeInventario', function () {
+    $USUARIO_PK = session('usuario_pk');
+    if ($USUARIO_PK) {
+        return view('reporteInventario');
+    } else {
+        return redirect()->route('login')->with('warning', 'Inicia sesión antes');
+    }
+})->name('formReporte.inventario');
+Route::post('/generandoReporteDeInventario', [Reporte_controller::class, 'generarReporteInventario'])->name('generarReporte.inventario');
+
+Route::get('/generarReporteDeProducto', function () {
+    $USUARIO_PK = session('usuario_pk');
+    if ($USUARIO_PK) {
+        return view('reporteProducto');
+    } else {
+        return redirect()->route('login')->with('warning', 'Inicia sesión antes');
+    }
+})->name('formReporte.producto');
+Route::post('/generandoReporteDeProductos', [Reporte_controller::class, 'generarReporteProducto'])->name('generarReporte.producto');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -84,6 +120,7 @@ Route::post('/registrandoSalida', [Asistencia_controller::class, 'registrarSalid
 
 Route::get('/nomina', action: [Nomina_controller::class, 'mostrar'])->name('nomina.mostrar');
 Route::post('/generandoNomina', [Nomina_controller::class, 'generarNomina'])->name('nomina.generar');
+Route::get('/nominasFiltradas', [Nomina_controller::class, 'filtrar'])->name('nomina.filtrar');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -117,6 +154,7 @@ Route::get('/editarProducto/{producto_pk}', [Producto_controller::class, 'datosP
 Route::put('/editandoProducto/{producto_pk}', [Producto_controller::class, 'actualizar'])->name('producto.actualizar');
 Route::match(['get', 'put'], '/dandoDeBajaProducto/{producto_pk}', [Producto_controller::class, 'baja'])->name('producto.baja');
 Route::match(['get', 'put'], '/dandoDeAltaProducto/{producto_pk}', [Producto_controller::class, 'alta'])->name('producto.alta');
+Route::get('/productosFiltrados', [Producto_controller::class, 'filtrar'])->name('producto.filtrar');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -124,9 +162,9 @@ Route::match(['get', 'put'], '/dandoDeAltaProducto/{producto_pk}', [Producto_con
 
 Route::get('/inventario', [Inventario_controller::class, 'mostrar'])->name('inventario.mostrar');
 Route::post('/agregandoStock', [Inventario_controller::class, 'insertar'])->name('inventario.insertar');
-Route::get('/inventarioCritico', [Inventario_controller::class, 'mostrarPocoStock'])->name('inventario.mostrarPocoStock');
 Route::get('/actualizarStock/{inventario_pk}', [Inventario_controller::class, 'datosParaEdicion'])->name('inventario.datosParaEdicion');
 Route::put('/actualizandoStock/{inventario_pk}', [Inventario_controller::class, 'actualizar'])->name('inventario.actualizar');
+Route::get('/inventarioFiltrado', [Inventario_controller::class, 'filtrar'])->name('inventario.filtrar');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -147,8 +185,10 @@ Route::get('/reservas', [Reserva_controller::class, 'mostrar'])->name('reserva.m
 Route::post('/registrandoReserva', [Reserva_controller::class, 'insertar'])->name('reserva.insertar');
 Route::get('/editarReserva/{reserva_pk}', [Reserva_controller::class, 'datosParaEdicion'])->name('reserva.datosParaEdicion');
 Route::put('/editandoReserva/{reserva_pk}', [Reserva_controller::class, 'actualizar'])->name('reserva.actualizar');
-Route::match(['get', 'put'], '/dandoDeBajaReserva/{reserva_pk}', [Reserva_controller::class, 'baja'])->name('reserva.baja');
-Route::match(['get', 'put'], '/dandoDeAltaReserva/{reserva_pk}', [Reserva_controller::class, 'alta'])->name('reserva.alta');
+Route::match(['get', 'put'], '/marcandoPendienteReserva/{reserva_pk}', [Reserva_controller::class, 'pendiente'])->name('reserva.pendiente');
+Route::match(['get', 'put'], '/marcandoAtendidaReserva/{reserva_pk}', [Reserva_controller::class, 'atendida'])->name('reserva.atendida');
+Route::match(['get', 'put'], '/marcandoCancelacionReserva/{reserva_pk}', [Reserva_controller::class, 'cancelada'])->name('reserva.cancelada');
+Route::get('/reservasFiltradas', [Reserva_controller::class, 'filtrar'])->name('reserva.filtrar');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

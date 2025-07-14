@@ -22,6 +22,9 @@ class Usuario extends Model
     public function empleado(){
         return $this->hasMany(Empleado::class, 'usuario_fk');
     }
+    public function entradas_caja(){
+        return $this->hasMany(Entradas_caja::class, 'usuario_fk');
+    }
     public function rol(){
         return $this->belongsTo(Rol::class, 'rol_fk');
     }
