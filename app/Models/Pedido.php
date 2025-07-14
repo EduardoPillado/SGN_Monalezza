@@ -35,6 +35,9 @@ class Pedido extends Model
     public function empleado(){
         return $this->belongsTo(Empleado::class, 'empleado_fk');
     }
+    public function usuario(){
+        return $this->belongsTo(Usuario::class, 'usuario_fk');
+    }
     public function medio_pedido(){
         return $this->belongsTo(Medio_pedido::class, 'medio_pedido_fk');
     }

@@ -21,20 +21,28 @@
                 <table id="tabla-corte-caja" class="w-full">
                     <thead>
                         <tr class="border-b">
+                            <th class="text-left py-2">Folio</th>
                             <th class="text-left py-2">Fecha inicial</th>
                             <th class="text-left py-2">Fecha final</th>
+                            <th class="text-left py-2">Apertura de caja</th>
                             <th class="text-left py-2">Cantidad de ventas</th>
                             <th class="text-left py-2">Ganancias totales</th>
+                            <th class="text-left py-2">Gasto en servicios</th>
+                            <th class="text-left py-2">Saldo final</th>
                             <th class="no-print text-right py-2">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($datosCorteCaja as $dato)
                             <tr id="registro-{{ $dato->corte_caja_pk }}" class="border-b cursor-pointer" title="CLIC PARA VER DETALLES" data-empleados='@json($dato->empleados)'>
+                                <td class="py-2">{{ $dato->corte_caja_pk}}</td>
                                 <td class="py-2">{{ $dato->fecha_corte_inicio }}</td>
                                 <td class="py-2">{{ $dato->fecha_corte_fin }}</td>
+                                <td class="py-2">${{ $dato->suma_efectivo_inicial }}</td>
                                 <td class="py-2">{{ $dato->cantidad_ventas }}</td>
                                 <td class="py-2">${{ $dato->ganancia_total }}</td>
+                                <td class="py-2">${{ $dato->suma_gasto_servicios }}</td>
+                                <td class="py-2">${{ $dato->utilidad_neta }}</td>
                                 <td class="no-print text-right py-2">
                                     <button onclick="printRecord('registro-{{ $dato->corte_caja_pk }}')" type="button" class="bg-blue-500 text-white px-4 py-2 rounded">
                                         <span>Imprimir corte</span>
@@ -226,12 +234,12 @@
             // Tabla principal
             printWindow.document.write('<div class="print-section">');
             printWindow.document.write('<table>');
-            printWindow.document.write('<tr><th>Fecha inicial</th><th>Fecha final</th><th>Cantidad de ventas</th><th>Ganancias totales</th></tr>');
+            printWindow.document.write('<tr><th>Folio</th><th>Fecha inicial</th><th>Fecha final</th><th>Efectivo inicial</th><th>Cantidad de ventas</th><th>Ganancias totales</th><th>Inversión</th><th>Utilidad neta</th></tr>');
             printWindow.document.write(recordRow.outerHTML);
             printWindow.document.write('</table>');
 
             if (empleados.length > 0) {
-                printWindow.document.write('<table style="width: 60%; margin: 0 auto; border-collapse: collapse;">');
+                printWindow.document.write('<table style="width: 94.4%; margin: 0 auto; border-collapse: collapse;">');
                 printWindow.document.write('<tr><th>Empleados que realizaron ventas:</th></tr>');
                 empleados.forEach(empleado => {
                     const usuario = empleado.usuario ? empleado.usuario.usuario : 'Empleado no disponible';

@@ -73,10 +73,11 @@ class Producto_controller extends Controller
 
     public function mostrar(){
         $datosProducto = Producto::all();
-        $tipos_producto = Tipo_producto::where('estatus_tipo_producto', '=', 1)->get();
+        $datosTipoProducto = Tipo_producto::where('estatus_tipo_producto', '=', 1)->get();
+        $allTipoProducto = Tipo_producto::all();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            return view('productos', compact('datosProducto', 'tipos_producto'));
+            return view('productos', compact('datosProducto', 'datosTipoProducto', 'allTipoProducto'));
         } else {
             return redirect('/login');
         }
@@ -96,9 +97,9 @@ class Producto_controller extends Controller
         }
 
         $datosProducto = $query->get();
-        $tipos_producto = Tipo_producto::where('estatus_tipo_producto', '=', 1)->get();
+        $datosTipoProducto = Tipo_producto::where('estatus_tipo_producto', '=', 1)->get();
 
-        return view('productos', compact('datosProducto', 'tipos_producto'));
+        return view('productos', compact('datosProducto', 'datosTipoProducto'));
     }
 
     public function baja($producto_pk){

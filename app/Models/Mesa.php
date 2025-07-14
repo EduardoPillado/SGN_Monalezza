@@ -13,7 +13,8 @@ class Mesa extends Model
     protected $primaryKey='mesa_pk';
     protected $fillable = [
         'numero_mesa',
-        'ubicacion'
+        'ubicacion',
+        'estatus_mesa'
     ];
     public $timestamps=false;
     public function reservas() {

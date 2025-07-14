@@ -152,6 +152,25 @@ class Inventario_controller extends Controller
         ));
     }
 
+    public function obtenerStockPorProducto($producto_fk){
+        $producto = Inventario::where('producto_fk', $producto_fk)
+            ->first();
+
+        if ($producto) {
+            $estadoStock = $producto->cantidad_inventario <= $producto->cantidad_inventario_minima
+                ? 'En riesgo'
+                : 'Disponible';
+
+            return response()->json([
+                'estadoStock' => $estadoStock,
+                'cantidad_inventario' => $producto->cantidad_inventario,
+                'cantidad_inventario_minima' => $producto->cantidad_inventario_minima
+            ]);
+        }
+
+        return response()->json(['error' => 'Producto no encontrado'], 404);
+    }
+
     public function datosParaEdicion($inventario_pk){
         $datosInventario = Inventario::findOrFail($inventario_pk);
         $USUARIO_PK = session('usuario_pk');

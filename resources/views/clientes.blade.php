@@ -114,7 +114,7 @@
                             </div>
                             <div class="mb-4">
                                 <label for="numero_interno" class="block text-sm font-medium text-gray-700">Número interno</label>
-                                <input type="number" id="numero_interno" name="numero_interno" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                <input type="text" id="numero_interno" name="numero_interno" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                             </div>
                             <div class="mb-4">
                                 <label for="referencias" class="block text-sm font-medium text-gray-700">Referencias</label>

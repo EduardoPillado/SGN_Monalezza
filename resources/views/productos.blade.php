@@ -35,7 +35,7 @@
                                 <label for="filtro_tipo_producto" class="block font-semibold mb-1">Por tipo de producto:</label>
                                 <select name="tipo_producto_fk" id="filtro_tipo_producto" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     <option value="">Todos los tipos de producto</option>
-                                    @foreach($tipos_producto as $tipo)
+                                    @foreach($datosTipoProducto as $tipo)
                                         <option value="{{ $tipo->tipo_producto_pk }}" {{ request('tipo_producto_fk') == $tipo->tipo_producto_pk ? 'selected' : '' }}>
                                             {{ $tipo->nombre_tipo_producto }}
                                         </option>
@@ -112,7 +112,44 @@
                 </table>
             </div>
             <div class="mt-4 text-right">
-                <button data-modal-open="modal-form" class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo producto</button>
+                <button data-modal-open="modal-producto" class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo producto</button>
+            </div>
+
+            <h1 class="text-2xl font-bold mb-4">Tipo de producto</h1>
+            <div class="bg-white shadow-md rounded-lg p-4">
+                <table id="tabla-tipo-producto" class="w-full">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="text-left py-2">Nombre tipo producto</th>
+                            <th class="text-left py-2">Estatus</th>
+                            <th class="text-right py-2">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ( $allTipoProducto as $dato )
+                            <tr class="border-b cursor-pointer">
+                                <td class="py-2">{{ $dato->nombre_tipo_producto }}</td>
+                                @if ( $dato->estatus_tipo_producto == 1 )
+                                    <td class="py-2">Activo</td>
+                                @else
+                                    <td class="py-2">Inactivo</td>
+                                @endif
+                                <td class="text-right py-2">
+                                    <a href="{{ route('tipo_producto.datosParaEdicion', $dato->tipo_producto_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
+
+                                    @if ($dato->estatus_tipo_producto == 1)
+                                        <a href="{{ route('tipo_producto.baja', $dato->tipo_producto_pk) }}" onclick="confirmarBaja(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
+                                    @else
+                                        <a href="{{ route('tipo_producto.alta', $dato->tipo_producto_pk) }}" onclick="confirmarAlta(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4 text-right">
+                <button data-modal-open="modal-tipo-producto" class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo tipo de producto</button>
             </div>
         </div>
 
@@ -214,7 +251,7 @@
         </script>
 
         <!-- Modal de registro de producto -->
-        <div data-modal="modal-form" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
+        <div data-modal="modal-producto" style="display: none;" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nuevo Producto</h3>
@@ -236,7 +273,7 @@
                                 </label>
                                 <select name="tipo_producto_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Selecciona el tipo de producto</option>
-                                    @foreach ($tipos_producto as $dato)
+                                    @foreach ($datosTipoProducto as $dato)
                                         <option value="{{ $dato->tipo_producto_pk }}">{{ $dato->nombre_tipo_producto }}</option>
                                     @endforeach
                                 </select>
@@ -282,7 +319,37 @@
                             </div>
                             
                             <div class="items-center px-4 py-3">
-                                <button type="button" data-modal-cancel="modal-form" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                <button type="button" data-modal-cancel="modal-producto" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="mt-3 px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
+                                    Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de registro de tipo de producto -->
+        <div data-modal="modal-tipo-producto" style="display: none;" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
+            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                <div class="mt-3 text-center">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nuevo Tipo de Producto</h3>
+                    <div class="mt-2 px-7 py-3">
+                        <p class="text-sm text-gray-600 mb-3">
+                            <span class="text-red-500">*</span> Campo necesario</p>
+                        <form id="form-tipoprod" action="{{ route('tipo_producto.insertar') }}" method="post">
+                            @csrf
+                            <div class="mb-4">
+                                <label for="nombre_tipo_producto" class="block text-sm font-medium text-gray-700">Nombre
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="nombre_tipo_producto" name="nombre_tipo_producto" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                            </div>
+                            <div class="items-center px-4 py-3">
+                                <button type="button" data-modal-cancel="modal-tipo-producto" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
                                     Cancelar
                                 </button>
                                 <button type="submit" class="mt-3 px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">

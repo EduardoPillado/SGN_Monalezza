@@ -166,15 +166,18 @@ class Pedido_controller extends Controller
             ->findOrFail($pedido_pk);
         return view('ticket', compact('pedido'));
     }
-    
+
     public function mostrar(){
-        $datosPedido = Pedido::with('detalle_pedido.producto.tipo_producto')->get();
         $USUARIO_PK = session('usuario_pk');
-        if ($USUARIO_PK) {
-            return view('ventas', compact('datosPedido'));
-        } else {
+        if (!$USUARIO_PK) {
             return redirect('/login');
         }
+
+        $datosPedido = Pedido::with('detalle_pedido.producto.tipo_producto')->get();
+        $datosTipo_pago = Tipo_pago::all();
+        $datosMedio_pedido = Medio_pedido::all();
+
+        return view('ventas', compact('datosPedido', 'datosTipo_pago', 'datosMedio_pedido'));
     }
 
     public function filtrar(Request $req){

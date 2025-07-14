@@ -13,8 +13,10 @@ class Corte_caja extends Model
     protected $fillable = [
         'fecha_corte_inicio',
         'fecha_corte_fin',
+        'efectivo_inicial',
         'cantidad_ventas',
-        'ganancia_total'
+        'ganancia_total',
+        'utilidad_neta'
     ];
     public $timestamps=false;
     public function empleados() {

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('domicilio_pk')->autoIncrement();
             $table->string('calle', 50);
             $table->integer('numero_externo');
-            $table->integer('numero_interno')->nullable();
+            $table->string('numero_interno')->nullable();
             $table->text('referencias')->nullable();
         });
     }
