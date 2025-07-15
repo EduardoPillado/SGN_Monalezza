@@ -190,10 +190,21 @@
                     const lastShown = localStorage.getItem('modalLastShown');
                     const today = new Date().toDateString();
                     
-                    if (!lastShown || lastShown !== today) {
-                        this.modalOpen = true;
-                        localStorage.setItem('modalLastShown', today);
-                    }
+                    fetch('/verificarRegistro')
+                        .then(response => {
+                            if (!response.ok) throw new Error('Error en la respuesta');
+                            return response.json();
+                        })
+                        .then(data => {
+                            if ((!lastShown || lastShown !== data.hoy) || !data.registroHoy) {
+                                this.modalOpen = true;
+                                localStorage.setItem('modalLastShown', data.hoy);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            // this.modalOpen = true;
+                        });
                 }
             }" x-show="modalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
                 <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
