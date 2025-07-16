@@ -100,9 +100,9 @@
                                     <td class="text-right py-2">
                                         <a href="{{ route('producto.datosParaEdicion', $dato->producto_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
                                         @if ($dato->estatus_producto)
-                                            <a href="{{ route('producto.baja', $dato->producto_pk) }}" onclick="confirmarBaja(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
+                                            <a href="{{ route('producto.baja', $dato->producto_pk) }}" onclick="confirmarBajaProducto(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
                                         @else
-                                            <a href="{{ route('producto.alta', $dato->producto_pk) }}" onclick="confirmarAlta(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
+                                            <a href="{{ route('producto.alta', $dato->producto_pk) }}" onclick="confirmarAltaProducto(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
                                         @endif
                                     </td>
                                 @endif
@@ -115,7 +115,7 @@
                 <button data-modal-open="modal-producto" class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo producto</button>
             </div>
 
-            <h1 class="text-2xl font-bold mb-4">Tipo de producto</h1>
+            <h1 class="text-2xl font-bold mb-4">Tipos de producto</h1>
             <div class="bg-white shadow-md rounded-lg p-4">
                 <table id="tabla-tipo-producto" class="w-full">
                     <thead>
@@ -138,9 +138,9 @@
                                     <a href="{{ route('tipo_producto.datosParaEdicion', $dato->tipo_producto_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
 
                                     @if ($dato->estatus_tipo_producto == 1)
-                                        <a href="{{ route('tipo_producto.baja', $dato->tipo_producto_pk) }}" onclick="confirmarBaja(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
+                                        <a href="{{ route('tipo_producto.baja', $dato->tipo_producto_pk) }}" onclick="confirmarBajaTipoProducto(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
                                     @else
-                                        <a href="{{ route('tipo_producto.alta', $dato->tipo_producto_pk) }}" onclick="confirmarAlta(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
+                                        <a href="{{ route('tipo_producto.alta', $dato->tipo_producto_pk) }}" onclick="confirmarAltaTipoProducto(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
                                     @endif
                                 </td>
                             </tr>
@@ -205,8 +205,8 @@
                 }
             });
 
-            // Alerta de confirmación de baja
-            function confirmarBaja(event) {
+            // Alerta de confirmación de baja de producto
+            function confirmarBajaProducto(event) {
                 event.preventDefault();
     
                 const link = event.target.closest('a');
@@ -214,7 +214,7 @@
                 if (link) {
                     Swal.fire({
                         title: '¿Seguro?',
-                        text: '¿Deseas dar de baja a este producto?',
+                        text: '¿Deseas dar de baja este producto?',
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, dar de baja',
@@ -227,8 +227,8 @@
                 }
             }
 
-            // Alerta de confirmación de alta
-            function confirmarAlta(event) {
+            // Alerta de confirmación de alta de producto
+            function confirmarAltaProducto(event) {
                 event.preventDefault();
     
                 const link = event.target.closest('a');
@@ -236,7 +236,51 @@
                 if (link) {
                     Swal.fire({
                         title: '¿Seguro?',
-                        text: '¿Deseas dar de alta a este producto?',
+                        text: '¿Deseas dar de alta este producto?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, dar de alta',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = link.href;
+                        }
+                    });
+                }
+            }
+
+            // Alerta de confirmación de baja de tipo de producto
+            function confirmarBajaTipoProducto(event) {
+                event.preventDefault();
+    
+                const link = event.target.closest('a');
+    
+                if (link) {
+                    Swal.fire({
+                        title: '¿Seguro?',
+                        text: '¿Deseas dar de baja este tipo de producto?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, dar de baja',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = link.href;
+                        }
+                    });
+                }
+            }
+
+            // Alerta de confirmación de alta de tipo de producto
+            function confirmarAltaTipoProducto(event) {
+                event.preventDefault();
+    
+                const link = event.target.closest('a');
+    
+                if (link) {
+                    Swal.fire({
+                        title: '¿Seguro?',
+                        text: '¿Deseas dar de alta este tipo de producto?',
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, dar de alta',

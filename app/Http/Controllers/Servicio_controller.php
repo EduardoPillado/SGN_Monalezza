@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Servicio;
+use App\Models\Tipo_gasto;
+use Illuminate\Support\Str;
 
 class Servicio_controller extends Controller
 {
@@ -12,10 +14,24 @@ class Servicio_controller extends Controller
             $nombreTipoGasto = $servicio->tipo_gasto->nombre_tipo_gasto ?? 'Desconocido';
     
             // Clasificación de origen
-            if (in_array($nombreTipoGasto, ['Ingredientes', 'Bebidas'])) {
-                $origen = $nombreTipoGasto;
-            } else {
-                $origen = 'Servicio'; // Cualquier otro caso es 'Servicio'
+            $palabrasClave = [
+                'ingrediente' => 'Ingredientes',
+                'comida' => 'Ingredientes',
+                'alimento' => 'Ingredientes',
+                'bebida' => 'Bebidas',
+                'refresco' => 'Bebidas',
+                'licor' => 'Bebidas',
+                'agua' => 'Bebidas',
+            ];
+
+            $lowerNombre = strtolower($nombreTipoGasto);
+            $origen = 'Servicio'; // Valor por defecto
+
+            foreach ($palabrasClave as $palabra => $categoria) {
+                if (Str::contains($lowerNombre, $palabra)) {
+                    $origen = $categoria;
+                    break;
+                }
             }
     
             return [
@@ -26,12 +42,15 @@ class Servicio_controller extends Controller
                 'pk' => $servicio->servicio_pk,
             ];
         });
+        
+        $datosTipoGasto=Tipo_gasto::where('estatus_tipo_gasto', '=', 1)->get();
+        $datosTipo_gasto = Tipo_gasto::all();
     
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
             $ROL = session('nombre_rol');
             if ($ROL == 'Administrador') {
-                return view('gastos', compact('datosServicio'));
+                return view('gastos', compact('datosServicio', 'datosTipoGasto', 'datosTipo_gasto'));
             } else {
                 return back()->with('message', 'No puedes acceder');
             }
@@ -74,11 +93,12 @@ class Servicio_controller extends Controller
 
     public function datosParaEdicion($servicio_pk){
         $datosServicio = Servicio::findOrFail($servicio_pk);
+        $datosTipoGasto=Tipo_gasto::where('estatus_tipo_gasto', '=', 1)->get();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
             $ROL = session('nombre_rol');
             if ($ROL == 'Administrador') {
-                return view('editarGasto', compact('datosServicio'));
+                return view('editarGasto', compact('datosServicio', 'datosTipoGasto'));
             } else {
                 return back()->with('warning', 'No puedes acceder');
             }

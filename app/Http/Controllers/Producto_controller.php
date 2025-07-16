@@ -98,8 +98,9 @@ class Producto_controller extends Controller
 
         $datosProducto = $query->get();
         $datosTipoProducto = Tipo_producto::where('estatus_tipo_producto', '=', 1)->get();
+        $allTipoProducto = Tipo_producto::all();
 
-        return view('productos', compact('datosProducto', 'datosTipoProducto'));
+        return view('productos', compact('datosProducto', 'datosTipoProducto', 'allTipoProducto'));
     }
 
     public function baja($producto_pk){

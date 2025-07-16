@@ -35,16 +35,6 @@ class Mesa_controller extends Controller
         }
     }
 
-    public function mostrar(){
-        $datosMesa = Mesa::all();
-        $USUARIO_PK = session('usuario_pk');
-        if ($USUARIO_PK) {
-            return view('reservas', compact('datosMesa'));
-        } else {
-            return redirect('/login');
-        }
-    }
-
      public function datosParaEdicion($mesa_pk){
         $datosMesa = Mesa::findOrFail($mesa_pk);
         $USUARIO_PK = session('usuario_pk');

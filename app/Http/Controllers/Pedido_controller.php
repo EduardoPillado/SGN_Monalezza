@@ -197,8 +197,10 @@ class Pedido_controller extends Controller
         }
 
         $datosPedido = $query->get();
+        $datosTipo_pago = Tipo_pago::all();
+        $datosMedio_pedido = Medio_pedido::all();
 
-        return view('ventas', compact('datosPedido'));
+        return view('ventas', compact('datosPedido', 'datosTipo_pago', 'datosMedio_pedido'));
     }
 
     public function datosParaEdicion($pedido_pk){

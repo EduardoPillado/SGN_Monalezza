@@ -12,11 +12,6 @@
 
 <body class="h-full bg-gray-100 overflow-hidden">
 
-    @php
-        use App\Models\Tipo_gasto;
-        $datosTipoGasto=Tipo_gasto::where('estatus_tipo_gasto', '=', 1)->get();
-    @endphp
-
     <div class="h-screen flex flex-col">
         @include('sidebar')
 

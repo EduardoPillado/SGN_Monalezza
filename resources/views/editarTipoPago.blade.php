@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('img/monalezza.ico') }}" rel="icon">
-    <title>Edición de Tipo de Pago - La Monalezza</title>
+    <title>Edición de Método de Pago - La Monalezza</title>
     {{-- Tailwind --}}
     @vite('resources/css/app.css')
 </head>
@@ -16,14 +16,14 @@
         @include('sidebar')
 
         <div class="flex-grow overflow-y-auto p-4">
-            <h1 class="text-2xl font-bold mb-4">Edición de Tipo de Pago</h1>
+            <h1 class="text-2xl font-bold mb-4">Edición de Método de Pago</h1>
             <div class="bg-white shadow-md rounded-lg p-4">
                 <form action="{{ route('tipo_pago.actualizar', $datosTipo_pago->tipo_pago_pk) }}" method="post">
                     @csrf
                     @method('put')
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="mb-4">
-                            <label for="nombre_tipo_pago" class="block text-sm font-medium text-gray-700">Nombre de tipo de pago</label>
+                            <label for="nombre_tipo_pago" class="block text-sm font-medium text-gray-700">Nombre del método de pago</label>
                             <input type="text" id="nombre_tipo_pago" name="nombre_tipo_pago" value="{{ $datosTipo_pago->nombre_tipo_pago }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         </div>
