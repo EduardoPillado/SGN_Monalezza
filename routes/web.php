@@ -209,7 +209,7 @@ Route::match(['get', 'put'], '/dandoDeAltaIngrediente/{ingrediente_pk}', [Ingred
 
 // Reserva ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Route::get('/reservas', [Reserva_controller::class, 'mostrar'], [Mesa_controller::class, 'mostrar'])->name('reserva.mostrar', 'mesa.mostrar');
+Route::get('/reservas', [Reserva_controller::class, 'mostrar'])->name('reserva.mostrar');
 Route::post('/registrandoReserva', [Reserva_controller::class, 'insertar'])->name('reserva.insertar');
 Route::get('/editarReserva/{reserva_pk}', [Reserva_controller::class, 'datosParaEdicion'])->name('reserva.datosParaEdicion');
 Route::put('/editandoReserva/{reserva_pk}', [Reserva_controller::class, 'actualizar'])->name('reserva.actualizar');
@@ -219,8 +219,8 @@ Route::match(['get', 'put'], '/marcandoCancelacionReserva/{reserva_pk}', [Reserv
 Route::get('/reservasFiltradas', [Reserva_controller::class, 'filtrar'])->name('reserva.filtrar');
 
 Route::post('/registrandoMesa', [Mesa_controller::class, 'insertar'])->name('mesa.insertar');
-Route::get('/editarMesa/{mesa_pk}', [Mesa_controller::class, 'datosParaEdicion'])->name('mesa.datosParaEdicion');
-Route::put('/editandoMesa/{mesa_pk}', [Mesa_controller::class, 'actualizar'])->name('mesa.actualizar');
+Route::match(['get', 'put'], '/dandoDeBajaMesa/{mesa_pk}', [Mesa_controller::class, 'baja'])->name('mesa.baja');
+Route::match(['get', 'put'], '/dandoDeAltaMesa/{mesa_pk}', [Mesa_controller::class, 'alta'])->name('mesa.alta');
 Route::get('/editarMesa/{mesa_pk}', [Mesa_controller::class, 'datosParaEdicion'])->name('mesa.datosParaEdicion');
 Route::put('/editandoMesa/{mesa_pk}', [Mesa_controller::class, 'actualizar'])->name('mesa.actualizar');
 
@@ -228,7 +228,7 @@ Route::put('/editandoMesa/{mesa_pk}', [Mesa_controller::class, 'actualizar'])->n
 
 // Gasto -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Route::get('/gastos', [Servicio_controller::class, 'mostrar'], [Tipo_gasto_controller::class, 'mostrar'])->name('gasto.mostrar', 'tipo_gasto.mostrar');
+Route::get('/gastos', [Servicio_controller::class, 'mostrar'])->name('gasto.mostrar');
 Route::post('/registrandoGasto', [Servicio_controller::class, 'insertar'])->name('gasto.insertar');
 Route::get('/editarGasto/{servicio_pk}', [Servicio_controller::class, 'datosParaEdicion'])->name('gasto.datosParaEdicion');
 Route::put('/editandoGasto/{servicio_pk}', [Servicio_controller::class, 'actualizar'])->name('gasto.actualizar');

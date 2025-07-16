@@ -23,7 +23,7 @@
                     @method('put')
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="mb-4">
-                            <label for="nombre_tipo_producto" class="block text-sm font-medium text-gray-700">Nombre de tipo de producto</label>
+                            <label for="nombre_tipo_producto" class="block text-sm font-medium text-gray-700">Nombre del tipo de producto</label>
                             <input type="text" id="nombre_tipo_producto" name="nombre_tipo_producto" value="{{ $datosTipo_producto->nombre_tipo_producto }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         </div>

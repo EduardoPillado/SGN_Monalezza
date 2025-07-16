@@ -12,14 +12,6 @@
 
 <body class="h-full bg-gray-100 overflow-hidden">
 
-    @php
-        use App\Models\Cliente;
-        $datosCliente=Cliente::all();
-
-        use App\Models\Mesa;
-        $datosMesa=Mesa::all();
-    @endphp
-
     <div class="h-screen flex flex-col">
         @include('sidebar')
 
@@ -48,7 +40,7 @@
                                 <label for="cliente_fk" class="block font-semibold mb-1">Por cliente:</label>
                                 <select name="cliente_fk" id="cliente_fk" class="w-full border border-gray-300 rounded px-3 py-2">
                                     <option value="">Todos los clientes</option>
-                                    @foreach($datosCliente as $cliente)
+                                    @foreach($clientes as $cliente)
                                         <option value="{{ $cliente->cliente_pk }}" {{ request('cliente_fk') == $cliente->cliente_pk ? 'selected' : '' }}>
                                             {{ $cliente->nombre_cliente }}
                                         </option>
@@ -148,7 +140,11 @@
                         @foreach ( $datosMesa as $dato )
                             <tr class="border-b cursor-pointer">
                                 <td class="py-2">{{ $dato->numero_mesa }}</td>
-                                <td class="py-2">{{ $dato->ubicacion }}</td>
+                                @if ( $dato->ubicacion )
+                                    <td class="py-2">{{ $dato->ubicacion }}</td>
+                                @else
+                                    <td class="py-2"><em>Sin ubicación</em></td>
+                                @endif
                                 @if ( $dato->estatus_mesa == 1 )
                                     <td class="py-2">Activo</td>
                                 @else
@@ -158,9 +154,9 @@
                                     <a href="{{ route('mesa.datosParaEdicion', $dato->mesa_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
 
                                     @if ($dato->estatus_mesa == 1)
-                                        <a href="{{ route('mesa.baja', $dato->mesa_pk) }}" onclick="confirmarBaja(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
+                                        <a href="{{ route('mesa.baja', $dato->mesa_pk) }}" onclick="confirmarBajaMesa(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
                                     @else
-                                        <a href="{{ route('mesa.alta', $dato->mesa_pk) }}" onclick="confirmarAlta(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
+                                        <a href="{{ route('mesa.alta', $dato->mesa_pk) }}" onclick="confirmarAltaMesa(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
                                     @endif
                                 </td>
                             </tr>
@@ -290,6 +286,50 @@
                     });
                 }
             }
+
+            // Alerta de confirmación de baja de mesa
+            function confirmarBajaMesa(event) {
+                event.preventDefault();
+    
+                const link = event.target.closest('a');
+    
+                if (link) {
+                    Swal.fire({
+                        title: '¿Seguro?',
+                        text: '¿Deseas dar de baja esta mesa?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, dar de baja',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = link.href;
+                        }
+                    });
+                }
+            }
+
+            // Alerta de confirmación de alta de mesa
+            function confirmarAltaMesa(event) {
+                event.preventDefault();
+    
+                const link = event.target.closest('a');
+    
+                if (link) {
+                    Swal.fire({
+                        title: '¿Seguro?',
+                        text: '¿Deseas dar de alta esta mesa?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, dar de alta',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = link.href;
+                        }
+                    });
+                }
+            }
         </script>
 
         <!-- Modal de registro de reserva -->
@@ -309,7 +349,7 @@
                                 </label>
                                 <select name="cliente_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                                     <option value="">Selecciona el cliente</option>
-                                    @foreach ($datosCliente as $dato)
+                                    @foreach ($clientes as $dato)
                                         <option value="{{ $dato->cliente_pk }}">{{ $dato->nombre_cliente }}</option>
                                     @endforeach
                                 </select>
@@ -334,7 +374,7 @@
                                             </label>
                                             <select name="mesas[]" class="w-full rounded-md border-gray-300 mb-2" required>
                                                 <option value="">Selecciona número de mesa</option>
-                                                @foreach ($datosMesa as $dato)
+                                                @foreach ($mesas as $dato)
                                                     <option value="{{ $dato->mesa_pk }}">{{ $dato->numero_mesa }}</option>
                                                 @endforeach
                                             </select>
@@ -375,7 +415,7 @@
                                 </label>
                                 <input type="number" id="numero_mesa" name="numero_mesa" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                                 <label for="ubicacion" class="block text-sm font-medium text-gray-700">Ubicación</label>
-                                <input type="text" id="ubicacion" name="ubicacion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                                <input type="text" id="ubicacion" name="ubicacion" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                             </div>
                             <div class="items-center px-4 py-3">
                                 <button type="button" data-modal-cancel="modal-mesa" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
@@ -438,7 +478,7 @@
                     <div class="flex flex-col w-3/4">
                         <select name="mesas[]" class="w-full rounded-md border-gray-300 mb-2" required>
                             <option value="">Selecciona número de mesa</option>
-                            @foreach ($datosMesa as $dato)
+                            @foreach ($mesas as $dato)
                                 <option value="{{ $dato->mesa_pk }}">{{ $dato->numero_mesa }}</option>
                             @endforeach
                         </select>

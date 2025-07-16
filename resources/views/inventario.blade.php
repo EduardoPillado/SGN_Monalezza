@@ -134,7 +134,7 @@
                                     <td class="py-2">{{ $dato->producto->nombre_producto }}</td>
                                 @endif
                                 <td class="py-2">{{ $dato->fecha_inventario }}</td>
-                                <td class="py-2">{{ $dato->cantidad_inventario }} u</td>
+                                <td class="py-2">{{ $dato->cantidad_inventario }} paq</td>
                                 <td class="py-2">{{ $dato->cantidad_paquete }} gr/ml/u</td>
                                 <td class="py-2">{{ $dato->cantidad_parcial }} gr/ml/u</td>
                                 <td class="py-2">{{ $dato->proveedor->nombre_proveedor }}</td>

@@ -89,10 +89,13 @@ class Reserva_controller extends Controller
     }
 
     public function mostrar(){
-        $datosReserva = Reserva::with('mesas', 'cliente')->get();
+        $datosReserva = Reserva::all();
+        $mesas = Mesa::where('estatus_mesa', '=', 1)->get();
+        $clientes = Cliente::all();
+        $datosMesa = Mesa::all();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            return view('reservas', compact('datosReserva'));
+            return view('reservas', compact('datosReserva', 'mesas', 'clientes', 'datosMesa'));
         } else {
             return redirect('/login');
         }
@@ -118,11 +121,11 @@ class Reserva_controller extends Controller
         }
 
         $datosReserva = $query->orderBy('fecha_hora_reserva', 'desc')->get();
+        $mesas = Mesa::where('estatus_mesa', '=', 1)->get();
+        $clientes = Cliente::all();
+        $datosMesa = Mesa::all();
 
-        // Para mostrar los clientes en el select
-        $datosCliente = Cliente::all();
-
-        return view('reservas', compact('datosReserva', 'datosCliente'));
+        return view('reservas', compact('datosReserva', 'mesas', 'clientes', 'datosMesa'));
     }
 
     public function pendiente($reserva_pk){

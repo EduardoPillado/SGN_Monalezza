@@ -31,16 +31,6 @@ class Tipo_gasto_controller extends Controller
         }
     }
 
-     public function mostrar(){
-        $datosTipo_gasto = Tipo_gasto::all();
-        $USUARIO_PK = session('usuario_pk');
-        if ($USUARIO_PK) {
-            return view('gastos', compact('datosTipo_gasto'));
-        } else {
-            return redirect('/login');
-        }
-    }
-
      public function datosParaEdicion($tipo_gasto_pk){
         $datosTipo_gasto = Tipo_gasto::findOrFail($tipo_gasto_pk);
         $USUARIO_PK = session('usuario_pk');
@@ -68,11 +58,11 @@ class Tipo_gasto_controller extends Controller
             'nombre_tipo_gasto.unique' => 'El nombre de tipo de gasto ya existe.',
         ]);
 
-        $tipo_gasto->nombre_medio_pedido=$req->nombre_medio_pedido;
+        $tipo_gasto->nombre_tipo_gasto=$req->nombre_tipo_gasto;
 
         $tipo_gasto->save();
 
-        if ($tipo_gasto->medio_pedido_pk) {
+        if ($tipo_gasto->tipo_gasto_pk) {
             return redirect('/gastos')->with('success', 'Tipo de gasto actualizado');
         } else {
             return back()->with('error', 'Hay algún problema con la información');

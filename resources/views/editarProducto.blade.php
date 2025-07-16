@@ -111,7 +111,7 @@
                     @endforeach
                 </select>
 
-                <input type="number" name="cantidades_necesarias[]" class="ml-2 w-20 rounded-md border-gray-300" required>
+                <input type="number" name="cantidades_necesarias[]" class="ml-2 w-25 rounded-md border-gray-300" required>
 
                 <button type="button" class="ml-2 px-2 py-1 bg-red-500 text-white rounded-md remove-ingrediente">Eliminar</button>
             `;

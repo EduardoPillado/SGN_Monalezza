@@ -31,16 +31,6 @@ class Tipo_producto_controller extends Controller
         }
     }
 
-    //  public function mostrar(){
-    //     $datosTipo_producto = Tipo_producto::all();
-    //     $USUARIO_PK = session('usuario_pk');
-    //     if ($USUARIO_PK) {
-    //         return view('productos', compact('datosTipo_producto'));
-    //     } else {
-    //         return redirect('/login');
-    //     }
-    // }
-
      public function datosParaEdicion($tipo_producto_pk){
         $datosTipo_producto = Tipo_Producto::findOrFail($tipo_producto_pk);
         $USUARIO_PK = session('usuario_pk');

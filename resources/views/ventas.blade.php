@@ -130,7 +130,7 @@
                 </table>
             </div>
 
-            <h1 class="text-2xl font-bold mb-4">Tipo de Pago</h1>
+            <h1 class="text-2xl font-bold mb-4">Métodos de Pago</h1>
             <div class="bg-white shadow-md rounded-lg p-4">
                 <table id="tabla-tipo-pago" class="w-full">
                     <thead>
@@ -153,9 +153,9 @@
                                     <a href="{{ route('tipo_pago.datosParaEdicion', $dato->tipo_pago_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
 
                                     @if ($dato->estatus_tipo_pago == 1)
-                                        <a href="{{ route('tipo_pago.baja', $dato->tipo_pago_pk) }}" onclick="confirmarBaja(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
+                                        <a href="{{ route('tipo_pago.baja', $dato->tipo_pago_pk) }}" onclick="confirmarBajaTipoPago(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
                                     @else
-                                        <a href="{{ route('tipo_pago.alta', $dato->tipo_pago_pk) }}" onclick="confirmarAlta(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
+                                        <a href="{{ route('tipo_pago.alta', $dato->tipo_pago_pk) }}" onclick="confirmarAltaTipoPago(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
                                     @endif
                                 </td>
                             </tr>
@@ -167,7 +167,7 @@
                 <button data-modal-open="modal-tipo-pago" class="bg-green-500 text-white px-4 py-2 rounded">Registrar nuevo tipo de pago</button>
             </div>
 
-            <h1 class="text-2xl font-bold mb-4">Medio de Pedido</h1>
+            <h1 class="text-2xl font-bold mb-4">Medios de Pedido</h1>
             <div class="bg-white shadow-md rounded-lg p-4">
                 <table id="tabla-medio-pedido" class="w-full">
                     <thead>
@@ -190,9 +190,9 @@
                                     <a href="{{ route('medio_pedido.datosParaEdicion', $dato->medio_pedido_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Editar</a>
 
                                     @if ($dato->estatus_medio_pedido == 1)
-                                        <a href="{{ route('medio_pedido.baja', $dato->medio_pedido_pk) }}" onclick="confirmarBaja(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
+                                        <a href="{{ route('medio_pedido.baja', $dato->medio_pedido_pk) }}" onclick="confirmarBajaMedioPedido(event)" class="bg-red-500 text-white px-2 py-1 rounded">Dar de baja</a>
                                     @else
-                                        <a href="{{ route('medio_pedido.alta', $dato->medio_pedido_pk) }}" onclick="confirmarAlta(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
+                                        <a href="{{ route('medio_pedido.alta', $dato->medio_pedido_pk) }}" onclick="confirmarAltaMedioPedido(event)" class="bg-green-500 text-white px-2 py-1 rounded">Dar de alta</a>
                                     @endif
                                 </td>
                             </tr>
@@ -235,11 +235,11 @@
             </div>
         </div>
 
-        <!-- Modal de registro de tipo de pago -->
+        <!-- Modal de registro de método de pago -->
         <div data-modal="modal-tipo-pago" style="display: none;" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                 <div class="mt-3 text-center">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nuevo Tipo de Pago</h3>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Registrar Nuevo Método de Pago</h3>
                     <div class="mt-2 px-7 py-3">
                         <p class="text-sm text-gray-600 mb-3">
                             <span class="text-red-500">*</span> Campo necesario</p>
@@ -252,7 +252,7 @@
                                 <input type="text" id="nombre_tipo_pago" name="nombre_tipo_pago" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
                             </div>
                             <div class="items-center px-4 py-3">
-                                <button type="button" data-modal="modal-tipo-pago" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                <button type="button" data-modal-cancel="modal-tipo-pago" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300">
                                     Cancelar
                                 </button>
                                 <button type="submit" class="mt-3 px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
@@ -381,6 +381,94 @@
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, deshacer',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = link.href;
+                        }
+                    });
+                }
+            }
+
+            // Alerta de confirmación de baja de método de pago
+            function confirmarBajaTipoPago(event) {
+                event.preventDefault();
+    
+                const link = event.target.closest('a');
+    
+                if (link) {
+                    Swal.fire({
+                        title: '¿Seguro?',
+                        text: '¿Deseas dar de baja este método de pago?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, dar de baja',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = link.href;
+                        }
+                    });
+                }
+            }
+
+            // Alerta de confirmación de alta de método de pago
+            function confirmarAltaTipoPago(event) {
+                event.preventDefault();
+    
+                const link = event.target.closest('a');
+    
+                if (link) {
+                    Swal.fire({
+                        title: '¿Seguro?',
+                        text: '¿Deseas dar de alta este método de pago?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, dar de alta',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = link.href;
+                        }
+                    });
+                }
+            }
+
+            // Alerta de confirmación de baja de medio de pedido
+            function confirmarBajaMedioPedido(event) {
+                event.preventDefault();
+    
+                const link = event.target.closest('a');
+    
+                if (link) {
+                    Swal.fire({
+                        title: '¿Seguro?',
+                        text: '¿Deseas dar de baja este medio de pedido?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, dar de baja',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = link.href;
+                        }
+                    });
+                }
+            }
+
+            // Alerta de confirmación de alta de medio de pedido
+            function confirmarAltaMedioPedido(event) {
+                event.preventDefault();
+    
+                const link = event.target.closest('a');
+    
+                if (link) {
+                    Swal.fire({
+                        title: '¿Seguro?',
+                        text: '¿Deseas dar de alta este medio de pedido?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, dar de alta',
                         cancelButtonText: 'Cancelar',
                     }).then((result) => {
                         if (result.isConfirmed) {

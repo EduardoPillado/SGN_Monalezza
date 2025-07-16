@@ -14,9 +14,6 @@
 
     @php
         use Carbon\Carbon;
-
-        use App\Models\Tipo_gasto;
-        $datosTipoGasto=Tipo_gasto::where('estatus_tipo_gasto', '=', 1)->get();
     @endphp
 
     <div class="h-screen flex flex-col">
@@ -65,7 +62,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ( $datosTipoGasto as $dato )
+                        @foreach ( $datosTipo_gasto as $dato )
                             <tr class="border-b cursor-pointer">
                                 <td class="py-2">{{ $dato->nombre_tipo_gasto }}</td>
                                 @if ( $dato->estatus_tipo_gasto == 1 )
@@ -113,7 +110,7 @@
                 });
             });
 
-            // Alerta de confirmación de baja
+            // Alerta de confirmación de baja tipo de gasto
             function confirmarBaja(event) {
                 event.preventDefault();
     
@@ -122,7 +119,7 @@
                 if (link) {
                     Swal.fire({
                         title: '¿Seguro?',
-                        text: '¿Deseas dar de baja el gasto registrado?',
+                        text: '¿Deseas dar de baja el tipo de gasto?',
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, dar de baja',
@@ -135,7 +132,7 @@
                 }
             }
 
-            // Alerta de confirmación de alta
+            // Alerta de confirmación de alta tipo de gasto
             function confirmarAlta(event) {
                 event.preventDefault();
     
@@ -144,7 +141,7 @@
                 if (link) {
                     Swal.fire({
                         title: '¿Seguro?',
-                        text: '¿Deseas dar de alta el gasto registrado?',
+                        text: '¿Deseas dar de alta el tipo de gasto?',
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, dar de alta',
