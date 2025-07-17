@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
             // Indicador de cuantas reservas hay para el día en curso
             $hoy = Carbon::now()->toDateString();
             $cantidadReservasHoy = Reserva::whereDate('fecha_hora_reserva', $hoy)
-                ->where('estatus_reserva', 0)
+                ->where('estatus_reserva', 1)
                 ->count();
 
             $view->with([
