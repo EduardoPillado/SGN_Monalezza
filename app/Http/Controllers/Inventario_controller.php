@@ -153,34 +153,59 @@ class Inventario_controller extends Controller
     }
 
     public function obtenerStockPorProducto($producto_fk){
-        $producto = Inventario::where('producto_fk', $producto_fk)
-            ->first();
+        // Buscar el producto con su tipo de producto
+        $producto = Producto::with('tipo_producto')->find($producto_fk);
 
-        if ($producto) {
-            $estadoStock = $producto->cantidad_inventario <= $producto->cantidad_inventario_minima
+        if (!$producto) {
+            return response()->json(['error' => 'Producto no encontrado'], 404);
+        }
+
+        // Tipos de producto que no se gestionan por inventario
+        $tiposExcluidos = Tipo_producto::where(function($query) {
+            $query->where('nombre_tipo_producto', 'like', '%pizza%')
+                ->orWhere('nombre_tipo_producto', 'like', '%mediana%')
+                ->orWhere('nombre_tipo_producto', 'like', '%familiar%')
+                ->orWhere('nombre_tipo_producto', 'like', '%mega%')
+                ->orWhere('nombre_tipo_producto', 'like', '%cuadrada%');
+        })->pluck('tipo_producto_pk');
+
+        // Si el tipo del producto es uno de los excluidos, no se muestra stock
+        if ($tiposExcluidos->contains($producto->tipo_producto_fk)) {
+            return response()->json([
+                'estadoStock' => 'No aplica',
+                'mensaje' => 'Este producto no se gestiona en el inventario'
+            ]);
+        }
+
+        // Buscar el inventario si no es tipo excluido
+        $inventario = Inventario::where('producto_fk', $producto_fk)->first();
+
+        if ($inventario) {
+            $estadoStock = $inventario->cantidad_inventario <= $inventario->cantidad_inventario_minima
                 ? 'En riesgo'
                 : 'Disponible';
 
             return response()->json([
                 'estadoStock' => $estadoStock,
-                'cantidad_inventario' => $producto->cantidad_inventario,
-                'cantidad_inventario_minima' => $producto->cantidad_inventario_minima
+                'cantidad_inventario' => $inventario->cantidad_inventario,
+                'cantidad_inventario_minima' => $inventario->cantidad_inventario_minima
             ]);
         }
 
-        return response()->json(['error' => 'Producto no encontrado'], 404);
+        // Si no hay inventario registrado, pero debería haberlo (y no está en tipos excluidos)
+        return response()->json([
+            'estadoStock' => 'En riesgo',
+            'cantidad_inventario' => 0,
+            'cantidad_inventario_minima' => 0,
+            'mensaje' => 'Sin registros de inventario'
+        ]);
     }
 
     public function datosParaEdicion($inventario_pk){
         $datosInventario = Inventario::findOrFail($inventario_pk);
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            $ROL = session('nombre_rol');
-            if ($ROL == 'Administrador') {
-                return view('actualizarStock', compact('datosInventario'));
-            } else {
-                return back()->with('warning', 'No puedes acceder');
-            }
+            return view('actualizarStock', compact('datosInventario'));
         } else {
             return redirect('/login');
         }

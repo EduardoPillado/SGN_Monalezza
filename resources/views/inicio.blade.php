@@ -287,17 +287,22 @@
                                     console.log(data.error);
                                     return;
                                 }
-                                const stockMessage = data.estadoStock === 'En riesgo'
-                                    ? '<span style="color: red; font-weight: bold;"> (Stock en riesgo)</span>'
-                                    : '<span style="color: green; font-weight: bold;"> (Stock disponible)</span>';
-                                
+
+                                let stockMessage = '';
+                                if (data.estadoStock === 'En riesgo') {
+                                    stockMessage = '<span style="color: red; font-weight: bold;"> (Stock en riesgo)</span>';
+                                } else if (data.estadoStock === 'Disponible') {
+                                    stockMessage = '<span style="color: green; font-weight: bold;"> (Stock disponible)</span>';
+                                } else if (data.estadoStock === 'No aplica') {
+                                    stockMessage = '';
+                                }
+
                                 // Actualizar el contenido del span con el mensaje de stock
                                 const productInfo = document.getElementById(`product-info-${productId}`);
                                 productInfo.innerHTML = `${productName} (${productType}) - $${productPrice}${stockMessage}`;
                             })
                             .catch(error => {
                                 console.log('Error al obtener el estado del stock:', error);
-                                // Indicador de stock
                             });
                     } else {
                         // Si ya existe, incrementa la cantidad
@@ -469,7 +474,7 @@
                         allowOutsideClick: false,
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = "{{ route('ticket.mostrar', ['pedido_pk' => Session::get('pedido_pk')]) }}";
+                            const win = window.open("{{ route('ticket.mostrar', ['pedido_pk' => Session::get('pedido_pk')]) }}", "_blank");
                         }
                     });
                 </script>
@@ -484,7 +489,7 @@
                         allowOutsideClick: false,
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = "{{ route('ticket.mostrar', ['pedido_pk' => Session::get('pedido_pk')]) }}";
+                            const win = window.open("{{ route('ticket.mostrar', ['pedido_pk' => Session::get('pedido_pk')]) }}", "_blank");
                         }
                     });
                 </script>

@@ -24,6 +24,7 @@
         <thead>
             <tr>
                 <th>Producto</th>
+                <th>Tipo Producto</th>
                 <th>Cantidad Vendida</th>
                 <th>% Vendido</th>
                 <th>Precio Unitario ($)</th>
@@ -36,6 +37,7 @@
             @forelse ($productosVendidos as $dato)
                 <tr>
                     <td>{{ $dato->nombre_producto }}</td>
+                    <td>{{ $dato->nombre_tipo_producto }}</td>
                     <td>{{ $dato->cantidad_vendida }}</td>
                     <td>{{ number_format($dato->porcentaje_vendido, 2) }}%</td>
                     <td>${{ number_format($dato->precio_producto, 2) }}</td>
