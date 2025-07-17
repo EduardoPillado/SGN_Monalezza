@@ -18,13 +18,27 @@ class Servicio_controller extends Controller
                 'ingrediente' => 'Ingredientes',
                 'comida' => 'Ingredientes',
                 'alimento' => 'Ingredientes',
+                'extra' => 'Ingredientes',
+
+                'aderezo' => 'Aderezos',
+                'salsa' => 'Aderezos',
+                'condimento' => 'Aderezos',
+
+                'postre' => 'Postres',
+                'pastel' => 'Postres',
+                'gelatina' => 'Postres',
+                'pay' => 'Postres',
+
                 'bebida' => 'Bebidas',
                 'refresco' => 'Bebidas',
                 'licor' => 'Bebidas',
                 'agua' => 'Bebidas',
+                'café' => 'Bebidas',
+                'té' => 'Bebidas',
+                'jug' => 'Bebidas',
             ];
 
-            $lowerNombre = strtolower($nombreTipoGasto);
+            $lowerNombre = strtolower(trim($nombreTipoGasto));
             $origen = 'Servicio'; // Valor por defecto
 
             foreach ($palabrasClave as $palabra => $categoria) {

@@ -116,6 +116,7 @@ class Reserva_controller extends Controller
 
         // Filtrar por estatus
         $estatus = $req->input('estatus');
+        // Por estatus de reservación (atendida, pendiente, cancelada)
         if (in_array($estatus, ['0', '1', '2'])) {
             $query->where('estatus_reserva', $estatus);
         }
