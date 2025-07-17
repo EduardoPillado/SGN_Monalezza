@@ -69,6 +69,12 @@
             white-space: nowrap;
         }
 
+        .descripcion-producto {
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: 200px;
+        }
+
         .total {
             font-weight: bold;
         }
@@ -122,7 +128,9 @@
                 </tr>
                 @foreach ($pedido->productos as $producto)
                     <tr>
-                        <td>x{{ $producto->pivot->cantidad_producto }} {{ $producto->nombre_producto }} ({{ $producto->tipo_producto->nombre_tipo_producto }})</td>
+                        <td class="descripcion-producto">
+                            x{{ $producto->pivot->cantidad_producto }} {{ $producto->nombre_producto }} ({{ $producto->tipo_producto->nombre_tipo_producto }})
+                        </td>
                         <td>$ {{ number_format($producto->precio_producto * $producto->pivot->cantidad_producto, 2) }}</td>
                     </tr>
                 @endforeach
@@ -150,7 +158,7 @@
         window.onload = function() {
             window.print();
             window.onafterprint = function() {
-                window.location.href = "/";
+                window.close();
             };
         };
     </script>

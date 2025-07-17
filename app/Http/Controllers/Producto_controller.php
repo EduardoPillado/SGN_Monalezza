@@ -11,7 +11,7 @@ class Producto_controller extends Controller
 {
     public function insertar(Request $req){
         $req->validate([
-            'nombre_producto' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:producto,nombre_producto'],
+            'nombre_producto' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50'],
             'tipo_producto_fk' => ['required', 'exists:tipo_producto,tipo_producto_pk'],
             'precio_producto' => ['required', 'numeric', 'min:0.01', 'max:999999.99'],
             'imagen_producto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
@@ -20,7 +20,6 @@ class Producto_controller extends Controller
             'nombre_producto.required' => 'El nombre del producto es obligatorio.',
             'nombre_producto.regex' => 'El nombre del producto solo puede contener letras, números y espacios.',
             'nombre_producto.max' => 'El nombre del producto no puede tener más de :max caracteres.',
-            'nombre_producto.unique' => 'El nombre del producto ya existe.',
 
             'tipo_producto_fk.required' => 'El tipo de producto es obligatorio.',
             'tipo_producto_fk.exists' => 'El tipo de producto seleccionado no es válido.',
@@ -169,7 +168,7 @@ class Producto_controller extends Controller
         $datosProducto = Producto::findOrFail($producto_pk);
 
         $req->validate([
-            'nombre_producto' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:producto,nombre_producto,' . $producto_pk . ',producto_pk'],
+            'nombre_producto' => ['regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50'],
             'tipo_producto_fk' => ['exists:tipo_producto,tipo_producto_pk'],
             'precio_producto' => ['numeric', 'min:0.01', 'max:999999.99'],
             'imagen_producto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
@@ -177,7 +176,6 @@ class Producto_controller extends Controller
         ], [
             'nombre_producto.regex' => 'El nombre del producto solo puede contener letras, números y espacios.',
             'nombre_producto.max' => 'El nombre del producto no puede tener más de :max caracteres.',
-            'nombre_producto.unique' => 'El nombre del producto ya existe.',
 
             'tipo_producto_fk.exists' => 'El tipo de producto seleccionado no es válido.',
 

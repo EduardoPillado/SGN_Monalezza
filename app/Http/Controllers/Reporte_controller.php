@@ -74,17 +74,19 @@ class Reporte_controller extends Controller
         // Obtener productos vendidos
         $productosVendidos = DB::table('detalle_pedido')
             ->join('producto', 'detalle_pedido.producto_fk', '=', 'producto.producto_pk')
+            ->join('tipo_producto', 'producto.tipo_producto_fk', '=', 'tipo_producto.tipo_producto_pk')
             ->join('pedido', 'detalle_pedido.pedido_fk', '=', 'pedido.pedido_pk')
             ->whereBetween('pedido.fecha_hora_pedido', [$inicio, $fin])
             ->where('pedido.estatus_pedido', 0)
             ->select(
                 'producto.producto_pk',
                 'producto.nombre_producto',
+                'tipo_producto.nombre_tipo_producto',
                 'producto.precio_producto',
                 DB::raw('SUM(detalle_pedido.cantidad_producto) as cantidad_vendida'),
                 DB::raw('SUM(producto.precio_producto * detalle_pedido.cantidad_producto) as total_recaudado')
             )
-            ->groupBy('producto.producto_pk', 'producto.nombre_producto', 'producto.precio_producto')
+            ->groupBy('producto.producto_pk', 'producto.nombre_producto', 'tipo_producto.nombre_tipo_producto', 'producto.precio_producto')
             ->orderByDesc('cantidad_vendida')
             ->get();
 

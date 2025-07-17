@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('suma_efectivo_inicial');
             $table->integer('cantidad_ventas');
             $table->decimal('ganancia_total');
+            $table->decimal('suma_gasto_servicios');
             $table->decimal('utilidad_neta');
         });
     }
