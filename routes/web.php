@@ -23,6 +23,7 @@ use App\Http\Controllers\Tipo_producto_controller;
 use App\Http\Controllers\Detalle_efectivo_controller;
 use App\Http\Controllers\Mesa_controller;
 use App\Models\Detalle_efectivo;
+use App\Models\Entradas_caja;
 
 Route::get('/', function () {
     $USUARIO_PK = session('usuario_pk');
@@ -60,7 +61,8 @@ Route::match(['get', 'put'], '/dandoDeAltaTipoPago/{tipo_pago_pk}', [Tipo_pago_c
 
 Route::get('/producto/{producto_fk}/estado-stock', [Inventario_Controller::class, 'obtenerStockPorProducto'])->name('inventario.obtenerStockPorProducto');
 
-Route::get('/verificarRegistro', [Detalle_efectivo_Controller::class, 'verificarRegistro']);
+Route::get('/verificarRegistro', [Entradas_caja_controller::class, 'verificarRegistro']);
+Route::post('/registrandoEfectivo', [Entradas_caja_controller::class, 'efectivoInicial'])->name('entradas_caja.efectivoInicial');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -99,8 +101,6 @@ Route::get('/entradasDeCaja', [Entradas_caja_controller::class, 'mostrar'])->nam
 
 Route::post('/generandoCorte', [Corte_caja_controller::class, 'generarCorte'])->name('corteDeCaja.generarCorte');
 Route::get('/cortes', [Corte_caja_controller::class, 'mostrar'])->name('corteDeCaja.mostrar');
-
-Route::post('/registrandoEfectivo', [Detalle_efectivo_controller::class, 'insertar'])->name('efectivoInicial.insertar');
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
