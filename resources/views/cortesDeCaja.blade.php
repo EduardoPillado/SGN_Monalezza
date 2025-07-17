@@ -24,7 +24,7 @@
                             <th class="text-left py-2">Folio</th>
                             <th class="text-left py-2">Fecha inicial</th>
                             <th class="text-left py-2">Fecha final</th>
-                            <th class="text-left py-2">Apertura de caja</th>
+                            <th class="text-left py-2">Entradas</th>
                             <th class="text-left py-2">Cantidad de ventas</th>
                             <th class="text-left py-2">Ganancias totales</th>
                             <th class="text-left py-2">Gasto en servicios</th>
@@ -234,12 +234,12 @@
             // Tabla principal
             printWindow.document.write('<div class="print-section">');
             printWindow.document.write('<table>');
-            printWindow.document.write('<tr><th>Folio</th><th>Fecha inicial</th><th>Fecha final</th><th>Efectivo inicial</th><th>Cantidad de ventas</th><th>Ganancias totales</th><th>Inversión</th><th>Utilidad neta</th></tr>');
+            printWindow.document.write('<tr><th>Folio</th><th>Fecha inicial</th><th>Fecha final</th><th>Entradas</th><th>Cantidad de ventas</th><th>Ganancias totales</th><th>Inversión</th><th>Utilidad neta</th></tr>');
             printWindow.document.write(recordRow.outerHTML);
             printWindow.document.write('</table>');
 
             if (empleados.length > 0) {
-                printWindow.document.write('<table style="width: 94.4%; margin: 0 auto; border-collapse: collapse;">');
+                printWindow.document.write('<table style="width: 80%; margin: 40 auto; border-collapse: collapse;">');
                 printWindow.document.write('<tr><th>Empleados que realizaron ventas:</th></tr>');
                 empleados.forEach(empleado => {
                     const usuario = empleado.usuario ? empleado.usuario.usuario : 'Empleado no disponible';

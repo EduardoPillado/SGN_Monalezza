@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Corte_caja;
-use App\Models\Detalle_efectivo;
+use App\Models\Entradas_caja;
 use App\Models\Pedido;
 use App\Models\Servicio;
 
@@ -28,8 +28,8 @@ class Corte_caja_controller extends Controller
         $corte->fecha_corte_inicio = $req->input('fecha_corte_inicio');
         $corte->fecha_corte_fin = $req->input('fecha_corte_fin');
 
-        $suma = Detalle_efectivo::whereBetween('fecha_actual', [$corte->fecha_corte_inicio, $corte->fecha_corte_fin])->get();
-        $corte->suma_efectivo_inicial = $suma->sum('efectivo_inicial');
+        $suma = Entradas_caja::whereBetween('fecha_entrada_caja', [$corte->fecha_corte_inicio, $corte->fecha_corte_fin])->get();
+        $corte->suma_efectivo_inicial = $suma->sum('monto_entrada_caja');
     
         $ventas = Pedido::whereBetween('fecha_hora_pedido', [$corte->fecha_corte_inicio, $corte->fecha_corte_fin])->get();
 

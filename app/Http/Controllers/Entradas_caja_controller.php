@@ -104,4 +104,43 @@ class Entradas_caja_controller extends Controller
             'total_caja' => $totalCaja
         ];
     }
+
+    public function verificarRegistro()
+    {
+        $registroHoy = Entradas_caja::whereDate('fecha_entrada_caja', Carbon::today())->where('tipo_entrada_caja', 'Inicial')->exists();
+        
+        return response()->json([
+            'registroHoy' => $registroHoy,
+            'hoy' => Carbon::today()->toDateString()
+        ]);
+    }
+
+    public function efectivoInicial(Request $req)
+    {
+         $validated = $req->validate([
+            'monto_entrada_caja' => 'required|numeric|min:0.01'
+        ], [
+            'monto_entrada_caja.required' => 'La apertura de caja es obligatoria.',
+            'monto_entrada_caja.numeric' => 'Debe ser una cantidad numérica.',
+            'monto_entrada_caja.min' => 'Debe ser mayor o igual a 0.'
+        ]);
+
+        $usuario_pk = session('usuario_pk');
+        if (!$usuario_pk) {
+            return redirect('/login');
+        }
+
+        $efectivo = new Entradas_caja();
+        $efectivo->monto_entrada_caja = $validated['monto_entrada_caja'];
+        $efectivo->tipo_entrada_caja = 'Inicial';
+        $efectivo->concepto_entrada_caja = 'Apertura de caja.';
+        $efectivo->fecha_entrada_caja = now();
+        $efectivo->usuario_fk = $usuario_pk;
+        $efectivo->save();
+
+        return back()->with(
+            $efectivo->exists ? 'success' : 'error',
+            $efectivo->exists ? 'Registro exitoso' : 'Error al registrar'
+        );
+    }
 }
