@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('entradas_caja', function (Blueprint $table) {
             $table->id('entradas_caja_pk')->autoIncrement();
             $table->decimal('monto_entrada_caja', 10, 2);
-            $table->enum('tipo_entrada_caja', ['Inicial', 'Entrada'])->default('Entrada');
+            $table->enum('tipo_entrada_caja', ['Inicial', 'Entrada']);
             $table->string('concepto_entrada_caja')->nullable();
             $table->dateTime('fecha_entrada_caja');
             $table->unsignedBigInteger('usuario_fk');

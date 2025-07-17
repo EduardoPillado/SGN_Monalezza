@@ -83,17 +83,7 @@
                         <form id="form-entrada-caja" action="{{ route('entradas_caja.insertar') }}" method="post">
                             @csrf
 
-                            <div class="mb-4">
-                                <label for="tipo_entrada_caja" class="block text-sm font-medium text-gray-700">Tipo de entrada
-                                    <span class="text-red-500">*</span>
-                                </label>
-                                <select id="tipo_entrada_caja" name="tipo_entrada_caja"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                    required>
-                                    <option value="Entrada">Entrada</option>
-                                    <option value="Inicial">Inicial</option>
-                                </select>
-                            </div>
+                            <input type="hidden" name="tipo_entrada_caja" id="tipo_entrada_caja" value="Entrada">
 
                             <div class="mb-4">
                                 <label for="monto_entrada_caja" class="block text-sm font-medium text-gray-700">Monto
