@@ -48,12 +48,46 @@
 
                         <div>
                             <label for="cliente_fk" class="block font-medium mb-2">Cliente</label>
-                            <select name="cliente_fk" id="cliente_fk" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <!-- <select name="cliente_fk" id="cliente_fk" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Cliente genérico o Selecciona un cliente</option>
                                 @foreach($clientes as $cliente)
                                     <option value="{{ $cliente->cliente_pk }}">{{ $cliente->nombre_cliente }}</option>
                                 @endforeach
-                            </select>
+                            </select> -->
+                                    @csrf
+                                    <div class="search-container">
+                                        <!-- Input de búsqueda -->
+                                        <input 
+                                            type="search" 
+                                            class="search__input" 
+                                            id="buscarCliente" 
+                                            placeholder="Selecciona un cliente" 
+                                            oninput="filtrarClientes()" 
+                                            onfocus="mostrarClientes()"
+                                            autocomplete="off"
+                                            required 
+                                        />
+                                        
+                                        <input type="hidden" name="cliente_fk" id="cliente_fk">
+                                        
+                                        <!-- Dropdown con lista de clientes -->
+                                        <div id="clientesDropdown" class="clientes-dropdown hidden">
+                                            <div class="cliente-item" data-cliente-id="" data-nombre="Cliente genérico">
+                                                Cliente genérico
+                                            </div>
+                                            @foreach($clientes as $cliente)
+                                                <div class="cliente-item" data-cliente-id="{{ $cliente->cliente_pk }}" data-nombre="{{ $cliente->nombre_cliente }}">
+                                                    {{ $cliente->nombre_cliente }}
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                <!-- Mostrar cliente seleccionado -->
+                                <!-- <div id="clienteSeleccionado" class="mt-4 p-3 bg-gray-50 rounded-md hidden">
+                                    <div class="text-sm text-gray-600">Cliente seleccionado:</div>
+                                    <div id="nombreClienteSeleccionado" class="font-medium"></div>
+                                </div> -->
                         </div>
 
                         <div>
@@ -127,6 +161,7 @@
                     </div>
 
                 </form>
+                                
             </div>
             
             <!-- Columna derecha -->
@@ -235,6 +270,109 @@
                 </div>
             </div>
             </div>
+
+            <!-- Buscador de clientes -->
+           <script>
+                let clientesData = [];
+                let clienteSeleccionado = null;
+
+                // Inicializar datos de clientes al cargar la página
+                document.addEventListener('DOMContentLoaded', function() {
+                    const clienteItems = document.querySelectorAll('.cliente-item');
+                    clienteItems.forEach(item => {
+                        const cliente = {
+                            id: item.dataset.clienteId,
+                            nombre: item.dataset.nombre
+                        };
+                        clientesData.push(cliente);
+                        
+                        // Agregar event listener para selección
+                        item.addEventListener('click', function() {
+                            seleccionarCliente(cliente.id, cliente.nombre);
+                        });
+                    });
+                });
+
+                function filtrarClientes() {
+                    const input = document.getElementById('buscarCliente').value.toLowerCase();
+                    const dropdown = document.getElementById('clientesDropdown');
+                    const clienteItems = dropdown.querySelectorAll('.cliente-item');
+                    
+                    let hayResultados = false;
+                    
+                    clienteItems.forEach(item => {
+                        const nombre = item.dataset.nombre.toLowerCase();
+                        if (nombre.includes(input)) {
+                            item.style.display = 'block';
+                            hayResultados = true;
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                    
+                    // Mostrar dropdown si hay texto y resultados
+                    if (input.length > 0 && hayResultados) {
+                        dropdown.classList.remove('hidden');
+                    } else if (input.length === 0) {
+                        dropdown.classList.remove('hidden'); // Mostrar todos si no hay texto
+                        clienteItems.forEach(item => {
+                            item.style.display = 'block';
+                        });
+                    } else {
+                        dropdown.classList.add('hidden');
+                    }
+                }
+
+                function mostrarClientes() {
+                    const dropdown = document.getElementById('clientesDropdown');
+                    dropdown.classList.remove('hidden');
+                }
+
+                function seleccionarCliente(clienteId, nombreCliente) {
+                    // Actualizar input visible
+                    document.getElementById('buscarCliente').value = nombreCliente;
+                    
+                    // Actualizar input hidden
+                    document.getElementById('cliente_fk').value = clienteId;
+                    
+                    // Ocultar dropdown
+                    document.getElementById('clientesDropdown').classList.add('hidden');
+                    
+                    // Actualizar selección visual
+                    document.querySelectorAll('.cliente-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    const itemSeleccionado = document.querySelector(`[data-cliente-id="${clienteId}"]`);
+                    if (itemSeleccionado) {
+                        itemSeleccionado.classList.add('selected');
+                    }
+                    
+                    // Mostrar cliente seleccionado
+                    const clienteSeleccionadoDiv = document.getElementById('clienteSeleccionado');
+                    const nombreDiv = document.getElementById('nombreClienteSeleccionado');
+                    
+                    nombreDiv.textContent = nombreCliente;
+                    clienteSeleccionadoDiv.classList.remove('hidden');
+                    
+                    clienteSeleccionado = { id: clienteId, nombre: nombreCliente };
+                }
+
+                // Ocultar dropdown al hacer clic fuera
+                document.addEventListener('click', function(event) {
+                    const searchContainer = document.querySelector('.search-container');
+                    if (!searchContainer.contains(event.target)) {
+                        document.getElementById('clientesDropdown').classList.add('hidden');
+                    }
+                });
+
+                // Manejar tecla Escape para cerrar dropdown
+                document.getElementById('buscarCliente').addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') {
+                        document.getElementById('clientesDropdown').classList.add('hidden');
+                    }
+                });
+            </script>
+            <!-- Buscador de clientes -->
 
             <script>
                 $(document).ready(function() {

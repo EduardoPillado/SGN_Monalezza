@@ -64,6 +64,8 @@ Route::get('/producto/{producto_fk}/estado-stock', [Inventario_Controller::class
 Route::get('/verificarRegistro', [Entradas_caja_controller::class, 'verificarRegistro']);
 Route::post('/registrandoEfectivo', [Entradas_caja_controller::class, 'efectivoInicial'])->name('entradas_caja.efectivoInicial');
 
+Route::get('/lista_clientes', [Cliente_controller::class,'show' ])->name('clientes.show');
+
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // Reportes de movimientos -----------------------------------------------------------------------------------------------------------------------------------------------

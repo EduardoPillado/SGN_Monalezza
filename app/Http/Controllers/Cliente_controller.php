@@ -143,4 +143,10 @@ class Cliente_controller extends Controller
             return back()->with('error', 'Hay algún problema con la información');
         }
     }
+     public function show(Request $request){
+
+        $clientes = Cliente::all();
+    
+        return view('lista_clientes',compact('clientes.show'));
+    }
 }
