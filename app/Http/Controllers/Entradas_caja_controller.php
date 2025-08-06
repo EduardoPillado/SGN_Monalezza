@@ -105,16 +105,6 @@ class Entradas_caja_controller extends Controller
         ];
     }
 
-    public function verificarRegistro()
-    {
-        $registroHoy = Entradas_caja::whereDate('fecha_entrada_caja', Carbon::today())->where('tipo_entrada_caja', 'Inicial')->exists();
-        
-        return response()->json([
-            'registroHoy' => $registroHoy,
-            'hoy' => Carbon::today()->toDateString()
-        ]);
-    }
-
     public function efectivoInicial(Request $req)
     {
          $validated = $req->validate([

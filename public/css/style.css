@@ -182,6 +182,14 @@
     cursor: pointer;
 }
 
+.order-item .edit-btn {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
 /* Fin Estilos nuevos para pedidos */
 
 /* Responsive design */
@@ -221,3 +229,106 @@
 }
 
 /* Fin de corrección de sobrepuesto de DataTables */
+
+/* Select2 para clientes en pedidos */
+
+/* Contenedor principal */
+.select2-container {
+    width: 100% !important;
+}
+
+/* Caja de selección visible */
+.select2-container .select2-selection--single {
+    height: auto !important;
+    min-height: 42px;
+    border: 1px solid #d1d5db !important;
+    border-radius: 0.375rem !important;
+    padding: 0.5rem 0.75rem !important;
+    background-color: #fff;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Caja de selección en foco */
+.select2-container--open .select2-selection--single,
+.select2-container--focus .select2-selection--single {
+    outline: none !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px #3b82f6 !important;
+}
+
+/* Texto mostrado */
+.select2-container .select2-selection--single .select2-selection__rendered {
+    padding-left: 0 !important;
+    color: #000000;
+    line-height: 1.5 !important;
+}
+
+/* Flecha desplegable */
+.select2-container .select2-selection--single .select2-selection__arrow {
+    height: 100% !important;
+    top: 0 !important;
+    right: 8px !important;
+}
+
+/* Placeholder */
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+  color: #000000 !important;
+}
+
+/* Dropdown */
+.select2-dropdown {
+    border: 1px solid #b6b9bc !important;
+    border-radius: 0 0 0.375rem 0.375rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important; /* shadow-lg */
+    margin-top: 2px !important;
+}
+
+/* Opciones del dropdown */
+.select2-results__option {
+    padding: 8px 12px !important;
+    color: #000000;
+}
+
+/* Opción seleccionada */
+.select2-results__option[aria-selected=true] {
+    background-color: #f3f4f6 !important;
+}
+
+/* Opción destacada (hover) */
+.select2-results__option--highlighted {
+    background-color: #1967d2 !important;
+    color: white !important;
+}
+
+/* Búsqueda en dropdown */
+.select2-search__field {
+    border: 1px solid #b6b9bc !important;
+    border-radius: 0.375rem !important;
+    padding: 0.25rem 0.5rem !important;
+    margin: 8px !important;
+    width: calc(100% - 16px) !important;
+}
+
+/* Para selects múltiples */
+.select2-container .select2-selection--multiple {
+    min-height: 42px !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Tags en select múltiple */
+.select2-container .select2-selection--multiple .select2-selection__choice {
+    background-color: #3b82f6 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 0.25rem !important;
+    padding: 0 8px !important;
+    margin-right: 6px !important;
+}
+
+/* Botón para eliminar tags */
+.select2-container .select2-selection--multiple .select2-selection__choice__remove {
+  color: white !important;
+  margin-right: 4px !important;
+}
+
+/* Fin de select2 para clientes en pedidos */

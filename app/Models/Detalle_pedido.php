@@ -17,6 +17,12 @@ class Detalle_pedido extends Model
         'cantidad_producto'
     ];
     public $timestamps=false;
+    public function detalle_pedido_ingrediente(){
+        return $this->hasMany(Detalle_pedido_ingrediente::class, 'detalle_pedido_fk');
+    }
+    public function ingredientesPersonalizados(){
+        return $this->hasMany(Detalle_pedido_ingrediente::class, 'detalle_pedido_fk', 'detalle_pedido_pk');
+    }
     public function pedido(){
         return $this->belongsTo(Pedido::class, 'pedido_fk');
     }

@@ -24,7 +24,7 @@ class Tipo_pago_controller extends Controller
 
         $tipo_pago->save();
 
-        if ($tipo_pago->nombre_tipo_pago) {
+        if ($tipo_pago->tipo_pago_pk) {
             return back()->with('success', 'Tipo de pago registrado');
         } else {
             return back()->with('error', 'Hay algún problema con la información');
@@ -62,10 +62,10 @@ class Tipo_pago_controller extends Controller
         $req->validate([
             'nombre_tipo_pago' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:tipo_pago,nombre_tipo_pago'],
         ], [
-            'nombre_tipo_pago.required' => 'El nombre de tipo de pago es obligatorio.',
-            'nombre_tipo_pago.regex' => 'El nombre de tipo de pago solo puede contener letras, números y espacios.',
-            'nombre_tipo_pago.max' => 'El nombre de tipo de pago no puede tener más de :max caracteres.',
-            'nombre_tipo_pago.unique' => 'El nombre de tipo de pago ya existe.',
+            'nombre_tipo_pago.required' => 'El nombre del tipo de pago es obligatorio.',
+            'nombre_tipo_pago.regex' => 'El nombre del tipo de pago solo puede contener letras, números y espacios.',
+            'nombre_tipo_pago.max' => 'El nombre del tipo de pago no puede tener más de :max caracteres.',
+            'nombre_tipo_pago.unique' => 'El nombre del tipo de pago ya existe.',
         ]);
 
         $tipo_pago->nombre_tipo_pago=$req->nombre_tipo_pago;
