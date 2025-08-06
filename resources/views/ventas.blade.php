@@ -110,12 +110,11 @@
                                     <button onclick="abrirTicket({{ $dato->pedido_pk }})" class="bg-gray-500 text-white px-2 py-1 rounded fix">Ticket</button>
                                 </td>
                                 <td class="text-right py-2">
-                                    @if (  session('rol_pk') == 1)
-                                        <a href="{{ route('pedido.datosParaEdicion', $dato->pedido_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded fix">Editar</a>
-                                    @endif
-
                                     @if ( $dato->estatus_pedido == 1 )
                                         <a href="{{ route('pedido.entregado', $dato->pedido_pk) }}" onclick="confirmarEntrega(event)" class="bg-green-500 text-white px-2 py-1 rounded fix">Entregado</a>
+                                        @if (  session('rol_pk') == 1)
+                                            <a href="{{ route('pedido.datosParaEdicion', $dato->pedido_pk) }}" class="bg-blue-500 text-white px-2 py-1 rounded fix">Editar</a>
+                                        @endif
                                     @endif
 
                                     @if ( $dato->estatus_pedido != 2 )
@@ -318,17 +317,40 @@
                             const tipoProducto = detalle.producto && detalle.producto.tipo_producto ? detalle.producto.tipo_producto.nombre_tipo_producto : 'Tipo no disponible';
                             const precio = detalle.producto ? detalle.producto.precio_producto : 0;
                             const subtotal = detalle.cantidad_producto * precio;
-                            
+                            const unidadTexto = detalle.cantidad_producto == 1 ? 'unidad' : 'unidades';
+
+                            let ingredientesHtml = '';
+                            if (detalle.ingredientes_personalizados && detalle.ingredientes_personalizados.length > 0) {
+                                ingredientesHtml += '<ul style="margin-left: 25px; font-size: 0.9em; color: #555;">';
+                                detalle.ingredientes_personalizados.forEach(ingredienteDetalle => {
+                                    const nombreIngrediente = ingredienteDetalle.ingrediente ? ingredienteDetalle.ingrediente.nombre_ingrediente : 'Ingrediente desconocido';
+                                    ingredientesHtml += `<li>+ ${nombreIngrediente}</li>`;
+                                });
+                                ingredientesHtml += '</ul>';
+                            }
+
                             return `<li>
-                                ${producto} (${tipoProducto}) - ${detalle.cantidad_producto} unidades - Precio: $${precio}
+                                <strong>${producto} (${tipoProducto})</strong> - ${detalle.cantidad_producto} ${unidadTexto} - Precio: $${precio}
                                 ${detalle.cantidad_producto >= 2 ? ` - Subtotal: $${subtotal}` : ''}
-                            </li>`;
+                                ${ingredientesHtml}  </li>`;
+                            
+                            if (detalle.cantidad_producto == 1) {
+                                return `<li>
+                                    ${producto} (${tipoProducto}) - ${detalle.cantidad_producto} unidad - Precio: $${precio}
+                                    ${detalle.cantidad_producto >= 2 ? ` - Subtotal: $${subtotal}` : ''}
+                                </li>`;
+                            } else {
+                                return `<li>
+                                    ${producto} (${tipoProducto}) - ${detalle.cantidad_producto} unidades - Precio: $${precio}
+                                    ${detalle.cantidad_producto >= 2 ? ` - Subtotal: $${subtotal}` : ''}
+                                </li>`;
+                            }
                         }).join('') + '</ul>';
                     }
 
                     return `<div class="p-4 bg-gray-50">
-                                <strong>Productos:</strong> ${contenido}
-                            </div>`;
+                        <strong>Productos:</strong> ${contenido}
+                    </div>`;
                 }
             });
 

@@ -10,11 +10,6 @@
 
 <body class="h-full bg-gray-100 overflow-hidden">
 
-    @php
-        use App\Models\Ingrediente;
-        $datosIngrediente=Ingrediente::where('estatus_ingrediente', '=', 1)->get();
-    @endphp
-
     <div class="h-screen flex flex-col">
         @include('sidebar')
 
@@ -75,6 +70,9 @@
                             <th class="text-left py-2">Tipo de producto</th>
                             <th class="text-left py-2">Precio</th>
                             <th class="text-left py-2">Imagen</th>
+                            @if ( session('rol_pk') == 1 )
+                                <th class="text-left py-2">Personalizable</th>
+                            @endif
                             <th class="text-left py-2">Estatus</th>
                             @if ( session('rol_pk') == 1 )
                                 <th class="text-right py-2">Acciones</th>
@@ -88,13 +86,20 @@
                                 <td class="py-2">{{ $dato->nombre_producto }}</td>
                                 <td class="py-2">{{ $dato->tipo_producto->nombre_tipo_producto }}</td>
                                 <td class="py-2">${{ $dato->precio_producto }}</td>
-                                <td class="py-2">
-                                    @if ($dato->imagen_producto)
+                                @if ($dato->imagen_producto)
+                                    <td class="py-2">
                                         <img src="{{ asset($dato->imagen_producto) }}" alt="Imagen del producto" class="w-16 h-16 object-cover rounded shadow">
+                                    </td>
+                                @else
+                                    <td class="py-2"><em>Sin imagen</em></td>
+                                @endif
+                                @if ( session('rol_pk') == 1 )
+                                    @if ($dato->personalizable == 0)
+                                        <td class="py-2"><i class="bi bi-hand-thumbs-down"></i></td>
                                     @else
-                                        <span class="text-gray-500 italic">Sin imagen</span>
+                                        <td class="py-2 text-green-600"><i class="bi bi-hand-thumbs-up"></i></td>
                                     @endif
-                                </td>
+                                @endif
                                 <td class="py-2">{{ $dato->estatus_producto ? 'Activo' : 'Inactivo' }}</td>
                                 @if ( session('rol_pk') == 1 )
                                     <td class="text-right py-2">
@@ -336,6 +341,11 @@
                                 <label for="imagen_producto" class="block text-sm font-medium text-gray-700">Imagen del producto</label>
                                 <input type="file" name="imagen_producto" id="imagen_producto" accept="image/*"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="personalizable" class="block text-sm font-medium text-gray-700">¿Es personalizable?</label>
+                                <input type="checkbox" name="personalizable" id="personalizable" value="1" class="mt-2 w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                             </div>
 
                             <div class="mb-4">

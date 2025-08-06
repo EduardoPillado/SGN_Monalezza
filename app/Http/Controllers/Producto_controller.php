@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Models\Detalle_ingrediente;
 use App\Models\Tipo_producto;
+use App\Models\Ingrediente;
 
 class Producto_controller extends Controller
 {
@@ -47,6 +48,7 @@ class Producto_controller extends Controller
             $archivo->move(public_path('img/productos'), $nombreArchivo);
             $producto->imagen_producto = 'img/productos/' . $nombreArchivo;
         }
+        $producto->personalizable = $req->has('personalizable') ? 1 : 0;
         $producto->estatus_producto=1;
 
         $producto->save();
@@ -74,9 +76,10 @@ class Producto_controller extends Controller
         $datosProducto = Producto::all();
         $datosTipoProducto = Tipo_producto::where('estatus_tipo_producto', '=', 1)->get();
         $allTipoProducto = Tipo_producto::all();
+        $datosIngrediente=Ingrediente::where('estatus_ingrediente', '=', 1)->get();
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
-            return view('productos', compact('datosProducto', 'datosTipoProducto', 'allTipoProducto'));
+            return view('productos', compact('datosProducto', 'datosTipoProducto', 'allTipoProducto', 'datosIngrediente'));
         } else {
             return redirect('/login');
         }
@@ -150,12 +153,14 @@ class Producto_controller extends Controller
 
     public function datosParaEdicion($producto_pk){
         $datosProducto = Producto::with('ingredientes')->findOrFail($producto_pk);
+        $datosTipoProducto=Tipo_producto::where('estatus_tipo_producto', '=', 1)->get();
+        $datosIngrediente=Ingrediente::where('estatus_ingrediente', '=', 1)->get();
 
         $USUARIO_PK = session('usuario_pk');
         if ($USUARIO_PK) {
             $ROL = session('nombre_rol');
             if ($ROL == 'Administrador') {
-                return view('editarProducto', compact('datosProducto'));
+                return view('editarProducto', compact('datosProducto', 'datosTipoProducto', 'datosIngrediente'));
             } else {
                 return back()->with('warning', 'No puedes acceder');
             }
@@ -199,6 +204,7 @@ class Producto_controller extends Controller
             $archivo->move(public_path('img/productos'), $nombreArchivo);
             $datosProducto->imagen_producto = 'img/productos/' . $nombreArchivo;
         }
+        $datosProducto->personalizable = $req->has('personalizable') ? 1 : 0;
         $datosProducto->save();
 
         $ingredientes = $req->ingredientes ? array_filter($req->ingredientes) : [];

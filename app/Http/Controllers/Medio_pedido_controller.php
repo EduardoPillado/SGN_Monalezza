@@ -24,7 +24,7 @@ class Medio_pedido_controller extends Controller
 
         $medio_pedido->save();
 
-        if ($medio_pedido->nombre_medio_pedido) {
+        if ($medio_pedido->medio_pedido_pk) {
             return back()->with('success', 'Medio de pedido registrado');
         } else {
             return back()->with('error', 'Hay algún problema con la información');

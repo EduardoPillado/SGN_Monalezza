@@ -27,6 +27,16 @@ class Producto extends Model
     public function inventario(){
         return $this->hasMany(Inventario::class, 'producto_fk');
     }
+    public function ingredientesPersonalizados(){
+        return $this->hasManyThrough(
+            Detalle_pedido_ingrediente::class,  // Tabla relacionada (destino)
+            Detalle_pedido::class,              // Tabla intermedia (a través de)
+            'producto_fk',                     // Foreign key en tabla intermedia (detalle_pedido)
+            'detalle_pedido_fk',              // Foreign key en tabla final (detalle_pedido_ingrediente)
+            'producto_pk',                     // Local key en tabla inicial (producto)
+            'detalle_pedido_pk'          // Local key en tabla intermedia (detalle_pedido)
+        );
+    }
     public function ingredientes() {
         return $this->belongsToMany(Ingrediente::class, 'detalle_ingrediente', 'producto_fk', 'ingrediente_fk')
             ->withPivot('cantidad_necesaria');

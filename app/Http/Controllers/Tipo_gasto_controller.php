@@ -11,10 +11,10 @@ class Tipo_gasto_controller extends Controller
         $req->validate([
             'nombre_tipo_gasto' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:tipo_gasto,nombre_tipo_gasto'],
         ], [
-            'nombre_tipo_gasto.required' => 'El nombre del tipo de producto es obligatorio.',
-            'nombre_tipo_gasto.regex' => 'El nombre del tipo de producto solo puede contener letras, números y espacios.',
-            'nombre_tipo_gasto.max' => 'El nombre del tipo de producto no puede tener más de :max caracteres.',
-            'nombre_tipo_gasto.unique' => 'El nombre del tipo de producto ya existe.',
+            'nombre_tipo_gasto.required' => 'El nombre del tipo de gasto es obligatorio.',
+            'nombre_tipo_gasto.regex' => 'El nombre del tipo de gasto solo puede contener letras, números y espacios.',
+            'nombre_tipo_gasto.max' => 'El nombre del tipo de gasto no puede tener más de :max caracteres.',
+            'nombre_tipo_gasto.unique' => 'El nombre del tipo de gasto ya existe.',
         ]);
 
         $tipo_gasto=new Tipo_gasto();
@@ -24,8 +24,8 @@ class Tipo_gasto_controller extends Controller
 
         $tipo_gasto->save();
 
-        if ($tipo_gasto->nombre_tipo_gasto) {
-            return back()->with('success', 'Tipo de producto registrado');
+        if ($tipo_gasto->tipo_gasto_pk) {
+            return back()->with('success', 'Tipo de gasto registrado');
         } else {
             return back()->with('error', 'Hay algún problema con la información');
         }
@@ -52,10 +52,10 @@ class Tipo_gasto_controller extends Controller
         $req->validate([
             'nombre_tipo_gasto' => ['required', 'regex:/^[a-zA-ZñÑáéíóúÁÉÍÓÚ0-9 ]+$/', 'max:50', 'unique:tipo_gasto,nombre_tipo_gasto'],
         ], [
-            'nombre_tipo_gasto.required' => 'El nombre de tipo de gasto es obligatorio.',
-            'nombre_tipo_gasto.regex' => 'El nombre de tipo de gasto solo puede contener letras, números y espacios.',
-            'nombre_tipo_gasto.max' => 'El nombre de tipo de gasto no puede tener más de :max caracteres.',
-            'nombre_tipo_gasto.unique' => 'El nombre de tipo de gasto ya existe.',
+            'nombre_tipo_gasto.required' => 'El nombre del tipo de gasto es obligatorio.',
+            'nombre_tipo_gasto.regex' => 'El nombre del tipo de gasto solo puede contener letras, números y espacios.',
+            'nombre_tipo_gasto.max' => 'El nombre del tipo de gasto no puede tener más de :max caracteres.',
+            'nombre_tipo_gasto.unique' => 'El nombre del tipo de gasto ya existe.',
         ]);
 
         $tipo_gasto->nombre_tipo_gasto=$req->nombre_tipo_gasto;

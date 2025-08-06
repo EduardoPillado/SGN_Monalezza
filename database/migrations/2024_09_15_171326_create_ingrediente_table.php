@@ -14,7 +14,12 @@ return new class extends Migration
         Schema::create('ingrediente', function (Blueprint $table) {
             $table->id('ingrediente_pk')->autoIncrement();
             $table->string('nombre_ingrediente', 50);
+            $table->unsignedBigInteger('tipo_ingrediente_fk');
             $table->smallInteger('estatus_ingrediente');
+
+            $table->foreign('tipo_ingrediente_fk')
+                ->references('tipo_ingrediente_pk')
+                ->on('tipo_ingrediente');
         });
     }
 
