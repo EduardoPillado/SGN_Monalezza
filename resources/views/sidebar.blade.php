@@ -23,6 +23,9 @@
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     {{-- SweetAlert2 --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {{-- Select2 (CSS y JS) --}}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
     <style>
         .sidebar-hidden {
@@ -101,6 +104,7 @@
 
                         <ul x-show="open" @click.away="open = false" x-transition
                             class="bg-white shadow-md rounded mt-2 p-2 w-52 absolute z-10">
+                            <li class="mb-2"><a href="{{ route('formReporte.consumoPorVentas') }}" class="block p-2 hover:bg-gray-100 rounded">Reporte de consumo por ventas</a></li>
                             <li class="mb-2"><a href="{{ route('formReporte.inventario') }}" class="block p-2 hover:bg-gray-100 rounded">Reporte de inventario</a></li>
                             <li class="mb-2"><a href="{{ route('formReporte.producto') }}" class="block p-2 hover:bg-gray-100 rounded">Reporte de productos</a></li>
                         </ul>

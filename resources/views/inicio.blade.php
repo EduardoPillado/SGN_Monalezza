@@ -13,8 +13,6 @@
 
     @php
         use Carbon\Carbon;
-
-        $USUARIO_PK = session('usuario_pk');
         $USUARIO = session('usuario');
     @endphp
 
@@ -48,53 +46,25 @@
 
                         <div>
                             <label for="cliente_fk" class="block font-medium mb-2">Cliente</label>
-                            <!-- <select name="cliente_fk" id="cliente_fk" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">Cliente genérico o Selecciona un cliente</option>
+                            <select name="cliente_fk" id="cliente_fk" data-control="select2" data-placeholder="Cliente genérico o Selecciona un cliente">
+                                <option value=""></option>
                                 @foreach($clientes as $cliente)
                                     <option value="{{ $cliente->cliente_pk }}">{{ $cliente->nombre_cliente }}</option>
                                 @endforeach
-                            </select> -->
-                                    @csrf
-                                    <div class="search-container">
-                                        <!-- Input de búsqueda -->
-                                        <input 
-                                            type="search" 
-                                            class="search__input" 
-                                            id="buscarCliente" 
-                                            placeholder="Selecciona un cliente" 
-                                            oninput="filtrarClientes()" 
-                                            onfocus="mostrarClientes()"
-                                            autocomplete="off"
-                                            required 
-                                        />
-                                        
-                                        <input type="hidden" name="cliente_fk" id="cliente_fk">
-                                        
-                                        <!-- Dropdown con lista de clientes -->
-                                        <div id="clientesDropdown" class="clientes-dropdown hidden">
-                                            <div class="cliente-item" data-cliente-id="" data-nombre="Cliente genérico">
-                                                Cliente genérico
-                                            </div>
-                                            @foreach($clientes as $cliente)
-                                                <div class="cliente-item" data-cliente-id="{{ $cliente->cliente_pk }}" data-nombre="{{ $cliente->nombre_cliente }}">
-                                                    {{ $cliente->nombre_cliente }}
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-
-                                <!-- Mostrar cliente seleccionado -->
-                                <!-- <div id="clienteSeleccionado" class="mt-4 p-3 bg-gray-50 rounded-md hidden">
-                                    <div class="text-sm text-gray-600">Cliente seleccionado:</div>
-                                    <div id="nombreClienteSeleccionado" class="font-medium"></div>
-                                </div> -->
+                            </select>
                         </div>
+
+                        <script>
+                            $(document).ready(function() {
+                                $('#cliente_fk').select2();
+                            });
+                        </script>
 
                         <div>
                             <label for="empleado" class="block font-medium mb-2">Empleado
                                 <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" value="{{ $USUARIO }}" readonly class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" value="{{ $USUARIO }}" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" readonly>
                         </div>
 
                         <div>
@@ -157,9 +127,7 @@
                                 Registrar Pedido
                             </button>
                         </div>
-
                     </div>
-
                 </form>
                                 
             </div>
@@ -174,6 +142,7 @@
                             data-nombre="{{ $producto->nombre_producto }}" 
                             data-tipo="{{ $producto->tipo_producto->nombre_tipo_producto }}" 
                             data-precio="{{ $producto->precio_producto }}" 
+                            data-personalizable="{{ $producto->personalizable }}" 
                             onclick="toggleProductSelection(this, {{ $producto->producto_pk }}, '{{ $producto->nombre_producto }}', {{ $producto->precio_producto }}, '{{ $producto->tipo_producto->nombre_tipo_producto }}')">
                             <div class="absolute inset-0 bg-black bg-opacity-50 rounded-lg"></div>
                             <input type="checkbox" name="producto_fk[]" value="{{ $producto->producto_pk }}" class="relative z-10">
@@ -217,50 +186,65 @@
                 </div>
             </div>
 
-            <!-- Modal de registro de efectivo inicial -->
-            <div 
-            x-data="{
-                modalOpen: false,
-                init() {
-                    const lastShown = localStorage.getItem('modalLastShown');
-                    const today = new Date().toDateString();
-                    
-                    fetch('/verificarRegistro')
-                        .then(response => {
-                            if (!response.ok) throw new Error('Error en la respuesta');
-                            return response.json();
-                        })
-                        .then(data => {
-                            if ((!lastShown || lastShown !== data.hoy) || !data.registroHoy) {
-                                this.modalOpen = true;
-                                localStorage.setItem('modalLastShown', data.hoy);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            // this.modalOpen = true;
-                        });
-                }
-            }" x-show="modalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
-            <div id="modal-overlay" style="position: fixed; width: 100%; height: 100%; z-index: 1000; background: transparent;">
-                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <!-- Modal para personalizar pizza -->
+            <div id="modal-personalizar" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+                <div class="relative top-10 mx-auto p-5 border w-full max-w-xl shadow-lg rounded-md bg-white">
+                    <div class="text-center">
+                        <h3 class="text-xl font-bold text-gray-800">Personalizar Pizza</h3>
+                        <p id="info-pizza" class="text-sm text-gray-500 mt-1 mb-3">
+                            {{-- Información de la pizza personalizable --}}
+                        </p>
+
+                        <form id="form-personalizar">
+                            <div id="contenedor-ingredientes" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left mb-4">
+                                @foreach ($datosIngrediente as $dato)
+                                    <div class="space-y-1 border rounded p-2">
+                                        <label class="flex items-center space-x-2">
+                                            <input type="checkbox" class="checkbox-ingrediente" data-id="{{ $dato->ingrediente_pk }}">
+                                            <span class="text-sm text-gray-800">{{ $dato->nombre_ingrediente }}</span>
+                                        </label>
+                                        <input type="number" class="cantidad-ingrediente w-full border-gray-300 rounded text-sm" 
+                                            data-id="{{ $dato->ingrediente_pk }}" 
+                                            placeholder="Cantidad en gr/ml" 
+                                            disabled min="1">
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div class="flex justify-end space-x-3">
+                                <button type="button" onclick="cerrarModalPersonalizar()" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700">Cancelar</button>
+                                <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700">Agregar al pedido</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de apertura de caja -->
+            <div id="modal-apertura-caja" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+                <div class="fixed w-full h-full z-40 bg-transparent" id="modal-overlay"></div>
+
+                <div class="relative z-50 top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                     <div class="mt-3 text-center">
                         <h3 class="text-lg leading-6 font-medium text-gray-900">Apertura de caja</h3>
                         <div class="mt-2 px-7 py-3">
                             <p class="text-sm text-gray-600 mb-3">
-                                <span class="text-red-500">*</span> Campo necesario</p>
-                            <form id="form-efectivoInicial" action="{{ route('entradas_caja.efectivoInicial') }}" method="post">
+                                <span class="text-red-500">*</span> Campo necesario
+                            </p>
+
+                            <form id="form-efectivoInicial" action="{{ route('entradas_caja.efectivoInicial') }}" method="POST">
                                 @csrf
                                 <div class="mb-4">
-                                     <label for="monto_entrada_caja" class="block text-sm font-medium text-gray-700">Monto
-                                    <span class="text-red-500">*</span>
-                                </label>
-                                <input type="number" step="0.01" min="0.01" id="monto_entrada_caja" name="monto_entrada_caja"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                    required>
+                                    <label for="monto_entrada_caja" class="block text-sm font-medium text-gray-700">
+                                        Monto <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="number" step="0.01" min="0.01" id="monto_entrada_caja" name="monto_entrada_caja"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                        required>
                                 </div>
                                 <div class="items-center px-4 py-3">
-                                    <button type="submit" class="mt-3 px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
+                                    <button type="submit"
+                                        class="mt-3 px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
                                         Guardar
                                     </button>
                                 </div>
@@ -269,111 +253,28 @@
                     </div>
                 </div>
             </div>
-            </div>
 
-            <!-- Buscador de clientes -->
-           <script>
-                let clientesData = [];
-                let clienteSeleccionado = null;
+            {{-- Script del modal de apertura de caja --}}
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const modal = document.getElementById('modal-apertura-caja');
 
-                // Inicializar datos de clientes al cargar la página
-                document.addEventListener('DOMContentLoaded', function() {
-                    const clienteItems = document.querySelectorAll('.cliente-item');
-                    clienteItems.forEach(item => {
-                        const cliente = {
-                            id: item.dataset.clienteId,
-                            nombre: item.dataset.nombre
-                        };
-                        clientesData.push(cliente);
-                        
-                        // Agregar event listener para selección
-                        item.addEventListener('click', function() {
-                            seleccionarCliente(cliente.id, cliente.nombre);
-                        });
-                    });
-                });
+                    const registroHoy = @json($registroHoy); // viene desde PHP
+                    const hoy = @json($hoy);
 
-                function filtrarClientes() {
-                    const input = document.getElementById('buscarCliente').value.toLowerCase();
-                    const dropdown = document.getElementById('clientesDropdown');
-                    const clienteItems = dropdown.querySelectorAll('.cliente-item');
-                    
-                    let hayResultados = false;
-                    
-                    clienteItems.forEach(item => {
-                        const nombre = item.dataset.nombre.toLowerCase();
-                        if (nombre.includes(input)) {
-                            item.style.display = 'block';
-                            hayResultados = true;
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-                    
-                    // Mostrar dropdown si hay texto y resultados
-                    if (input.length > 0 && hayResultados) {
-                        dropdown.classList.remove('hidden');
-                    } else if (input.length === 0) {
-                        dropdown.classList.remove('hidden'); // Mostrar todos si no hay texto
-                        clienteItems.forEach(item => {
-                            item.style.display = 'block';
-                        });
-                    } else {
-                        dropdown.classList.add('hidden');
+                    const yaSeMostroHoy = localStorage.getItem('modalLastShown') === hoy;
+
+                    if (registroHoy) {
+                        localStorage.setItem('modalLastShown', hoy);
                     }
-                }
 
-                function mostrarClientes() {
-                    const dropdown = document.getElementById('clientesDropdown');
-                    dropdown.classList.remove('hidden');
-                }
-
-                function seleccionarCliente(clienteId, nombreCliente) {
-                    // Actualizar input visible
-                    document.getElementById('buscarCliente').value = nombreCliente;
-                    
-                    // Actualizar input hidden
-                    document.getElementById('cliente_fk').value = clienteId;
-                    
-                    // Ocultar dropdown
-                    document.getElementById('clientesDropdown').classList.add('hidden');
-                    
-                    // Actualizar selección visual
-                    document.querySelectorAll('.cliente-item').forEach(item => {
-                        item.classList.remove('selected');
-                    });
-                    const itemSeleccionado = document.querySelector(`[data-cliente-id="${clienteId}"]`);
-                    if (itemSeleccionado) {
-                        itemSeleccionado.classList.add('selected');
-                    }
-                    
-                    // Mostrar cliente seleccionado
-                    const clienteSeleccionadoDiv = document.getElementById('clienteSeleccionado');
-                    const nombreDiv = document.getElementById('nombreClienteSeleccionado');
-                    
-                    nombreDiv.textContent = nombreCliente;
-                    clienteSeleccionadoDiv.classList.remove('hidden');
-                    
-                    clienteSeleccionado = { id: clienteId, nombre: nombreCliente };
-                }
-
-                // Ocultar dropdown al hacer clic fuera
-                document.addEventListener('click', function(event) {
-                    const searchContainer = document.querySelector('.search-container');
-                    if (!searchContainer.contains(event.target)) {
-                        document.getElementById('clientesDropdown').classList.add('hidden');
-                    }
-                });
-
-                // Manejar tecla Escape para cerrar dropdown
-                document.getElementById('buscarCliente').addEventListener('keydown', function(event) {
-                    if (event.key === 'Escape') {
-                        document.getElementById('clientesDropdown').classList.add('hidden');
+                    if (!yaSeMostroHoy || !registroHoy) {
+                        modal.classList.remove('hidden');
                     }
                 });
             </script>
-            <!-- Buscador de clientes -->
 
+            {{-- Script de buscador de productos --}}
             <script>
                 $(document).ready(function() {
                     $('#search-bar').on('keyup', function() {
@@ -388,11 +289,192 @@
                     });
                 });
             </script>
+
+            {{-- Script del modal de personalización --}}
+            <script>
+                // Manejo de ingredientes seleccionados con cantidad
+                document.querySelectorAll('.checkbox-ingrediente').forEach(checkbox => {
+                    checkbox.addEventListener('change', function () {
+                        const ingredienteId = this.dataset.id;
+                        const inputCantidad = document.querySelector(`.cantidad-ingrediente[data-id="${ingredienteId}"]`);
+                        const seleccionados = document.querySelectorAll('.checkbox-ingrediente:checked');
+
+                        if (seleccionados.length > 4) {
+                            this.checked = false;
+                            Swal.fire({
+                                icon: 'warning',
+                                text: 'Solo puedes seleccionar hasta 4 ingredientes',
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
+                            return;
+                        }
+
+                        inputCantidad.disabled = !this.checked;
+                        if (!this.checked) inputCantidad.value = '';
+                    });
+                });
+
+                document.getElementById('form-personalizar').addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const seleccionados = document.querySelectorAll('.checkbox-ingrediente:checked');
+
+                    if (seleccionados.length < 1) {
+                        Swal.fire({
+                            icon: 'warning',
+                            text: 'Debes seleccionar al menos 1 ingrediente',
+                            timer: 3000,
+                            showConfirmButton: false
+                        });
+                        return;
+                    }
+
+                    const { id, name, price, type } = productoSeleccionado;
+
+                    const ingredientesPersonalizados = [];
+                    let errores = false;
+
+                    seleccionados.forEach(checkbox => {
+                        const ingredienteId = checkbox.dataset.id;
+                        const inputCantidad = document.querySelector(`.cantidad-ingrediente[data-id="${ingredienteId}"]`);
+                        const cantidad = parseFloat(inputCantidad.value);
+
+                        if (isNaN(cantidad) || cantidad <= 0) {
+                            Swal.fire({
+                                icon: 'warning',
+                                text: 'Debes ingresar una cantidad válida para todos los ingredientes seleccionados',
+                                timer: 3000,
+                                showConfirmButton: false
+                            });
+                            errores = true;
+                        }
+
+                        ingredientesPersonalizados.push({ id: ingredienteId, cantidad });
+                    });
+
+                    if (errores) return;
+
+                    // Agrega el producto personalizado
+                    if (!selectedProducts[id]) {
+                        selectedProducts[id] = {
+                            name,
+                            price,
+                            type,
+                            quantity: 1,
+                            personalizados: ingredientesPersonalizados
+                        };
+
+                        const nombresIngredientes = ingredientesPersonalizados.map(ing => {
+                            const checkbox = document.querySelector(`.checkbox-ingrediente[data-id="${ing.id}"]`);
+                            const span = checkbox?.parentElement?.querySelector('span');
+                            return span ? span.textContent.trim() : 'Ingrediente';
+                        });
+                        const div = document.createElement('div');
+                        div.className = 'order-item';
+                        div.id = `order-item-${id}`;
+                        div.innerHTML = `
+                            <span id="product-info-${id}">${name} (${type}) - $${price}<br>
+                                <small>${nombresIngredientes.join(' | ')}</small>
+                            </span>
+                            <input type="number" value="1" min="1" onchange="updateQuantity(${id}, this.value)">
+                            <button type="button" onclick="removeProductFromSummary(${id})">Eliminar</button>
+                        `;
+                        document.getElementById('productInputs').appendChild(div);
+
+                        const inputCantidad = document.createElement('input');
+                        inputCantidad.type = 'hidden';
+                        inputCantidad.name = `productos[${id}][cantidad_producto]`;
+                        inputCantidad.id = `input-producto-${id}`;
+                        inputCantidad.value = 1;
+                        document.querySelector('form').appendChild(inputCantidad);
+
+                        const hiddenInputNombrePersonalizado = document.createElement('input');
+                        hiddenInputNombrePersonalizado.type = 'hidden';
+                        hiddenInputNombrePersonalizado.name = `productos[${id}][nombre_producto]`;
+                        hiddenInputNombrePersonalizado.value = name;
+                        document.querySelector('form').appendChild(hiddenInputNombrePersonalizado);
+
+                        ingredientesPersonalizados.forEach(({ id: ingId, cantidad }) => {
+                            const hiddenIng = document.createElement('input');
+                            hiddenIng.type = 'hidden';
+                            hiddenIng.name = `productos[${id}][ingredientes_personalizados][${ingId}]`;
+                            hiddenIng.value = cantidad;
+                            hiddenIng.classList.add(`ingrediente-pizza-${id}`);
+                            document.querySelector('form').appendChild(hiddenIng);
+                        });
+
+                    } else {
+                        // Ya existe, solo actualiza cantidad y lista de ingredientes
+                        selectedProducts[id].quantity++;
+                        selectedProducts[id].personalizados = ingredientesPersonalizados;
+
+                        const input = document.querySelector(`#order-item-${id} input[type='number']`);
+                        const hiddenInput = document.getElementById(`input-producto-${id}`);
+
+                        if (input && hiddenInput) {
+                            input.value = selectedProducts[id].quantity;
+                            hiddenInput.value = selectedProducts[id].quantity;
+                        }
+
+                        document.querySelectorAll(`.ingrediente-pizza-${id}`).forEach(e => e.remove());
+
+                        ingredientesPersonalizados.forEach(({ id: ingId, cantidad }) => {
+                            const hiddenIng = document.createElement('input');
+                            hiddenIng.type = 'hidden';
+                            hiddenIng.name = `productos[${id}][ingredientes_personalizados][${ingId}]`;
+                            hiddenIng.value = cantidad;
+                            hiddenIng.classList.add(`ingrediente-pizza-${id}`);
+                            document.querySelector('form').appendChild(hiddenIng);
+                        });
+                    }
+
+                    cerrarModalPersonalizar();
+                    updateTotal();
+                });
+
+                function cerrarModalPersonalizar() {
+                    document.getElementById('modal-personalizar').classList.add('hidden');
+                    productoSeleccionado = null;
+
+                    // Reinicia los inputs
+                    document.querySelectorAll('.checkbox-ingrediente').forEach(input => input.checked = false);
+                    document.querySelectorAll('.cantidad-ingrediente').forEach(input => {
+                        input.disabled = true;
+                        input.value = '';
+                    });
+                }
+            </script>
             
+            {{-- Script general de pedidos --}}
             <script>
                 const selectedProducts = {};
+                let productoSeleccionado = null;
 
                 function toggleProductSelection(div, productId, productName, productPrice, productType) {
+                    const esPersonalizable = div.getAttribute('data-personalizable') === '1';
+
+                    // Si es personalizable - abre el modal de personalización y detiene el flujo
+                    if (esPersonalizable) {
+                        productoSeleccionado = {
+                            id: productId,
+                            name: productName,
+                            price: productPrice,
+                            type: productType
+                        };
+
+                        // Mostrar información del producto
+                        document.getElementById('info-pizza').innerText = `${productName} (${productType}) - $${productPrice}`;
+
+                        // Limpiar checkboxes previos
+                        document.querySelectorAll('#form-personalizar input[name="ingredientes[]"]').forEach(input => input.checked = false);
+
+                        // Mostrar modal
+                        document.getElementById('modal-personalizar').classList.remove('hidden');
+                        return; // Detiene el flujo, no continúa con el resumen
+                    }
+
+                    // Si no es personalizable - agrega el producto al resumen o solo aumentan las unidades del producto
                     if (!selectedProducts[productId]) {
                         // Si no está aún, se agrega por primera vez
                         selectedProducts[productId] = {
@@ -407,19 +489,25 @@
                         productElement.className = 'order-item';
                         productElement.id = `order-item-${productId}`;
                         productElement.innerHTML = `
-                            <span id="product-info-${productId}">${productName} (${productType}) - $${productPrice}</span>
+                            <span id="product-info-${productId}"><strong>${productName}</strong> (${productType}) - $${productPrice}</span>
                             <input type="number" value="1" min="1" onchange="updateQuantity(${productId}, this.value)">
                             <button type="button" onclick="removeProductFromSummary(${productId})">Eliminar</button>
                         `;
                         document.getElementById('productInputs').appendChild(productElement);
 
-                        // Input oculto para enviar cantidad
+                        // Inputs ocultos para enviar cantidad y nombre del producto
                         const hiddenInput = document.createElement('input');
                         hiddenInput.type = 'hidden';
                         hiddenInput.name = `productos[${productId}][cantidad_producto]`;
                         hiddenInput.id = `input-producto-${productId}`;
                         hiddenInput.value = 1;
                         document.querySelector('form').appendChild(hiddenInput);
+
+                        const hiddenInputNombre = document.createElement('input');
+                        hiddenInputNombre.type = 'hidden';
+                        hiddenInputNombre.name = `productos[${productId}][nombre_producto]`;
+                        hiddenInputNombre.value = productName;
+                        document.querySelector('form').appendChild(hiddenInputNombre);
 
                         // Obtener el estado del stock y actualizar
                         fetch(`/producto/${productId}/estado-stock`)
@@ -441,7 +529,7 @@
 
                                 // Actualizar el contenido del span con el mensaje de stock
                                 const productInfo = document.getElementById(`product-info-${productId}`);
-                                productInfo.innerHTML = `${productName} (${productType}) - $${productPrice}${stockMessage}`;
+                                productInfo.innerHTML = `<strong>${productName}</strong> (${productType}) - $${productPrice}${stockMessage}`;
                             })
                             .catch(error => {
                                 console.log('Error al obtener el estado del stock:', error);
@@ -476,7 +564,7 @@
                         productElement.className = 'order-item';
                         productElement.id = `order-item-${productId}`;
                         productElement.innerHTML = `
-                            <span>${productName} (${productType}) - $${productPrice}</span>
+                            <span><strong>${productName}</strong> (${productType}) - $${productPrice}</span>
                             <input type="number" value="1" min="1" onchange="updateQuantity(${productId}, this.value)">
                             <button onclick="removeProductFromSummary(${productId})">Eliminar</button>
                         `;

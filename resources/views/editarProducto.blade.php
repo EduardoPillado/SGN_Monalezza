@@ -12,14 +12,6 @@
 
 <body class="h-full bg-gray-100 overflow-hidden">
 
-    @php
-        use App\Models\Tipo_producto;
-        $datosTipoProducto=Tipo_producto::where('estatus_tipo_producto', '=', 1)->get();
-
-        use App\Models\Ingrediente;
-        $datosIngrediente=Ingrediente::where('estatus_ingrediente', '=', 1)->get();
-    @endphp
-
     <div class="h-screen flex flex-col">
         @include('sidebar')
 
@@ -34,6 +26,7 @@
                             <label for="nombre_producto" class="block text-sm font-medium text-gray-700">Nombre</label>
                             <input type="text" id="nombre_producto" name="nombre_producto" value="{{ $datosProducto->nombre_producto }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         </div>
+
                         <div class="mb-4">
                             <label for="tipo_producto_fk" class="block text-sm font-medium text-gray-700">Tipo de producto</label>
                             <select name="tipo_producto_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
@@ -43,9 +36,16 @@
                                 @endforeach
                             </select>
                         </div>
+
                         <div class="mb-4">
                             <label for="precio_producto" class="block text-sm font-medium text-gray-700">Precio</label>
                             <input type="number" id="precio_producto" name="precio_producto" value="{{ $datosProducto->precio_producto }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="personalizable" class="block text-sm font-medium text-gray-700">¿Es personalizable?</label>
+                            <input type="checkbox" name="personalizable" id="personalizable" value="1"
+                                @if($datosProducto->personalizable) checked @endif class="mt-3 w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                         </div>
                     </div>
 

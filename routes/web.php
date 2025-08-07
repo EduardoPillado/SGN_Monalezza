@@ -18,12 +18,10 @@ use App\Http\Controllers\Medio_pedido_controller;
 use App\Http\Controllers\Nomina_controller;
 use App\Http\Controllers\Servicio_controller;
 use App\Http\Controllers\Tipo_gasto_controller;
+use App\Http\Controllers\Tipo_ingrediente_controller;
 use App\Http\Controllers\Tipo_pago_controller;
 use App\Http\Controllers\Tipo_producto_controller;
-use App\Http\Controllers\Detalle_efectivo_controller;
 use App\Http\Controllers\Mesa_controller;
-use App\Models\Detalle_efectivo;
-use App\Models\Entradas_caja;
 
 Route::get('/', function () {
     $USUARIO_PK = session('usuario_pk');
@@ -61,14 +59,19 @@ Route::match(['get', 'put'], '/dandoDeAltaTipoPago/{tipo_pago_pk}', [Tipo_pago_c
 
 Route::get('/producto/{producto_fk}/estado-stock', [Inventario_Controller::class, 'obtenerStockPorProducto'])->name('inventario.obtenerStockPorProducto');
 
-Route::get('/verificarRegistro', [Entradas_caja_controller::class, 'verificarRegistro']);
-Route::post('/registrandoEfectivo', [Entradas_caja_controller::class, 'efectivoInicial'])->name('entradas_caja.efectivoInicial');
-
-Route::get('/lista_clientes', [Cliente_controller::class,'show' ])->name('clientes.show');
-
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // Reportes de movimientos -----------------------------------------------------------------------------------------------------------------------------------------------
+
+Route::get('/generarReporteDeConsumoPorVentas', function () {
+    $USUARIO_PK = session('usuario_pk');
+    if ($USUARIO_PK) {
+        return view('reporteConsumoPorVentas');
+    } else {
+        return redirect()->route('login')->with('warning', 'Inicia sesión antes');
+    }
+})->name('formReporte.consumoPorVentas');
+Route::post('/generandoReporteDeConsumoPorVentas', [Reporte_controller::class, 'generarReporteConsumoPorVentas'])->name('generarReporte.consumoPorVentas');
 
 Route::get('/generarReporteDeInventario', function () {
     $USUARIO_PK = session('usuario_pk');
@@ -96,6 +99,8 @@ Route::post('/generandoReporteDeProductos', [Reporte_controller::class, 'generar
 
 Route::post('/registrandoEntradaDeCaja', [Entradas_caja_controller::class, 'insertar'])->name('entradas_caja.insertar');
 Route::get('/entradasDeCaja', [Entradas_caja_controller::class, 'mostrar'])->name('entradas_caja.mostrar');
+Route::post('/registrandoEfectivo', [Entradas_caja_controller::class, 'efectivoInicial'])->name('entradas_caja.efectivoInicial');
+// Route::get('/verificarRegistro', [Entradas_caja_controller::class, 'verificarRegistro']);
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -210,6 +215,12 @@ Route::put('/editandoIngrediente/{ingrediente_pk}', [Ingrediente_controller::cla
 Route::match(['get', 'put'], '/dandoDeBajaIngrediente/{ingrediente_pk}', [Ingrediente_controller::class, 'baja'])->name('ingrediente.baja');
 Route::match(['get', 'put'], '/dandoDeAltaIngrediente/{ingrediente_pk}', [Ingrediente_controller::class, 'alta'])->name('ingrediente.alta');
 
+Route::post('/registrandoTipoIngrediente', [Tipo_ingrediente_controller::class, 'insertar'])->name('tipo_ingrediente.insertar');
+Route::get('/editarTipoIngrediente/{tipo_ingrediente_pk}', [Tipo_ingrediente_controller::class, 'datosParaEdicion'])->name('tipo_ingrediente.datosParaEdicion');
+Route::put('/editandoTipoIngrediente/{tipo_ingrediente_pk}', [Tipo_ingrediente_controller::class, 'actualizar'])->name('tipo_ingrediente.actualizar');
+Route::match(['get', 'put'], '/dandoDeBajaTipoIngrediente/{tipo_ingrediente_pk}', [Tipo_ingrediente_controller::class, 'baja'])->name('tipo_ingrediente.baja');
+Route::match(['get', 'put'], '/dandoDeAltaTipoIngrediente/{tipo_ingrediente_pk}', [Tipo_ingrediente_controller::class, 'alta'])->name('tipo_ingrediente.alta');
+
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // Reserva ------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -239,8 +250,8 @@ Route::get('/editarGasto/{servicio_pk}', [Servicio_controller::class, 'datosPara
 Route::put('/editandoGasto/{servicio_pk}', [Servicio_controller::class, 'actualizar'])->name('gasto.actualizar');
 
 Route::post('/registrandoTipoGasto', [Tipo_gasto_controller::class, 'insertar'])->name('tipo_gasto.insertar');
-Route::get('/editarTipoGasto/{tipo_gasto_pk}', [Tipo_Gasto_controller::class, 'datosParaEdicion'])->name('tipo_gasto.datosParaEdicion');
-Route::put('/editandoTipoGasto/{tipo_gasto_pk}', [Tipo_Gasto_controller::class, 'actualizar'])->name('tipo_gasto.actualizar');
+Route::get('/editarTipoGasto/{tipo_gasto_pk}', [Tipo_gasto_controller::class, 'datosParaEdicion'])->name('tipo_gasto.datosParaEdicion');
+Route::put('/editandoTipoGasto/{tipo_gasto_pk}', [Tipo_gasto_controller::class, 'actualizar'])->name('tipo_gasto.actualizar');
 Route::match(['get', 'put'], '/dandoDeBajaTipoGasto/{tipo_gasto_pk}', [Tipo_gasto_controller::class, 'baja'])->name('tipo_gasto.baja');
 Route::match(['get', 'put'], '/dandoDeAltaTipoGasto/{tipo_gasto_pk}', [Tipo_gasto_controller::class, 'alta'])->name('tipo_gasto.alta');
 

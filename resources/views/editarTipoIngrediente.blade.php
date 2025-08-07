@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('img/monalezza.ico') }}" rel="icon">
-    <title>Edición de Ingrediente - La Monalezza</title>
+    <title>Edición de Tipo de Ingrediente - La Monalezza</title>
     {{-- Tailwind --}}
     @vite('resources/css/app.css')
 </head>
@@ -16,25 +16,16 @@
         @include('sidebar')
 
         <div class="flex-grow overflow-y-auto p-4">
-            <h1 class="text-2xl font-bold mb-4">Edición de Ingrediente</h1>
+            <h1 class="text-2xl font-bold mb-4">Edición de Tipo de Ingrediente</h1>
             <div class="bg-white shadow-md rounded-lg p-4">
-                <form action="{{ route('ingrediente.actualizar', $datosIngrediente->ingrediente_pk) }}" method="post">
+                <form action="{{ route('tipo_ingrediente.actualizar', $datosTipo_ingrediente->tipo_ingrediente_pk) }}" method="post">
                     @csrf
                     @method('put')
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="mb-4">
-                            <label for="nombre_ingrediente" class="block text-sm font-medium text-gray-700">Nombre del ingrediente</label>
-                            <input type="text" id="nombre_ingrediente" name="nombre_ingrediente" value="{{ $datosIngrediente->nombre_ingrediente }}"
+                            <label for="nombre_tipo_ingrediente" class="block text-sm font-medium text-gray-700">Nombre de tipo de ingrediente</label>
+                            <input type="text" id="nombre_tipo_ingrediente" name="nombre_tipo_ingrediente" value="{{ $datosTipo_ingrediente->nombre_tipo_ingrediente }}"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                        </div>
-                        <div class="mb-4">
-                            <label for="tipo_ingrediente_fk" class="block text-sm font-medium text-gray-700">Tipo de ingrediente</label>
-                            <select name="tipo_ingrediente_fk" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                <option value="">Selecciona el tipo de ingrediente</option>
-                                @foreach ($datosTipoIngrediente as $dato)
-                                    <option @if ($dato->tipo_ingrediente_pk == $datosIngrediente->tipo_ingrediente_fk) selected @endif value="{{ $dato->tipo_ingrediente_pk }}">{{ $dato->nombre_tipo_ingrediente }}</option>
-                                @endforeach
-                            </select>
                         </div>
                     </div>
                     <div class="mt-6 text-right">

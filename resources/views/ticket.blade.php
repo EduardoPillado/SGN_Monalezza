@@ -133,6 +133,16 @@
                         </td>
                         <td>$ {{ number_format($producto->precio_producto * $producto->pivot->cantidad_producto, 2) }}</td>
                     </tr>
+
+                    {{-- Si el producto es personalizable, mostrar los ingredientes --}}
+                    @if ($producto->personalizable)
+                        @foreach ($producto->ingredientesPersonalizados as $dpi)
+                            <tr>
+                                <td class="descripcion-producto">+ {{ $dpi->ingrediente->nombre_ingrediente }}</td>
+                                <td></td>
+                            </tr>
+                        @endforeach
+                    @endif
                 @endforeach
                 <tr>
                     <td colspan="2">&nbsp;</td>

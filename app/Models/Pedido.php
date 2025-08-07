@@ -20,6 +20,8 @@ class Pedido extends Model
         'numero_transaccion',
         'tipo_pago_fk',
         'notas_remision',
+        'pago',
+        'cambio',
         'estatus_pedido'
     ];
     protected $casts = [

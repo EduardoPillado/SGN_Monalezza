@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte de Productos Vendidos</title>
     <style>
         body { font-family: sans-serif; font-size: 12px; margin-bottom: 70px; }
@@ -9,16 +11,18 @@
         th, td { border: 1px solid #000; padding: 6px; text-align: center; }
         th { background-color: #f2f2f2; }
         h2 { text-align: center; }
+        .header-info { margin-bottom: 20px; }
+        .footer { position: fixed; bottom: 0; left: 0; right: 0; text-align: center; height: 60px; }
+        .text-right { text-align: right; }
     </style>
 </head>
 <body>
-    @php
-        $USUARIO = session('usuario');
-    @endphp
-
     <h2>Reporte de Productos Vendidos</h2>
-    <p><strong>Desde:</strong> {{ $fecha_inicio }} &nbsp;&nbsp; <strong>Hasta:</strong> {{ $fecha_fin }}</p>
-    <p style="text-align: right;"><strong>Generado por:</strong> {{ $USUARIO }}</p>
+    <div class="header-info">
+        <p><strong>Período del reporte:</strong> Del {{ $fecha_inicio }} al {{ $fecha_fin }}</p>
+        <p><strong>Fecha de generación:</strong> {{ now()->format('d/m/Y H:i:s') }}</p>
+        <p class="text-right"><strong>Generado por:</strong> {{ session('usuario') }}</p>
+    </div>
 
     <table>
         <thead>
@@ -53,7 +57,7 @@
         </tbody>
     </table>
 
-    <div class="footer" style="position: fixed; bottom: 30px; left: 0; right: 0; text-align: center; font-size: 10px;">
+    <div class="footer">
         <img src="{{ public_path("img/monalezza.jpg") }}" alt="La Monalezza Pizzería" style="height: 80px;">
     </div>
 </body>
