@@ -100,6 +100,7 @@ Route::post('/generandoReporteDeProductos', [Reporte_controller::class, 'generar
 Route::post('/registrandoEntradaDeCaja', [Entradas_caja_controller::class, 'insertar'])->name('entradas_caja.insertar');
 Route::get('/entradasDeCaja', [Entradas_caja_controller::class, 'mostrar'])->name('entradas_caja.mostrar');
 Route::post('/registrandoEfectivo', [Entradas_caja_controller::class, 'efectivoInicial'])->name('entradas_caja.efectivoInicial');
+// Route::get('/verificarRegistro', [Entradas_caja_controller::class, 'verificarRegistro']);
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

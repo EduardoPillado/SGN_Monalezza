@@ -129,6 +129,7 @@
                         </div>
                     </div>
                 </form>
+                                
             </div>
             
             <!-- Columna derecha -->
